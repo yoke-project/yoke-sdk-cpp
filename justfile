@@ -3,7 +3,14 @@
 
 # Build this repository's codebase.
 build:
-    @echo "build: nothing to build in yoke-sdk-cpp yet"
+    #!/usr/bin/env bash
+    set -euo pipefail
+    mkdir -p build
+    for source in $(find definitions -name '*.cc' | sort); do
+        object="build/$(echo "${source%.cc}" | tr / _).o"
+        c++ -std=c++17 -Wall -Werror -c -I definitions -o "$object" "$source"
+    done
+    echo "build: the generated definitions compile"
 
 # Run this repository's own checks, with no sibling present.
 test:
@@ -36,7 +43,7 @@ lint:
 fmt:
     #!/usr/bin/env bash
     set -euo pipefail
-    files="$(find . \( -name '*.cpp' -o -name '*.hpp' -o -name '*.cc' -o -name '*.h' \) -not -path './.git/*' | sort)"
+    files="$(find . \( -name '*.cpp' -o -name '*.hpp' -o -name '*.cc' -o -name '*.h' \) -not -path './.git/*' -not -path './definitions/*' | sort)"
     if [[ -z "$files" ]]; then echo "fmt: nothing to format yet"; exit 0; fi
     clang-format --dry-run -Werror $files
     echo "fmt: every file is formatted"
