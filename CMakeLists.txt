@@ -18,7 +18,8 @@ set_source_files_properties(${DEFINITIONS} PROPERTIES COMPILE_OPTIONS "-Wall;-We
 
 add_library(yoke-cpp base/base.cpp plugin/plugin.cpp ${DEFINITIONS})
 target_include_directories(yoke-cpp
-    PUBLIC include definitions
+    PUBLIC $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include> $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/definitions>
+           $<INSTALL_INTERFACE:include>
     PRIVATE base)
 target_link_libraries(yoke-cpp PUBLIC PkgConfig::GRPCXX PkgConfig::PROTOBUF Threads::Threads)
 set_source_files_properties(base/base.cpp plugin/plugin.cpp PROPERTIES COMPILE_OPTIONS "-Wall;-Wextra;-Werror")
@@ -51,3 +52,21 @@ add_executable(harness_test harness/harness_test.cpp)
 target_compile_definitions(harness_test PRIVATE SOURCE_DIR="${CMAKE_SOURCE_DIR}")
 target_compile_options(harness_test PRIVATE -Wall -Wextra -Werror)
 target_link_libraries(harness_test PRIVATE yoke-cpp-harness yoke-cpp-testing)
+
+# What a consumer installs: the library, its public headers, a CMake package config `find_package` resolves,
+# and a pkg-config file for every build that is not CMake. The definitions are the library's own and are
+# not installed: no public header includes them.
+include(GNUInstallDirs)
+include(CMakePackageConfigHelpers)
+install(TARGETS yoke-cpp EXPORT yoke-sdk-cpp-targets ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+install(DIRECTORY include/yoke DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+install(EXPORT yoke-sdk-cpp-targets NAMESPACE yoke:: DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/yoke-sdk-cpp)
+configure_package_config_file(cmake/yoke-sdk-cpp-config.cmake.in ${CMAKE_BINARY_DIR}/yoke-sdk-cpp-config.cmake
+    INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/yoke-sdk-cpp)
+write_basic_package_version_file(${CMAKE_BINARY_DIR}/yoke-sdk-cpp-config-version.cmake COMPATIBILITY SameMinorVersion)
+install(FILES ${CMAKE_BINARY_DIR}/yoke-sdk-cpp-config.cmake ${CMAKE_BINARY_DIR}/yoke-sdk-cpp-config-version.cmake
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/yoke-sdk-cpp)
+# The pkg-config file finds the prefix from where it was installed, so a prefix given at install holds.
+file(RELATIVE_PATH PC_TO_PREFIX "/prefix/${CMAKE_INSTALL_LIBDIR}/pkgconfig" "/prefix")
+configure_file(cmake/yoke-sdk-cpp.pc.in ${CMAKE_BINARY_DIR}/yoke-sdk-cpp.pc @ONLY)
+install(FILES ${CMAKE_BINARY_DIR}/yoke-sdk-cpp.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
