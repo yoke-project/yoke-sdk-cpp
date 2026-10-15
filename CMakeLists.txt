@@ -1,6 +1,6 @@
 # The C++ family: the base and the plugin library, over the committed definitions, on gRPC's C++ API.
 cmake_minimum_required(VERSION 3.25)
-project(yoke-sdk-cpp VERSION 0.4.0 LANGUAGES CXX)
+project(yoke-sdk-cpp VERSION 0.4.1 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
