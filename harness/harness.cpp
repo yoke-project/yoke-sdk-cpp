@@ -60,6 +60,18 @@ struct Harness {
     std::map<std::string, plugin::Command> commands;
     std::map<std::string, plugin::Question> questions;
     std::atomic<bool> ended{false};
+    // The thread reporting what the library surfaces. It reads the unit and writes the socket, so it is
+    // asked to stop and joined before either goes: serve may return, and the state with it, while the
+    // Session is still open.
+    std::thread observer;
+    std::atomic<bool> stopping{false};
+
+    ~Harness() {
+        stopping = true;
+        if (observer.joinable()) {
+            observer.join();
+        }
+    }
 
     void send(const json &line) {
         std::string s = line.dump() + "\n";
@@ -75,7 +87,11 @@ struct Harness {
 
     // Reports everything the library surfaces, in the order it surfaced it.
     void observe() {
-        while (auto event = unit->next()) {
+        while (!stopping) {
+            auto event = unit->next(std::chrono::milliseconds(50));
+            if (!event) {
+                continue;
+            }
             json fields;
             std::string kind;
             bool end = false;
@@ -124,7 +140,7 @@ struct Harness {
                 const plugin::Admission a = u->admission();
                 if (!unit) {
                     unit = std::move(u);
-                    std::thread([this] { observe(); }).detach();
+                    observer = std::thread([this] { observe(); });
                 }
                 auto scope = [](const plugin::Scope &s) {
                     return json{{"capabilities", s.capabilities},
