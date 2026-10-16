@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# The conformance suite against this family's plugin harness: L2, which blocks.
+# The conformance suite against each of this family's harnesses, plugin and interface: L2, which blocks.
 #
 # The suite and the Core it drives are yoke's published pair of binaries, downloaded, authenticated by
 # the digest on their line in yoke's release manifest, and never built: a contributor needs no Go. The
@@ -37,6 +37,10 @@ tar -xzf "$work/$archive" -C "$work" yoke-conformance yoke-core
 echo "conformance: yoke $version, authenticated"
 
 cmake -S "$root" -B "$root/build" -DCMAKE_BUILD_TYPE=RelWithDebInfo > /dev/null
-cmake --build "$root/build" --target yoke-cpp-plugin-harness --parallel > /dev/null
+cmake --build "$root/build" --target yoke-cpp-plugin-harness yoke-cpp-interface-harness --parallel > /dev/null
 mkdir -p "$results"
-"$work/yoke-conformance" --core "$work/yoke-core" --harness "$root/build/yoke-cpp-plugin-harness" | tee "$results/conformance.txt"
+# Each contract the family offers, against its own harness; every one runs, and any failing fails.
+status=0
+"$work/yoke-conformance" --core "$work/yoke-core" --harness "$root/build/yoke-cpp-plugin-harness" | tee "$results/conformance.txt" || status=1
+"$work/yoke-conformance" --core "$work/yoke-core" --harness "$root/build/yoke-cpp-interface-harness" | tee -a "$results/conformance.txt" || status=1
+exit "$status"

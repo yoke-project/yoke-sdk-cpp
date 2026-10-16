@@ -3,12 +3,15 @@
 ## What it is
 
 The C++ family of Yoke's SDKs: the library a C++ program uses to run as a Plugin unit in a Yoke
-instance, over a base it shares with the libraries to come, and the harness that holds it to the
-contract under the conformance suite. Its messages and gRPC services are generated with `protoc` and
+instance, the library an interface client attaches to a channel with — on a local socket, or over TLS
+1.3 at a routable address — over a base they share, and the harnesses that hold each to its contract
+under the conformance suite. Its messages and gRPC services are generated with `protoc` and
 gRPC's C++ plugin.
 
 It is not the Core, and it holds no contract definitions of its own: the C++ it builds on is
-generated from the published definitions, at the version `definitions/record` pins. It is released as
+generated from the published definitions, at the version `definitions/record` pins. The interface
+contract's generated messages are installed beside the headers, because the interface library surfaces
+them. It is released as
 its source: an archive of the tagged tree, which `cmake --install` turns into the library, its headers,
 a CMake package config for `find_package(yoke-sdk-cpp)` and a `yoke-sdk-cpp.pc` for `pkg-config`. No
 package manager is involved.
@@ -17,28 +20,30 @@ package manager is involved.
 
 | Path | What it holds |
 | --- | --- |
-| `include/yoke/` | The public headers: `base.hpp` and `plugin.hpp` |
+| `include/yoke/` | The public headers: `base.hpp`, `plugin.hpp` and `interface.hpp` |
 | `base/` | What the libraries share: the connection, the envelope, a refusal |
 | `plugin/` | The library a Plugin unit is written with |
-| `harness/` | The library's harness for the conformance suite |
+| `harness/` | The plugin library's harness for the conformance suite |
+| `interface/` | The library an interface client is written with, and the TLS 1.3 it carries itself |
+| `interface-harness/` | The interface library's harness for the conformance suite |
 | `definitions/` | The generated C++ of every contract, and `record`, which pins the definitions' version, digest and generators |
 | `testing/` | What the programs that run the cases share |
 | `cmake/` | The package config and the pkg-config file `cmake --install` writes |
-| `checks/`, `ci/` | This repository's own checks, and the scripts continuous integration runs; `ci/definitions.sh` regenerates `definitions/` |
+| `checks/`, `ci/` | This repository's own checks, and the scripts continuous integration runs; `ci/definitions.sh` regenerates `definitions/`, `ci/conformance.sh` runs the suite against both harnesses, `ci/routable.sh` attaches to the published Core over TLS |
 
 A test's description sits beside the test, as a `.std.md` file.
 
 ## Working on it
 
-A C++ compiler, CMake and `pkg-config`; the development packages of protobuf, gRPC for C++ and
-nlohmann-json; `clang-format` 18.1.8 for `just fmt`, which `ci/install-tools.sh` installs; and
+A C++ compiler, CMake and `pkg-config`; the development packages of protobuf, gRPC for C++, OpenSSL 3
+and nlohmann-json; `clang-format` 18.1.8 for `just fmt`, which `ci/install-tools.sh` installs; and
 [`just`](https://just.systems) 1.58.0 or newer. `just develop` also puts the published verification
 tool, `yoke-verify`, on the `PATH`, which `just test` needs. The `Containerfile` builds a container
 with all of it.
 
 | Command | What it does |
 | --- | --- |
-| `just build` | Configures and builds, with CMake, the definitions, the base, the library and the programs that run their cases |
+| `just build` | Configures and builds, with CMake, the definitions, the base, the two libraries, their harnesses and the programs that run their cases |
 | `just test` | Runs the checks and the programs `just build` made, and checks each description against its tests |
 | `just lint` | Parses every shell script |
 | `just fmt` | Fails, naming each file, when a C++ file is not formatted |

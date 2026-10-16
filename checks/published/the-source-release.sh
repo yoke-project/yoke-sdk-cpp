@@ -22,8 +22,13 @@ published_program() {
   dir="$(mktemp -d)"
   cat > "$dir/main.cpp" <<'EOF'
 #include <cstdio>
+#include <yoke/interface.hpp>
 #include <yoke/plugin.hpp>
-int main() { std::printf("contract %d\n", yoke::plugin_contract()); return 0; }
+int main() {
+    std::printf("contract %d\n", yoke::plugin_contract());
+    std::printf("interface contract %d\n", yoke::iface::contract());
+    return 0;
+}
 EOF
   echo "$dir"
 }
@@ -34,13 +39,16 @@ check_installing_puts_the_package_under_the_prefix() {
   prefix="$(published_prefix)" || return 1
   lib="$(find "$prefix" -name libyoke-cpp.a | head -n1)"
   [[ -n "$lib" ]] || { echo "no libyoke-cpp.a under the prefix"; return 1; }
-  for f in include/yoke/base.hpp include/yoke/plugin.hpp; do
+  for f in include/yoke/base.hpp include/yoke/plugin.hpp include/yoke/interface.hpp include/yoke/interface/v1/interface.pb.h; do
     [[ -f "$prefix/$f" ]] || { echo "no $f under the prefix"; return 1; }
   done
   [[ -n "$(find "$prefix" -name yoke-sdk-cpp-config.cmake)" ]] || { echo "no package config"; return 1; }
   [[ -n "$(find "$prefix" -name yoke-sdk-cpp-config-version.cmake)" ]] || { echo "no package version file"; return 1; }
   [[ -n "$(find "$prefix" -name yoke-sdk-cpp.pc)" ]] || { echo "no pkg-config file"; return 1; }
-  [[ -z "$(find "$prefix" -name '*.pb.h')" ]] || { echo "a generated definition header is installed"; return 1; }
+  # The interface library surfaces its contract's messages, so those are installed; nothing else generated is.
+  local generated
+  generated="$(find "$prefix" -name '*.pb.h' \( -name '*.grpc.pb.h' -o -not -path '*/include/yoke/interface/v1/*' \))"
+  [[ -z "$generated" ]] || { echo "a generated definition header other than the interface contract's messages is installed: $generated"; return 1; }
 }
 
 # std: yoke-sdk-cpp:the-source-release.02
@@ -57,7 +65,7 @@ target_link_libraries(consumer PRIVATE yoke::yoke-cpp)
 EOF
   cmake -S "$dir" -B "$dir/build" -DCMAKE_PREFIX_PATH="$prefix" > /dev/null 2>&1 &&
     cmake --build "$dir/build" > /dev/null 2>&1 || { echo "a CMake consumer does not build against the package"; return 1; }
-  "$dir/build/consumer" | grep -qE '^contract [0-9]+$' || { echo "the consumer did not print the contract"; return 1; }
+  "$dir/build/consumer" | grep -cE '^(interface )?contract [0-9]+$' | grep -qx 2 || { echo "the consumer did not print both contracts"; return 1; }
 }
 
 # std: yoke-sdk-cpp:the-source-release.03
@@ -70,7 +78,7 @@ check_any_other_build_resolves_it() {
     { echo "pkg-config does not resolve yoke-sdk-cpp"; return 1; }
   # shellcheck disable=SC2086
   c++ -std=c++17 -o "$dir/consumer" "$dir/main.cpp" $flags 2> /dev/null || { echo "a program does not build with the flags pkg-config gives"; return 1; }
-  "$dir/consumer" | grep -qE '^contract [0-9]+$' || { echo "the consumer did not print the contract"; return 1; }
+  "$dir/consumer" | grep -cE '^(interface )?contract [0-9]+$' | grep -qx 2 || { echo "the consumer did not print both contracts"; return 1; }
 }
 
 # std: yoke-sdk-cpp:the-source-release.04
