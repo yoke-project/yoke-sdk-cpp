@@ -16,7 +16,7 @@
 | **Label** | blocking |
 | **Precondition** | a clean checkout, built |
 | **Action** | install it under an empty prefix |
-| **Expected** | the prefix holds `include/yoke/base.hpp` and `include/yoke/plugin.hpp`, the library `libyoke-cpp.a`, `yoke-sdk-cpp-config.cmake` with its version file, and `yoke-sdk-cpp.pc`; no generated definition header is installed |
+| **Expected** | the prefix holds `include/yoke/base.hpp`, `include/yoke/plugin.hpp` and `include/yoke/interface.hpp`, the library `libyoke-cpp.a`, `yoke-sdk-cpp-config.cmake` with its version file, and `yoke-sdk-cpp.pc`; of the generated definitions, only the interface contract's messages are installed, under `include/yoke/interface/v1/` — no generated service, and nothing of the plugin or the administrative contract |
 
 ## yoke-sdk-cpp:the-source-release.02 — a CMake build resolves it with `find_package` and links
 
@@ -27,9 +27,9 @@
 | **Method** | test |
 | **Not applicable in** | — |
 | **Label** | blocking |
-| **Precondition** | the family installed under a prefix, and a program calling `yoke::plugin_contract` |
+| **Precondition** | the family installed under a prefix, and a program calling `yoke::plugin_contract` and `yoke::iface::contract` |
 | **Action** | configure the program with `find_package(yoke-sdk-cpp)` against that prefix, link it to `yoke::yoke-cpp`, and run it |
-| **Expected** | it builds and prints the contract version the library speaks |
+| **Expected** | it builds and prints the contract version each library speaks |
 
 ## yoke-sdk-cpp:the-source-release.03 — any other build resolves it with `pkg-config` and links
 
@@ -42,7 +42,7 @@
 | **Label** | blocking |
 | **Precondition** | the family installed under a prefix, and the same program |
 | **Action** | compile it with the flags `pkg-config --cflags --libs yoke-sdk-cpp` gives, and run it |
-| **Expected** | it builds and prints the same contract version |
+| **Expected** | it builds and prints the same contract versions |
 
 ## yoke-sdk-cpp:the-source-release.04 — the family states one version
 
