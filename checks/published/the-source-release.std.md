@@ -69,3 +69,16 @@
 | **Precondition** | a clean checkout |
 | **Action** | read the `release` verb and the release workflow |
 | **Expected** | the verb runs the published release verb with `-source yoke-sdk-cpp`, and the workflow runs it on a `v` tag and keeps the lines it prints |
+
+## yoke-sdk-cpp:the-source-release.06 — the library alone is configured and built with nothing the harnesses use
+
+| Field | Value |
+| --- | --- |
+| **Cites** | prj_structure/40 E1 · prj_structure/97 §What C and C++ are consumed as |
+| **Level** | L1 |
+| **Method** | check |
+| **Not applicable in** | — |
+| **Label** | blocking |
+| **Precondition** | this tree, configured with `YOKE_SDK_CPP_TESTING` off and nlohmann-json made unfindable |
+| **Action** | configure it, and build the library |
+| **Expected** | the configure succeeds and declares no harness and no case program; the library builds — a consumer of the source release needs only what the library links. In this repository's own build the option is on, and the harnesses and the cases are built as before |
