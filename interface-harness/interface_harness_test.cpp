@@ -255,9 +255,9 @@ void test_the_suite_is_run_against_the_interface_harness() {
     std::string script = check::read(SOURCE_DIR "/ci/conformance.sh");
     REQUIRE(script.find("--target yoke-cpp-plugin-harness yoke-cpp-interface-harness") != std::string::npos,
             "ci/conformance.sh does not build the interface harness");
-    REQUIRE(script.find("--harness \"$root/build/yoke-cpp-interface-harness\"") != std::string::npos,
+    REQUIRE(script.find("run_suite \"$root/build/yoke-cpp-interface-harness\"") != std::string::npos,
             "ci/conformance.sh does not run the suite against the interface harness");
-    REQUIRE(script.find("--harness \"$root/build/yoke-cpp-plugin-harness\"") != std::string::npos,
+    REQUIRE(script.find("run_suite \"$root/build/yoke-cpp-plugin-harness\"") != std::string::npos,
             "ci/conformance.sh no longer runs the suite against the plugin harness");
 }
 
