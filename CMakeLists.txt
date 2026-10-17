@@ -40,6 +40,7 @@ foreach(program base/base_test plugin/plugin_test interface/interface_test inter
     target_compile_options(${name} PRIVATE -Wall -Wextra -Werror)
     target_link_libraries(${name} PRIVATE yoke-cpp-testing OpenSSL::SSL)
 endforeach()
+target_compile_definitions(interface_test PRIVATE YOKE_CPP_LIBRARY="$<TARGET_FILE:yoke-cpp>")
 
 # The harness the conformance suite drives, and its cases. It speaks to the suite in JSON, through
 # nlohmann-json, and to the Core only through the library under test.

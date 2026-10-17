@@ -1,4 +1,5 @@
 #include <atomic>
+#include <cstdio>
 #include <condition_variable>
 #include <cstring>
 #include <future>
@@ -471,6 +472,20 @@ void test_closing_an_attachment_ends_it_in_order() {
     REQUIRE(took < 1000, "close returned after ", took, " ms, and not once the Core ended the attachment");
 }
 
+// std: yoke-sdk-cpp:the-interface-library.09
+void test_a_panel_links_nothing_of_the_administrative_contract() {
+    std::string symbols;
+    FILE *nm = popen("nm -C --defined-only " YOKE_CPP_LIBRARY " 2>/dev/null", "r");
+    REQUIRE(nm != nullptr, "the library's symbols cannot be listed");
+    char line[4096];
+    while (fgets(line, sizeof line, nm) != nullptr) {
+        symbols += line;
+    }
+    REQUIRE(pclose(nm) == 0 && !symbols.empty(), "nm read no symbols from " YOKE_CPP_LIBRARY);
+    REQUIRE(symbols.find("yoke::administrative::") == std::string::npos,
+            "the library defines symbols of the administrative contract, which a panel would link");
+}
+
 } // namespace
 
 int main() {
@@ -485,5 +500,6 @@ int main() {
         {"yoke-sdk-cpp:the-interface-library.07",
          test_a_streams_delivery_is_read_where_its_answer_says_it_arrives},
         {"yoke-sdk-cpp:the-interface-library.08", test_closing_an_attachment_ends_it_in_order},
+        {"yoke-sdk-cpp:the-interface-library.09", test_a_panel_links_nothing_of_the_administrative_contract},
     });
 }
