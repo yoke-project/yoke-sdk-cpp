@@ -14,8 +14,10 @@ pkg_check_modules(PROTOBUF REQUIRED IMPORTED_TARGET protobuf)
 find_package(Threads REQUIRED)
 find_package(OpenSSL 3 REQUIRED)
 
-# The generated definitions, compiled as they were generated.
-file(GLOB_RECURSE DEFINITIONS CONFIGURE_DEPENDS definitions/*.cc)
+# The generated definitions of the two contracts the library speaks, compiled as they were generated. The
+# administrative contract's are generated beside them and compiled into nothing: a panel built on the
+# library must not link the operations an interface may never issue.
+file(GLOB_RECURSE DEFINITIONS CONFIGURE_DEPENDS definitions/yoke/plugin/*.cc definitions/yoke/interface/*.cc)
 set_source_files_properties(${DEFINITIONS} PROPERTIES COMPILE_OPTIONS "-Wall;-Werror")
 
 add_library(yoke-cpp base/base.cpp plugin/plugin.cpp interface/interface.cpp interface/tls.cpp ${DEFINITIONS})
