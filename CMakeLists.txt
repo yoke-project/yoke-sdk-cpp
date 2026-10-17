@@ -28,6 +28,11 @@ target_include_directories(yoke-cpp
 target_link_libraries(yoke-cpp PUBLIC PkgConfig::GRPCXX PkgConfig::PROTOBUF Threads::Threads PRIVATE OpenSSL::SSL)
 set_source_files_properties(base/base.cpp plugin/plugin.cpp interface/interface.cpp interface/tls.cpp PROPERTIES COMPILE_OPTIONS "-Wall;-Wextra;-Werror")
 
+# The harnesses and the cases are this repository's own build; a consumer of the source release turns
+# them off, and then needs only what the library links.
+option(YOKE_SDK_CPP_TESTING "build the harnesses and the case programs" ON)
+if(YOKE_SDK_CPP_TESTING)
+
 # The cases, each program reporting its own in the form the record writer reads.
 add_library(yoke-cpp-testing STATIC testing/check.cpp testing/channel.cpp testing/core.cpp)
 target_include_directories(yoke-cpp-testing PUBLIC testing)
@@ -70,6 +75,8 @@ target_include_directories(interface_harness_test PRIVATE base)
 target_compile_definitions(interface_harness_test PRIVATE SOURCE_DIR="${CMAKE_SOURCE_DIR}")
 target_compile_options(interface_harness_test PRIVATE -Wall -Wextra -Werror)
 target_link_libraries(interface_harness_test PRIVATE yoke-cpp-iharness yoke-cpp-testing)
+
+endif()
 
 # What a consumer installs: the library, its public headers, a CMake package config `find_package` resolves,
 # and a pkg-config file for every build that is not CMake. Of the definitions, the interface contract's
