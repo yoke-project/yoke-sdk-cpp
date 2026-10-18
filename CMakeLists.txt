@@ -1,7 +1,7 @@
 # The C++ family: the base, the plugin library and the interface library, over the committed definitions,
 # on gRPC's C++ API; the interface library carries TLS 1.3 itself, with OpenSSL.
 cmake_minimum_required(VERSION 3.25)
-project(yoke-sdk-cpp VERSION 0.6.0 LANGUAGES CXX)
+project(yoke-sdk-cpp VERSION 0.7.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
