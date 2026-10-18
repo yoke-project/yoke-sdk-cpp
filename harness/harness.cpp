@@ -1,4 +1,5 @@
 #include "harness.hpp"
+#include <algorithm>
 
 #include <atomic>
 #include <cerrno>
@@ -40,6 +41,12 @@ const plugin::Declaration &declaration() {
 }
 
 namespace {
+
+// The suite names the transports `ordered`, `framed` and `shared_object`; the library says them in words.
+std::string underscored(std::string words) {
+    std::replace(words.begin(), words.end(), ' ', '_');
+    return words;
+}
 
 int asked_pipe = -1;
 volatile std::sig_atomic_t asked = 0;
@@ -104,7 +111,8 @@ struct Harness {
                 std::lock_guard<std::mutex> hold(mu);
                 questions[q->id] = *q;
             } else if (auto *a = std::get_if<plugin::Activated>(&*event)) {
-                kind = "activated", fields = {{"stream", a->stream}, {"transport", a->transport}};
+                kind = "activated",
+                fields = {{"stream", a->stream}, {"transport", underscored(a->transport)}};
             } else if (auto *s = std::get_if<plugin::Stopped>(&*event)) {
                 kind = "stopped", fields = {{"stream", s->stream}};
             } else if (auto *r = std::get_if<plugin::Refused>(&*event)) {

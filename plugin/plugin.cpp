@@ -14,7 +14,11 @@
 #include <sstream>
 #include <thread>
 
+#include <linux/futex.h>
+#include <sys/mman.h>
 #include <sys/socket.h>
+#include <sys/stat.h>
+#include <sys/syscall.h>
 #include <sys/un.h>
 #include <unistd.h>
 
@@ -119,10 +123,93 @@ int bind_unit(const std::string &path) {
     return fd;
 }
 
-// One activated stream: the library's connection to its transport, and the next sequence.
+// The producer's side of the shared ring, layout 1: a frame is published into the slot its sequence
+// selects, and every reader waiting on the shared word is woken.
+class Ring {
+  public:
+    // Maps the ring a descriptor names, for writing, and reads its geometry from its header; null, and the
+    // reason, when the memory is not a ring this library writes.
+    static std::unique_ptr<Ring> open(int fd, std::string *why) {
+        struct stat info {};
+        if (::fstat(fd, &info) != 0 || info.st_size < static_cast<off_t>(header_size)) {
+            *why = "the memory handed is shorter than a ring's header";
+            return nullptr;
+        }
+        auto size = static_cast<std::size_t>(info.st_size);
+        void *mem = ::mmap(nullptr, size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+        if (mem == MAP_FAILED) {
+            *why = std::string("the ring cannot be mapped: ") + std::strerror(errno);
+            return nullptr;
+        }
+        std::unique_ptr<Ring> ring(new Ring(static_cast<unsigned char *>(mem), size));
+        std::uint32_t version, slots, capacity;
+        std::memcpy(&version, ring->mem_ + 8, 4);
+        std::memcpy(&slots, ring->mem_ + 12, 4);
+        std::memcpy(&capacity, ring->mem_ + 16, 4);
+        if (std::memcmp(ring->mem_, "YOKERING", 8) != 0) {
+            *why = "the memory handed is not a ring";
+        } else if (version != 1) {
+            *why = "the ring is of layout " + std::to_string(version) + "; this library writes layout 1";
+        } else if (slots == 0 ||
+                   header_size + static_cast<std::uint64_t>(slots) * (slot_header + capacity) > size) {
+            *why = "the ring's geometry, " + std::to_string(slots) + " slots of " + std::to_string(capacity) +
+                   " bytes, does not fit its " + std::to_string(size) + " bytes";
+        } else {
+            ring->slots_ = slots;
+            ring->capacity_ = capacity;
+            ring->published_ =
+                __atomic_load_n(reinterpret_cast<std::uint64_t *>(ring->mem_ + 24), __ATOMIC_ACQUIRE);
+            return ring;
+        }
+        return nullptr;
+    }
+
+    ~Ring() { ::munmap(mem_, size_); }
+    Ring(const Ring &) = delete;
+    Ring &operator=(const Ring &) = delete;
+
+    // Writes one frame and wakes every waiter; false, and the reason, for a frame larger than a slot.
+    bool publish(std::uint64_t clock, std::string_view payload, std::string *why) {
+        if (payload.size() > capacity_) {
+            *why = "the frame is " + std::to_string(payload.size()) +
+                   " bytes, and a slot of this ring holds " + std::to_string(capacity_);
+            return false;
+        }
+        std::uint64_t n = published_ + 1;
+        unsigned char *slot = mem_ + header_size + ((n - 1) % slots_) * (slot_header + capacity_);
+        auto *sequence = reinterpret_cast<std::uint64_t *>(slot);
+        __atomic_store_n(sequence, 0, __ATOMIC_RELEASE);
+        std::memcpy(slot + 8, &clock, 8);
+        auto length = static_cast<std::uint32_t>(payload.size());
+        std::memcpy(slot + 16, &length, 4);
+        std::memcpy(slot + slot_header, payload.data(), payload.size());
+        __atomic_store_n(sequence, n, __ATOMIC_RELEASE);
+        __atomic_store_n(reinterpret_cast<std::uint64_t *>(mem_ + 24), n, __ATOMIC_RELEASE);
+        auto *wake = reinterpret_cast<std::uint32_t *>(mem_ + 32);
+        __atomic_add_fetch(wake, 1, __ATOMIC_ACQ_REL);
+        // A reader in another process waits on this word, so the wake is shared and not private.
+        ::syscall(SYS_futex, wake, FUTEX_WAKE, 0x7fffffff, nullptr, nullptr, 0);
+        published_ = n;
+        return true;
+    }
+
+  private:
+    static constexpr std::size_t header_size = 64, slot_header = 32;
+
+    Ring(unsigned char *mem, std::size_t size) : mem_(mem), size_(size) {}
+
+    unsigned char *mem_;
+    std::size_t size_;
+    std::uint32_t slots_ = 0, capacity_ = 0;
+    std::uint64_t published_ = 0;
+};
+
+// One activated stream: the library's connection to its transport, and the next sequence. On the shared
+// ring the connection is held for the stream's life, and the frames go into the ring.
 struct Flow {
     int fd = -1;
     bool framed = false;
+    std::unique_ptr<Ring> ring;
     std::mutex mu;
     std::uint64_t next = 0;
 
@@ -133,8 +220,58 @@ struct Flow {
     }
 };
 
+// Reaches a stream's ring: connects to the socket the activation names and takes the descriptor the Core
+// hands the first connection, on one byte; the reason when it cannot.
+std::shared_ptr<Flow> connect_ring(const pluginv1::Control::Activate &a, std::string *why) {
+    sockaddr_un addr{};
+    addr.sun_family = AF_UNIX;
+    if (a.address().size() >= sizeof addr.sun_path) {
+        *why =
+            "the ring of " + a.stream() + " at " + a.address() + " cannot be reached: the path is too long";
+        return nullptr;
+    }
+    std::memcpy(addr.sun_path, a.address().c_str(), a.address().size() + 1);
+    auto f = std::make_shared<Flow>();
+    f->fd = ::socket(AF_UNIX, SOCK_SEQPACKET | SOCK_CLOEXEC, 0);
+    if (f->fd < 0 || ::connect(f->fd, reinterpret_cast<sockaddr *>(&addr), sizeof addr) != 0) {
+        *why = "the ring of " + a.stream() + " at " + a.address() +
+               " cannot be reached: " + std::strerror(errno);
+        return nullptr;
+    }
+    char byte;
+    iovec iov{&byte, 1};
+    alignas(cmsghdr) char control[CMSG_SPACE(sizeof(int))] = {};
+    msghdr m{};
+    m.msg_iov = &iov;
+    m.msg_iovlen = 1;
+    m.msg_control = control;
+    m.msg_controllen = sizeof control;
+    if (::recvmsg(f->fd, &m, MSG_CMSG_CLOEXEC) < 0) {
+        *why = "the ring of " + a.stream() + ": no descriptor was handed: " + std::strerror(errno);
+        return nullptr;
+    }
+    cmsghdr *c = CMSG_FIRSTHDR(&m);
+    if (c == nullptr || c->cmsg_level != SOL_SOCKET || c->cmsg_type != SCM_RIGHTS) {
+        *why = "the ring of " + a.stream() + ": no descriptor was handed";
+        return nullptr;
+    }
+    int memory;
+    std::memcpy(&memory, CMSG_DATA(c), sizeof memory);
+    std::string fault;
+    f->ring = Ring::open(memory, &fault);
+    ::close(memory);
+    if (f->ring == nullptr) {
+        *why = "the ring of " + a.stream() + ": " + fault;
+        return nullptr;
+    }
+    return f;
+}
+
 // Reaches the transport an activation names, as the Core created it; the reason when it cannot.
 std::shared_ptr<Flow> connect_flow(const pluginv1::Control::Activate &a, std::string *why) {
+    if (a.transport() == pluginv1::Control::Activate::TRANSPORT_SHARED_OBJECT) {
+        return connect_ring(a, why);
+    }
     int type;
     switch (a.transport()) {
     case pluginv1::Control::Activate::TRANSPORT_ORDERED:
@@ -317,8 +454,9 @@ struct Unit::State {
                 ::shutdown(former->fd, SHUT_RDWR);
             }
             acknowledge(e.message_id(), pluginv1::Ack::OUTCOME_DONE, "");
-            bool is_framed = a.transport() == pluginv1::Control::Activate::TRANSPORT_FRAMED;
-            push(Activated{a.stream(), is_framed ? "framed" : "ordered", a.address()});
+            push(Activated{a.stream(),
+                           spoken(pluginv1::Control::Activate::Transport_Name(a.transport()), "TRANSPORT_"),
+                           a.address()});
         } else if (e.has_control() && e.control().has_stop()) {
             const std::string &stream_id = e.control().stop().stream();
             std::shared_ptr<Flow> f;
@@ -441,6 +579,8 @@ std::unique_ptr<Unit> Unit::start(const Declaration &declaration, const Getenv &
     request.set_protocol(static_cast<std::uint32_t>(plugin_contract()));
     request.set_language("cpp");
     request.set_sdk_line(sdk_line);
+    // This library writes the shared ring, so a stream of it that tolerates loss may be carried there.
+    request.add_transports(pluginv1::Control::Activate::TRANSPORT_SHARED_OBJECT);
     // The surface the registration claims: the declaration again, from the same value.
     auto *claimed = request.mutable_declared();
     for (const auto &c : declaration.capabilities) {
@@ -625,6 +765,16 @@ void Unit::emit(std::string_view stream, std::string_view payload) {
     }
     std::lock_guard<std::mutex> lock(f->mu);
     std::uint64_t sequence = ++f->next;
+    if (f->ring != nullptr) {
+        std::string why;
+        if (!f->ring->publish(static_cast<std::uint64_t>(now_ns()), payload, &why)) {
+            f->next--;
+            // Refused as an oversized datagram is on the framed transport: the transport took nothing.
+            throw Refusal("stream.inactive",
+                          "the transport of " + std::string(stream) + " took nothing: " + why);
+        }
+        return;
+    }
     std::string message;
     if (f->framed) {
         message.resize(16);

@@ -225,3 +225,17 @@
 | **Precondition** | one stream activated on the ordered transport |
 | **Action** | the channel stops it; the author emits on it |
 | **Expected** | the library closes its connection, acknowledges the stop as done, and hands the author the stop; the emission is refused with `stream.inactive`, and nothing reaches the socket |
+
+## yoke-sdk-cpp:the-plugin-library.18 — the registration offers the shared ring; activated on it, the library takes the descriptor handed and Emit publishes into the ring
+
+| Field | Value |
+| --- | --- |
+| **Cites** | arch/50-plugin-surface/07 §The shared ring · arch/50-plugin-surface/08 §The registration exchange |
+| **Level** | L1 |
+| **Method** | test |
+| **Not applicable in** | — |
+| **Label** | blocking |
+| **Precondition** | a started unit; a ring of layout 1 behind a packet socket that hands its descriptor to the first connection, as the Core does |
+| **Action** | read the registration the channel received; activate a stream on the shared object at that socket; emit three payloads; then one larger than a slot |
+| **Expected** | the registration offers the shared object; the activation is acknowledged done and the author is handed it, naming the transport `shared object`; frames 1, 2 and 3 are in their slots with the payloads emitted, a clock each, and the count published is 3; the payload larger than a slot is refused with `stream.inactive`, naming the capacity, and nothing more is published |
+

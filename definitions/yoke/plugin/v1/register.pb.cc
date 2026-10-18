@@ -25,7 +25,9 @@ namespace plugin {
 namespace v1 {
 PROTOBUF_CONSTEXPR RegisterRequest::RegisterRequest(
     ::_pbi::ConstantInitialized): _impl_{
-    /*decltype(_impl_.plugin_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
+    /*decltype(_impl_.transports_)*/{}
+  , /*decltype(_impl_._transports_cached_byte_size_)*/{0}
+  , /*decltype(_impl_.plugin_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
   , /*decltype(_impl_.unit_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
   , /*decltype(_impl_.token_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
   , /*decltype(_impl_.artifact_version_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
@@ -116,6 +118,7 @@ const uint32_t TableStruct_yoke_2fplugin_2fv1_2fregister_2eproto::offsets[] PROT
   PROTOBUF_FIELD_OFFSET(::yoke::plugin::v1::RegisterRequest, _impl_.language_),
   PROTOBUF_FIELD_OFFSET(::yoke::plugin::v1::RegisterRequest, _impl_.sdk_line_),
   PROTOBUF_FIELD_OFFSET(::yoke::plugin::v1::RegisterRequest, _impl_.declared_),
+  PROTOBUF_FIELD_OFFSET(::yoke::plugin::v1::RegisterRequest, _impl_.transports_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::yoke::plugin::v1::Surface, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -152,9 +155,9 @@ const uint32_t TableStruct_yoke_2fplugin_2fv1_2fregister_2eproto::offsets[] PROT
 };
 static const ::_pbi::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, -1, sizeof(::yoke::plugin::v1::RegisterRequest)},
-  { 14, -1, -1, sizeof(::yoke::plugin::v1::Surface)},
-  { 25, -1, -1, sizeof(::yoke::plugin::v1::RegisterResponse)},
-  { 39, -1, -1, sizeof(::yoke::plugin::v1::HeartbeatTerms)},
+  { 15, -1, -1, sizeof(::yoke::plugin::v1::Surface)},
+  { 26, -1, -1, sizeof(::yoke::plugin::v1::RegisterResponse)},
+  { 40, -1, -1, sizeof(::yoke::plugin::v1::HeartbeatTerms)},
 };
 
 static const ::_pb::Message* const file_default_instances[] = {
@@ -166,47 +169,51 @@ static const ::_pb::Message* const file_default_instances[] = {
 
 const char descriptor_table_protodef_yoke_2fplugin_2fv1_2fregister_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
   "\n\035yoke/plugin/v1/register.proto\022\016yoke.pl"
-  "ugin.v1\032\036google/protobuf/duration.proto\""
-  "\271\001\n\017RegisterRequest\022\016\n\006plugin\030\001 \001(\t\022\014\n\004u"
-  "nit\030\002 \001(\t\022\r\n\005token\030\003 \001(\t\022\020\n\010protocol\030\004 \001"
-  "(\r\022\030\n\020artifact_version\030\005 \001(\t\022\020\n\010language"
-  "\030\006 \001(\t\022\020\n\010sdk_line\030\007 \001(\t\022)\n\010declared\030\010 \001"
-  "(\0132\027.yoke.plugin.v1.Surface\"h\n\007Surface\022\024"
-  "\n\014capabilities\030\001 \003(\t\022\017\n\007streams\030\002 \003(\t\022\020\n"
-  "\010commands\030\003 \003(\t\022\017\n\007queries\030\004 \003(\t\022\023\n\013occu"
-  "rrences\030\005 \003(\t\"\245\003\n\020RegisterResponse\0229\n\007ou"
-  "tcome\030\001 \001(\0162(.yoke.plugin.v1.RegisterRes"
-  "ponse.Outcome\022$\n\005stage\030\002 \001(\0162\025.yoke.plug"
-  "in.v1.Stage\022\014\n\004code\030\003 \001(\t\022\017\n\007message\030\004 \001"
-  "(\t\022\022\n\nsession_id\030\005 \001(\t\022(\n\007granted\030\006 \001(\0132"
-  "\027.yoke.plugin.v1.Surface\022)\n\010withheld\030\007 \001"
-  "(\0132\027.yoke.plugin.v1.Surface\0221\n\theartbeat"
-  "\030\010 \001(\0132\036.yoke.plugin.v1.HeartbeatTerms\"u"
-  "\n\007Outcome\022\027\n\023OUTCOME_UNSPECIFIED\020\000\022\024\n\020OU"
-  "TCOME_ACCEPTED\020\001\022&\n\"OUTCOME_ACCEPTED_WIT"
-  "H_RESTRICTIONS\020\002\022\023\n\017OUTCOME_REFUSED\020\003\"P\n"
-  "\016HeartbeatTerms\022+\n\010interval\030\001 \001(\0132\031.goog"
-  "le.protobuf.Duration\022\021\n\ttolerance\030\002 \001(\r*"
-  "\217\002\n\005Stage\022\025\n\021STAGE_UNSPECIFIED\020\000\022\024\n\020STAG"
-  "E_STRUCTURAL\020\001\022\022\n\016STAGE_IDENTITY\020\002\022\036\n\032ST"
-  "AGE_ADMINISTRATIVE_STATE\020\003\022\030\n\024STAGE_AUTH"
-  "ENTICATION\020\004\022\027\n\023STAGE_COMPATIBILITY\020\005\022!\n"
-  "\035STAGE_DECLARATION_CONSISTENCY\020\006\022\027\n\023STAG"
-  "E_AUTHORISATION\020\007\022\027\n\023STAGE_UNIT_CONFLICT"
-  "\020\010\022\035\n\031STAGE_SESSION_PREPARATION\020\t2Y\n\010Reg"
-  "ister\022M\n\010Register\022\037.yoke.plugin.v1.Regis"
-  "terRequest\032 .yoke.plugin.v1.RegisterResp"
-  "onseB<Z:github.com/yoke-project/yoke/pro"
-  "to/yoke/plugin/v1;pluginv1b\006proto3"
+  "ugin.v1\032\036google/protobuf/duration.proto\032"
+  "\035yoke/plugin/v1/families.proto\"\371\001\n\017Regis"
+  "terRequest\022\016\n\006plugin\030\001 \001(\t\022\014\n\004unit\030\002 \001(\t"
+  "\022\r\n\005token\030\003 \001(\t\022\020\n\010protocol\030\004 \001(\r\022\030\n\020art"
+  "ifact_version\030\005 \001(\t\022\020\n\010language\030\006 \001(\t\022\020\n"
+  "\010sdk_line\030\007 \001(\t\022)\n\010declared\030\010 \001(\0132\027.yoke"
+  ".plugin.v1.Surface\022>\n\ntransports\030\t \003(\0162*"
+  ".yoke.plugin.v1.Control.Activate.Transpo"
+  "rt\"h\n\007Surface\022\024\n\014capabilities\030\001 \003(\t\022\017\n\007s"
+  "treams\030\002 \003(\t\022\020\n\010commands\030\003 \003(\t\022\017\n\007querie"
+  "s\030\004 \003(\t\022\023\n\013occurrences\030\005 \003(\t\"\245\003\n\020Registe"
+  "rResponse\0229\n\007outcome\030\001 \001(\0162(.yoke.plugin"
+  ".v1.RegisterResponse.Outcome\022$\n\005stage\030\002 "
+  "\001(\0162\025.yoke.plugin.v1.Stage\022\014\n\004code\030\003 \001(\t"
+  "\022\017\n\007message\030\004 \001(\t\022\022\n\nsession_id\030\005 \001(\t\022(\n"
+  "\007granted\030\006 \001(\0132\027.yoke.plugin.v1.Surface\022"
+  ")\n\010withheld\030\007 \001(\0132\027.yoke.plugin.v1.Surfa"
+  "ce\0221\n\theartbeat\030\010 \001(\0132\036.yoke.plugin.v1.H"
+  "eartbeatTerms\"u\n\007Outcome\022\027\n\023OUTCOME_UNSP"
+  "ECIFIED\020\000\022\024\n\020OUTCOME_ACCEPTED\020\001\022&\n\"OUTCO"
+  "ME_ACCEPTED_WITH_RESTRICTIONS\020\002\022\023\n\017OUTCO"
+  "ME_REFUSED\020\003\"P\n\016HeartbeatTerms\022+\n\010interv"
+  "al\030\001 \001(\0132\031.google.protobuf.Duration\022\021\n\tt"
+  "olerance\030\002 \001(\r*\217\002\n\005Stage\022\025\n\021STAGE_UNSPEC"
+  "IFIED\020\000\022\024\n\020STAGE_STRUCTURAL\020\001\022\022\n\016STAGE_I"
+  "DENTITY\020\002\022\036\n\032STAGE_ADMINISTRATIVE_STATE\020"
+  "\003\022\030\n\024STAGE_AUTHENTICATION\020\004\022\027\n\023STAGE_COM"
+  "PATIBILITY\020\005\022!\n\035STAGE_DECLARATION_CONSIS"
+  "TENCY\020\006\022\027\n\023STAGE_AUTHORISATION\020\007\022\027\n\023STAG"
+  "E_UNIT_CONFLICT\020\010\022\035\n\031STAGE_SESSION_PREPA"
+  "RATION\020\t2Y\n\010Register\022M\n\010Register\022\037.yoke."
+  "plugin.v1.RegisterRequest\032 .yoke.plugin."
+  "v1.RegisterResponseB<Z:github.com/yoke-p"
+  "roject/yoke/proto/yoke/plugin/v1;pluginv"
+  "1b\006proto3"
   ;
-static const ::_pbi::DescriptorTable* const descriptor_table_yoke_2fplugin_2fv1_2fregister_2eproto_deps[1] = {
+static const ::_pbi::DescriptorTable* const descriptor_table_yoke_2fplugin_2fv1_2fregister_2eproto_deps[2] = {
   &::descriptor_table_google_2fprotobuf_2fduration_2eproto,
+  &::descriptor_table_yoke_2fplugin_2fv1_2ffamilies_2eproto,
 };
 static ::_pbi::once_flag descriptor_table_yoke_2fplugin_2fv1_2fregister_2eproto_once;
 const ::_pbi::DescriptorTable descriptor_table_yoke_2fplugin_2fv1_2fregister_2eproto = {
-    false, false, 1314, descriptor_table_protodef_yoke_2fplugin_2fv1_2fregister_2eproto,
+    false, false, 1409, descriptor_table_protodef_yoke_2fplugin_2fv1_2fregister_2eproto,
     "yoke/plugin/v1/register.proto",
-    &descriptor_table_yoke_2fplugin_2fv1_2fregister_2eproto_once, descriptor_table_yoke_2fplugin_2fv1_2fregister_2eproto_deps, 1, 4,
+    &descriptor_table_yoke_2fplugin_2fv1_2fregister_2eproto_once, descriptor_table_yoke_2fplugin_2fv1_2fregister_2eproto_deps, 2, 4,
     schemas, file_default_instances, TableStruct_yoke_2fplugin_2fv1_2fregister_2eproto::offsets,
     file_level_metadata_yoke_2fplugin_2fv1_2fregister_2eproto, file_level_enum_descriptors_yoke_2fplugin_2fv1_2fregister_2eproto,
     file_level_service_descriptors_yoke_2fplugin_2fv1_2fregister_2eproto,
@@ -289,7 +296,9 @@ RegisterRequest::RegisterRequest(const RegisterRequest& from)
   : ::PROTOBUF_NAMESPACE_ID::Message() {
   RegisterRequest* const _this = this; (void)_this;
   new (&_impl_) Impl_{
-      decltype(_impl_.plugin_){}
+      decltype(_impl_.transports_){from._impl_.transports_}
+    , /*decltype(_impl_._transports_cached_byte_size_)*/{0}
+    , decltype(_impl_.plugin_){}
     , decltype(_impl_.unit_){}
     , decltype(_impl_.token_){}
     , decltype(_impl_.artifact_version_){}
@@ -360,7 +369,9 @@ inline void RegisterRequest::SharedCtor(
   (void)arena;
   (void)is_message_owned;
   new (&_impl_) Impl_{
-      decltype(_impl_.plugin_){}
+      decltype(_impl_.transports_){arena}
+    , /*decltype(_impl_._transports_cached_byte_size_)*/{0}
+    , decltype(_impl_.plugin_){}
     , decltype(_impl_.unit_){}
     , decltype(_impl_.token_){}
     , decltype(_impl_.artifact_version_){}
@@ -407,6 +418,7 @@ RegisterRequest::~RegisterRequest() {
 
 inline void RegisterRequest::SharedDtor() {
   GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
+  _impl_.transports_.~RepeatedField();
   _impl_.plugin_.Destroy();
   _impl_.unit_.Destroy();
   _impl_.token_.Destroy();
@@ -426,6 +438,7 @@ void RegisterRequest::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
+  _impl_.transports_.Clear();
   _impl_.plugin_.ClearToEmpty();
   _impl_.unit_.ClearToEmpty();
   _impl_.token_.ClearToEmpty();
@@ -519,6 +532,18 @@ const char* RegisterRequest::_InternalParse(const char* ptr, ::_pbi::ParseContex
         if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 66)) {
           ptr = ctx->ParseMessage(_internal_mutable_declared(), ptr);
           CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // repeated .yoke.plugin.v1.Control.Activate.Transport transports = 9;
+      case 9:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 74)) {
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::PackedEnumParser(_internal_mutable_transports(), ptr, ctx);
+          CHK_(ptr);
+        } else if (static_cast<uint8_t>(tag) == 72) {
+          uint64_t val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+          _internal_add_transports(static_cast<::yoke::plugin::v1::Control_Activate_Transport>(val));
         } else
           goto handle_unusual;
         continue;
@@ -624,6 +649,15 @@ uint8_t* RegisterRequest::_InternalSerialize(
         _Internal::declared(this).GetCachedSize(), target, stream);
   }
 
+  // repeated .yoke.plugin.v1.Control.Activate.Transport transports = 9;
+  {
+    int byte_size = _impl_._transports_cached_byte_size_.load(std::memory_order_relaxed);
+    if (byte_size > 0) {
+      target = stream->WriteEnumPacked(
+          9, _impl_.transports_, byte_size, target);
+    }
+  }
+
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
@@ -639,6 +673,23 @@ size_t RegisterRequest::ByteSizeLong() const {
   uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
+
+  // repeated .yoke.plugin.v1.Control.Activate.Transport transports = 9;
+  {
+    size_t data_size = 0;
+    unsigned int count = static_cast<unsigned int>(this->_internal_transports_size());for (unsigned int i = 0; i < count; i++) {
+      data_size += ::_pbi::WireFormatLite::EnumSize(
+        this->_internal_transports(static_cast<int>(i)));
+    }
+    if (data_size > 0) {
+      total_size += 1 +
+        ::_pbi::WireFormatLite::Int32Size(static_cast<int32_t>(data_size));
+    }
+    int cached_size = ::_pbi::ToCachedSize(data_size);
+    _impl_._transports_cached_byte_size_.store(cached_size,
+                                    std::memory_order_relaxed);
+    total_size += data_size;
+  }
 
   // string plugin = 1;
   if (!this->_internal_plugin().empty()) {
@@ -712,6 +763,7 @@ void RegisterRequest::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const 
   uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
+  _this->_impl_.transports_.MergeFrom(from._impl_.transports_);
   if (!from._internal_plugin().empty()) {
     _this->_internal_set_plugin(from._internal_plugin());
   }
@@ -756,6 +808,7 @@ void RegisterRequest::InternalSwap(RegisterRequest* other) {
   auto* lhs_arena = GetArenaForAllocation();
   auto* rhs_arena = other->GetArenaForAllocation();
   _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  _impl_.transports_.InternalSwap(&other->_impl_.transports_);
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
       &_impl_.plugin_, lhs_arena,
       &other->_impl_.plugin_, rhs_arena
