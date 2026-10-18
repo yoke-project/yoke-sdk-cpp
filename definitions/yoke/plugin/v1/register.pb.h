@@ -32,6 +32,7 @@
 #include <google/protobuf/generated_enum_reflection.h>
 #include <google/protobuf/unknown_field_set.h>
 #include <google/protobuf/duration.pb.h>
+#include "yoke/plugin/v1/families.pb.h"
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
 #define PROTOBUF_INTERNAL_EXPORT_yoke_2fplugin_2fv1_2fregister_2eproto
@@ -257,6 +258,7 @@ class RegisterRequest final :
   // accessors -------------------------------------------------------
 
   enum : int {
+    kTransportsFieldNumber = 9,
     kPluginFieldNumber = 1,
     kUnitFieldNumber = 2,
     kTokenFieldNumber = 3,
@@ -266,6 +268,23 @@ class RegisterRequest final :
     kDeclaredFieldNumber = 8,
     kProtocolFieldNumber = 4,
   };
+  // repeated .yoke.plugin.v1.Control.Activate.Transport transports = 9;
+  int transports_size() const;
+  private:
+  int _internal_transports_size() const;
+  public:
+  void clear_transports();
+  private:
+  ::yoke::plugin::v1::Control_Activate_Transport _internal_transports(int index) const;
+  void _internal_add_transports(::yoke::plugin::v1::Control_Activate_Transport value);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField<int>* _internal_mutable_transports();
+  public:
+  ::yoke::plugin::v1::Control_Activate_Transport transports(int index) const;
+  void set_transports(int index, ::yoke::plugin::v1::Control_Activate_Transport value);
+  void add_transports(::yoke::plugin::v1::Control_Activate_Transport value);
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField<int>& transports() const;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField<int>* mutable_transports();
+
   // string plugin = 1;
   void clear_plugin();
   const std::string& plugin() const;
@@ -385,6 +404,8 @@ class RegisterRequest final :
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
   struct Impl_ {
+    ::PROTOBUF_NAMESPACE_ID::RepeatedField<int> transports_;
+    mutable std::atomic<int> _transports_cached_byte_size_;
     ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr plugin_;
     ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr unit_;
     ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr token_;
@@ -1553,6 +1574,49 @@ inline void RegisterRequest::set_allocated_declared(::yoke::plugin::v1::Surface*
   }
   _impl_.declared_ = declared;
   // @@protoc_insertion_point(field_set_allocated:yoke.plugin.v1.RegisterRequest.declared)
+}
+
+// repeated .yoke.plugin.v1.Control.Activate.Transport transports = 9;
+inline int RegisterRequest::_internal_transports_size() const {
+  return _impl_.transports_.size();
+}
+inline int RegisterRequest::transports_size() const {
+  return _internal_transports_size();
+}
+inline void RegisterRequest::clear_transports() {
+  _impl_.transports_.Clear();
+}
+inline ::yoke::plugin::v1::Control_Activate_Transport RegisterRequest::_internal_transports(int index) const {
+  return static_cast< ::yoke::plugin::v1::Control_Activate_Transport >(_impl_.transports_.Get(index));
+}
+inline ::yoke::plugin::v1::Control_Activate_Transport RegisterRequest::transports(int index) const {
+  // @@protoc_insertion_point(field_get:yoke.plugin.v1.RegisterRequest.transports)
+  return _internal_transports(index);
+}
+inline void RegisterRequest::set_transports(int index, ::yoke::plugin::v1::Control_Activate_Transport value) {
+  _impl_.transports_.Set(index, value);
+  // @@protoc_insertion_point(field_set:yoke.plugin.v1.RegisterRequest.transports)
+}
+inline void RegisterRequest::_internal_add_transports(::yoke::plugin::v1::Control_Activate_Transport value) {
+  _impl_.transports_.Add(value);
+}
+inline void RegisterRequest::add_transports(::yoke::plugin::v1::Control_Activate_Transport value) {
+  _internal_add_transports(value);
+  // @@protoc_insertion_point(field_add:yoke.plugin.v1.RegisterRequest.transports)
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField<int>&
+RegisterRequest::transports() const {
+  // @@protoc_insertion_point(field_list:yoke.plugin.v1.RegisterRequest.transports)
+  return _impl_.transports_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField<int>*
+RegisterRequest::_internal_mutable_transports() {
+  return &_impl_.transports_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField<int>*
+RegisterRequest::mutable_transports() {
+  // @@protoc_insertion_point(field_mutable_list:yoke.plugin.v1.RegisterRequest.transports)
+  return _internal_mutable_transports();
 }
 
 // -------------------------------------------------------------------

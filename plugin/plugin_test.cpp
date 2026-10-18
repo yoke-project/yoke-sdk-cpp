@@ -7,7 +7,10 @@
 #include <string>
 #include <vector>
 
+#include <thread>
+
 #include <poll.h>
+#include <sys/mman.h>
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <unistd.h>
@@ -355,9 +358,9 @@ int entries() {
 }
 
 // The refusal an emission meets, or an empty code if it met none.
-std::string emission_refused(Unit &u, const std::string &stream) {
+std::string emission_refused(Unit &u, const std::string &stream, const std::string &payload = "x") {
     try {
-        u.emit(stream, "x");
+        u.emit(stream, payload);
     } catch (const yoke::Refusal &r) {
         return r.code();
     }
@@ -611,6 +614,93 @@ void test_a_stop_closes_the_transport_and_emit_is_refused_after_it() {
             "an emission after the stop was not refused with stream.inactive");
 }
 
+// A ring of layout 1 behind a packet socket, as the Core creates one: the first connection is handed the
+// descriptor that writes, on one byte, and the socket stays open for the life of the stream.
+struct CoreRing {
+    std::string path = check::dir() + "/ring.sock";
+    unsigned slots, capacity;
+    Fd listener = listen_at(path, SOCK_SEQPACKET);
+    Fd memory, conn;
+    unsigned char *mem = nullptr;
+    std::thread hander;
+
+    CoreRing(unsigned slots_, unsigned capacity_) : slots(slots_), capacity(capacity_) {
+        std::size_t size = 64 + static_cast<std::size_t>(slots) * (32 + capacity);
+        memory = Fd(::memfd_create("yoke-test", MFD_CLOEXEC));
+        REQUIRE(memory.fd >= 0 && ::ftruncate(memory.fd, static_cast<off_t>(size)) == 0,
+                "the case cannot make a ring");
+        mem = static_cast<unsigned char *>(
+            ::mmap(nullptr, size, PROT_READ | PROT_WRITE, MAP_SHARED, memory.fd, 0));
+        REQUIRE(mem != MAP_FAILED, "the case cannot map its ring");
+        std::memcpy(mem, "YOKERING", 8);
+        std::uint32_t header[3] = {1, slots, capacity};
+        std::memcpy(mem + 8, header, sizeof header);
+        hander = std::thread([this] {
+            if (!readable(listener.fd, 5000)) {
+                return;
+            }
+            conn = Fd(::accept(listener.fd, nullptr, nullptr));
+            char byte = 0;
+            iovec iov{&byte, 1};
+            alignas(cmsghdr) char control[CMSG_SPACE(sizeof(int))] = {};
+            msghdr m{};
+            m.msg_iov = &iov;
+            m.msg_iovlen = 1;
+            m.msg_control = control;
+            m.msg_controllen = sizeof control;
+            cmsghdr *c = CMSG_FIRSTHDR(&m);
+            c->cmsg_level = SOL_SOCKET;
+            c->cmsg_type = SCM_RIGHTS;
+            c->cmsg_len = CMSG_LEN(sizeof(int));
+            std::memcpy(CMSG_DATA(c), &memory.fd, sizeof(int));
+            ::sendmsg(conn.fd, &m, MSG_NOSIGNAL);
+        });
+    }
+    ~CoreRing() {
+        if (hander.joinable()) {
+            hander.join();
+        }
+        ::munmap(mem, 64 + static_cast<std::size_t>(slots) * (32 + capacity));
+    }
+
+    std::uint64_t published() const {
+        return __atomic_load_n(reinterpret_cast<std::uint64_t *>(mem + 24), __ATOMIC_ACQUIRE);
+    }
+    unsigned char *slot(std::uint64_t n) const { return mem + 64 + ((n - 1) % slots) * (32 + capacity); }
+};
+
+// std: yoke-sdk-cpp:the-plugin-library.18
+void test_on_the_shared_ring_emit_publishes_into_it() {
+    Opened o;
+    auto request = o.ch->request();
+    REQUIRE(request && std::find(request->transports().begin(), request->transports().end(),
+                                 pluginv1::Control::Activate::TRANSPORT_SHARED_OBJECT) !=
+                           request->transports().end(),
+            "the registration does not offer the shared ring");
+    CoreRing ring(4, 64);
+    std::string id =
+        activate(*o.ch, "station.preview", pluginv1::Control::Activate::TRANSPORT_SHARED_OBJECT, ring.path);
+    auto activated = next_of<yp::Activated>(*o.unit);
+    REQUIRE(activated.stream == "station.preview" && activated.transport == "shared object",
+            "the author was handed ", activated.stream, " on ", activated.transport);
+    std::size_t from = 0;
+    auto a = ack_of(*o.ch, id, &from);
+    REQUIRE(a && a->outcome() == pluginv1::Ack::OUTCOME_DONE,
+            "the activation on the ring is not acknowledged as done: ", a ? a->line() : "no ack");
+    for (unsigned char i = 1; i <= 3; i++) {
+        o.unit->emit("station.preview", std::string{static_cast<char>(i), static_cast<char>(0xdd)});
+    }
+    REQUIRE(ring.published() == 3, ring.published(), " frames published, want 3");
+    for (unsigned n = 1; n <= 3; n++) {
+        const unsigned char *slot = ring.slot(n);
+        REQUIRE(le64(slot) == n && le64(slot + 8) > 0 && slot[32] == n && slot[33] == 0xdd, "frame ", n,
+                " is not in its slot with its payload and a clock");
+    }
+    REQUIRE(emission_refused(*o.unit, "station.preview", std::string(65, 'x')) == "stream.inactive",
+            "a payload larger than a slot was not refused with stream.inactive");
+    REQUIRE(ring.published() == 3, "the refused frame was published");
+}
+
 } // namespace
 
 int main() {
@@ -634,5 +724,6 @@ int main() {
          test_an_activation_connects_to_its_transport_and_is_acknowledged},
         {"yoke-sdk-cpp:the-plugin-library.16", test_emit_writes_envelopes_and_frames_numbered_from_one},
         {"yoke-sdk-cpp:the-plugin-library.17", test_a_stop_closes_the_transport_and_emit_is_refused_after_it},
+        {"yoke-sdk-cpp:the-plugin-library.18", test_on_the_shared_ring_emit_publishes_into_it},
     });
 }
