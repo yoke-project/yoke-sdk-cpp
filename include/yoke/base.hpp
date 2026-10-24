@@ -14,7 +14,7 @@
 namespace yoke {
 
 // What this project's libraries say they are: at admission, and in a harness's hello.
-inline constexpr const char *sdk_line = "yoke-sdk-cpp 0.7.0";
+inline constexpr const char *sdk_line = "yoke-sdk-cpp 0.7.1";
 
 // What a refusal names: a kind, an identity, and a unit's life where one is named.
 struct Subject {
