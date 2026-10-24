@@ -37,7 +37,7 @@ constexpr auto close_grace = std::chrono::seconds(2);
 
 // ---- the Manifest ----
 
-std::string quoted(std::string_view s) {
+std::string yaml_quoted(std::string_view s) {
     std::string out = "\"";
     for (unsigned char c : s) {
         if (c == '"' || c == '\\') {
@@ -60,7 +60,7 @@ void ids(std::ostringstream &out, const char *key, const std::vector<std::string
     }
     out << key << ":\n";
     for (const auto &id : list) {
-        out << "  - id: " << quoted(id) << "\n";
+        out << "  - id: " << yaml_quoted(id) << "\n";
     }
 }
 
@@ -309,17 +309,17 @@ std::shared_ptr<Flow> connect_flow(const pluginv1::Control::Activate &a, std::st
 
 std::string Declaration::manifest() const {
     std::ostringstream out;
-    out << "manifest: 1\nid: " << quoted(id) << "\nprotocol: " << plugin_contract() << "\n";
+    out << "manifest: 1\nid: " << yaml_quoted(id) << "\nprotocol: " << plugin_contract() << "\n";
     if (!needs.empty()) {
         out << "needs:\n";
         for (const auto &need : needs) {
-            out << "  - " << quoted(need) << "\n";
+            out << "  - " << yaml_quoted(need) << "\n";
         }
     }
     if (!streams.empty()) {
         out << "streams:\n";
         for (const auto &s : streams) {
-            out << "  - id: " << quoted(s.id) << "\n";
+            out << "  - id: " << yaml_quoted(s.id) << "\n";
             if (s.tolerates_loss) {
                 out << "    tolerates_loss: true\n";
             }
@@ -334,8 +334,8 @@ std::string Declaration::manifest() const {
     if (!capabilities.empty()) {
         out << "capabilities:\n";
         for (const auto &c : capabilities) {
-            out << "  - name: " << quoted(c.name) << "\n    governs:\n      " << governed(c.governs.kind)
-                << ": " << quoted(c.governs.id) << "\n";
+            out << "  - name: " << yaml_quoted(c.name) << "\n    governs:\n      " << governed(c.governs.kind)
+                << ": " << yaml_quoted(c.governs.id) << "\n";
         }
     }
     return out.str();
