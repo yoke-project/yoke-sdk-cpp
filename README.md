@@ -29,6 +29,7 @@ package manager is involved.
 | `definitions/` | The generated C++ of every contract, and `record`, which pins the definitions' version, digest and generators |
 | `testing/` | What the programs that run the cases share |
 | `cmake/` | The package config and the pkg-config file `cmake --install` writes |
+| `template/` | The starting tree of a Plugin project in C++, handed over with each release for `yoke-compose new plugin` |
 | `checks/`, `ci/` | This repository's own checks, and the scripts continuous integration runs; `ci/definitions.sh` regenerates `definitions/`, `ci/conformance.sh` runs the suite against both harnesses, `ci/routable.sh` attaches to the published Core over TLS |
 
 A test's description sits beside the test, as a `.std.md` file.
