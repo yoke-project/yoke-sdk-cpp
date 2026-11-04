@@ -21,8 +21,10 @@ file(GLOB_RECURSE DEFINITIONS CONFIGURE_DEPENDS definitions/yoke/plugin/*.cc def
 set_source_files_properties(${DEFINITIONS} PROPERTIES COMPILE_OPTIONS "-Wall;-Werror")
 
 add_library(yoke-cpp base/base.cpp plugin/plugin.cpp interface/interface.cpp interface/tls.cpp ${DEFINITIONS})
+# The library is reached as the project it is, and also from the project that fetches it: its own
+# directories are PROJECT_SOURCE_DIR and PROJECT_BINARY_DIR, never the top level's.
 target_include_directories(yoke-cpp
-    PUBLIC $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include> $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/definitions>
+    PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include> $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/definitions>
            $<INSTALL_INTERFACE:include>
     PRIVATE base interface)
 target_link_libraries(yoke-cpp PUBLIC PkgConfig::GRPCXX PkgConfig::PROTOBUF Threads::Threads PRIVATE OpenSSL::SSL)
@@ -43,7 +45,7 @@ foreach(program base/base_test plugin/plugin_test interface/interface_test inter
     get_filename_component(name ${program} NAME)
     add_executable(${name} ${program}.cpp)
     target_include_directories(${name} PRIVATE base interface)
-    target_compile_definitions(${name} PRIVATE SOURCE_DIR="${CMAKE_SOURCE_DIR}")
+    target_compile_definitions(${name} PRIVATE SOURCE_DIR="${PROJECT_SOURCE_DIR}")
     target_compile_options(${name} PRIVATE -Wall -Wextra -Werror)
     target_link_libraries(${name} PRIVATE yoke-cpp-testing OpenSSL::SSL)
 endforeach()
@@ -59,7 +61,7 @@ target_link_libraries(yoke-cpp-harness PUBLIC yoke-cpp nlohmann_json::nlohmann_j
 add_executable(yoke-cpp-plugin-harness harness/main.cpp)
 target_link_libraries(yoke-cpp-plugin-harness PRIVATE yoke-cpp-harness)
 add_executable(harness_test harness/harness_test.cpp)
-target_compile_definitions(harness_test PRIVATE SOURCE_DIR="${CMAKE_SOURCE_DIR}")
+target_compile_definitions(harness_test PRIVATE SOURCE_DIR="${PROJECT_SOURCE_DIR}")
 target_compile_options(harness_test PRIVATE -Wall -Wextra -Werror)
 target_link_libraries(harness_test PRIVATE yoke-cpp-harness yoke-cpp-testing)
 
@@ -72,7 +74,7 @@ add_executable(yoke-cpp-interface-harness interface-harness/main.cpp)
 target_link_libraries(yoke-cpp-interface-harness PRIVATE yoke-cpp-iharness)
 add_executable(interface_harness_test interface-harness/interface_harness_test.cpp)
 target_include_directories(interface_harness_test PRIVATE base)
-target_compile_definitions(interface_harness_test PRIVATE SOURCE_DIR="${CMAKE_SOURCE_DIR}")
+target_compile_definitions(interface_harness_test PRIVATE SOURCE_DIR="${PROJECT_SOURCE_DIR}")
 target_compile_options(interface_harness_test PRIVATE -Wall -Wextra -Werror)
 target_link_libraries(interface_harness_test PRIVATE yoke-cpp-iharness yoke-cpp-testing)
 
@@ -88,12 +90,12 @@ install(DIRECTORY include/yoke DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 install(DIRECTORY definitions/yoke/interface/v1 DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/yoke/interface
     FILES_MATCHING PATTERN "*.pb.h" PATTERN "*.grpc.pb.h" EXCLUDE)
 install(EXPORT yoke-sdk-cpp-targets NAMESPACE yoke:: DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/yoke-sdk-cpp)
-configure_package_config_file(cmake/yoke-sdk-cpp-config.cmake.in ${CMAKE_BINARY_DIR}/yoke-sdk-cpp-config.cmake
+configure_package_config_file(cmake/yoke-sdk-cpp-config.cmake.in ${PROJECT_BINARY_DIR}/yoke-sdk-cpp-config.cmake
     INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/yoke-sdk-cpp)
-write_basic_package_version_file(${CMAKE_BINARY_DIR}/yoke-sdk-cpp-config-version.cmake COMPATIBILITY SameMinorVersion)
-install(FILES ${CMAKE_BINARY_DIR}/yoke-sdk-cpp-config.cmake ${CMAKE_BINARY_DIR}/yoke-sdk-cpp-config-version.cmake
+write_basic_package_version_file(${PROJECT_BINARY_DIR}/yoke-sdk-cpp-config-version.cmake COMPATIBILITY SameMinorVersion)
+install(FILES ${PROJECT_BINARY_DIR}/yoke-sdk-cpp-config.cmake ${PROJECT_BINARY_DIR}/yoke-sdk-cpp-config-version.cmake
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/yoke-sdk-cpp)
 # The pkg-config file finds the prefix from where it was installed, so a prefix given at install holds.
 file(RELATIVE_PATH PC_TO_PREFIX "/prefix/${CMAKE_INSTALL_LIBDIR}/pkgconfig" "/prefix")
-configure_file(cmake/yoke-sdk-cpp.pc.in ${CMAKE_BINARY_DIR}/yoke-sdk-cpp.pc @ONLY)
-install(FILES ${CMAKE_BINARY_DIR}/yoke-sdk-cpp.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
+configure_file(cmake/yoke-sdk-cpp.pc.in ${PROJECT_BINARY_DIR}/yoke-sdk-cpp.pc @ONLY)
+install(FILES ${PROJECT_BINARY_DIR}/yoke-sdk-cpp.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
