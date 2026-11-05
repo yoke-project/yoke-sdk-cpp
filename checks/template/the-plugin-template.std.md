@@ -56,3 +56,16 @@
 | **Precondition** | the tree of `.03`; `yoke`, `yoke-compose`, `yoke-guardian` and `yoke-core` from `yoke`'s default branch, through the module proxy |
 | **Action** | make `try/` with `init`, any Core admitted; take the Plugin from `..` with `--yes`; build the package, install it, create an instance and start it |
 | **Expected** | the unit `greeter` reaches `Running`: its Manifest matches its declaration and it is admitted |
+
+## yoke-sdk-cpp:the-plugin-template.05 — with the library installed, the generated Plugin links its package's target
+
+| Field | Value |
+| --- | --- |
+| **Cites** | prj_structure/97 §A family's Plugin template · arch/20-composer/07 §The template |
+| **Level** | L1 |
+| **Method** | check |
+| **Not applicable in** | — |
+| **Label** | blocking |
+| **Precondition** | this checkout's library built and installed into a prefix of its own; the template generated as the greeter |
+| **Action** | build the greeter by its file's command, its CMake told to find the library installed and never to fetch it |
+| **Expected** | the build leaves `$YOKE_OUT/greeter`, linked against the installed package's `yoke::yoke-cpp` with what it depends on, and what it prints is byte for byte `plugin/com.example.greeter.yaml` |

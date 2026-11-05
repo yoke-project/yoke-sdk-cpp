@@ -122,3 +122,22 @@ check_the_generated_plugin_is_admitted_under_a_core() {
   [[ -n "$guardian" ]] && kill "$guardian" 2>/dev/null
   rm -rf "$dir" "$run"; return "$verdict"
 }
+
+# std: yoke-sdk-cpp:the-plugin-template.05
+check_with_the_library_installed_the_plugin_links_its_packages_target() {
+  local dir; dir="$(mktemp -d)"
+  cmake -S "$pt_root" -B "$dir/lib" -DCMAKE_BUILD_TYPE=Release -DYOKE_SDK_CPP_TESTING=OFF > "$dir/lib.log" 2>&1 \
+    && cmake --build "$dir/lib" --target yoke-cpp -j >> "$dir/lib.log" 2>&1 \
+    && cmake --install "$dir/lib" --prefix "$dir/prefix" >> "$dir/lib.log" 2>&1 \
+    || { echo "the library does not install: $(tail -5 "$dir/lib.log")"; return 1; }
+  pt_generate "$dir" || { echo "the template does not generate"; return 1; }
+  local plugin="$dir/template/plugin"
+  sed -i "s|^include(FetchContent)\$|include(FetchContent)\nset(FETCHCONTENT_TRY_FIND_PACKAGE_MODE ALWAYS)\nset(FETCHCONTENT_FULLY_DISCONNECTED ON)\nlist(PREPEND CMAKE_PREFIX_PATH \"$dir/prefix\")|" "$plugin/CMakeLists.txt"
+  mkdir -p "$dir/out"
+  local run; run="$(sed -n "s/^  run: '\(.*\)'$/\1/p" "$dir/template/yoke-plugin.yaml")"
+  (cd "$plugin" && YOKE_OUT="$dir/out" YOKE_ARCH="$(uname -m)" sh -c "$run") > "$dir/build.log" 2>&1 \
+    || { echo "the build against the installed library fails: $(grep -m3 -E 'undefined reference|error' "$dir/build.log")"; return 1; }
+  grep -q "yoke-sdk-cpp-src" "$dir/build.log" && { echo "the library was fetched, not found installed"; return 1; }
+  "$dir/out/greeter" --manifest | cmp -s - "$plugin/com.example.greeter.yaml" \
+    || { echo "the program prints another Manifest than the one kept"; return 1; }
+}
