@@ -13,7 +13,7 @@ FetchContent_Declare(yoke-sdk-cpp
 FetchContent_MakeAvailable(yoke-sdk-cpp)
 
 add_executable(@YOKE_PROGRAM@ main.cpp)
-if(TARGET yoke::yoke-cpppp)
+if(TARGET yoke::yoke-cpp)
     target_link_libraries(@YOKE_PROGRAM@ PRIVATE yoke::yoke-cpp)
 else()
     target_link_libraries(@YOKE_PROGRAM@ PRIVATE yoke-cpp)
