@@ -161,7 +161,8 @@ struct Harness {
                                    {"withheld", scope(a.withheld)}};
                 return;
             }
-            static const char *const acts[] = {"close", "emit", "report-health", "report", "ack", "answer"};
+            static const char *const acts[] = {"close", "emit",   "report-health", "report",
+                                               "ack",   "answer", "fail"};
             bool known = false;
             for (const char *a : acts) {
                 known = known || verb == a;
@@ -198,6 +199,9 @@ struct Harness {
                     }
                 }
                 unit->ack(c, plugin::Outcome::done, arg(args, "line"));
+            } else if (verb == "fail") {
+                // A question or a command the Core sent, failed with a code and a message, correlated to it.
+                unit->fail(arg(args, "about"), arg(args, "code"), arg(args, "message"));
             } else {
                 plugin::Question q;
                 {
