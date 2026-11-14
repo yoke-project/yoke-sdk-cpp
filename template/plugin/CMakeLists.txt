@@ -8,8 +8,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 include(FetchContent)
 FetchContent_Declare(yoke-sdk-cpp
     GIT_REPOSITORY https://github.com/yoke-project/yoke-sdk-cpp.git
-    GIT_TAG v0.8.0
-    FIND_PACKAGE_ARGS 0.8.0)
+    GIT_TAG v0.8.1
+    FIND_PACKAGE_ARGS 0.8.1)
 FetchContent_MakeAvailable(yoke-sdk-cpp)
 
 add_executable(@YOKE_PROGRAM@ main.cpp)
