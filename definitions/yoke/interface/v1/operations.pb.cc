@@ -139,7 +139,9 @@ struct QuestionDefaultTypeInternal {
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 QuestionDefaultTypeInternal _Question_default_instance_;
 PROTOBUF_CONSTEXPR UnitStream::UnitStream(
     ::_pbi::ConstantInitialized): _impl_{
-    /*decltype(_impl_.unit_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
+    /*decltype(_impl_.reads_)*/{}
+  , /*decltype(_impl_._reads_cached_byte_size_)*/{0}
+  , /*decltype(_impl_.unit_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
   , /*decltype(_impl_.stream_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
   , /*decltype(_impl_._cached_size_)*/{}} {}
 struct UnitStreamDefaultTypeInternal {
@@ -301,7 +303,7 @@ PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORIT
 }  // namespace interface
 }  // namespace yoke
 static ::_pb::Metadata file_level_metadata_yoke_2finterface_2fv1_2foperations_2eproto[20];
-static const ::_pb::EnumDescriptor* file_level_enum_descriptors_yoke_2finterface_2fv1_2foperations_2eproto[1];
+static const ::_pb::EnumDescriptor* file_level_enum_descriptors_yoke_2finterface_2fv1_2foperations_2eproto[2];
 static constexpr ::_pb::ServiceDescriptor const** file_level_service_descriptors_yoke_2finterface_2fv1_2foperations_2eproto = nullptr;
 
 const uint32_t TableStruct_yoke_2finterface_2fv1_2foperations_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
@@ -390,6 +392,7 @@ const uint32_t TableStruct_yoke_2finterface_2fv1_2foperations_2eproto::offsets[]
   ~0u,  // no _inlined_string_donated_
   PROTOBUF_FIELD_OFFSET(::yoke::interface::v1::UnitStream, _impl_.unit_),
   PROTOBUF_FIELD_OFFSET(::yoke::interface::v1::UnitStream, _impl_.stream_),
+  PROTOBUF_FIELD_OFFSET(::yoke::interface::v1::UnitStream, _impl_.reads_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::yoke::interface::v1::StreamRelease, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -471,6 +474,8 @@ const uint32_t TableStruct_yoke_2finterface_2fv1_2foperations_2eproto::offsets[]
   ::_pbi::kInvalidFieldOffsetTag,
   ::_pbi::kInvalidFieldOffsetTag,
   ::_pbi::kInvalidFieldOffsetTag,
+  ::_pbi::kInvalidFieldOffsetTag,
+  ::_pbi::kInvalidFieldOffsetTag,
   PROTOBUF_FIELD_OFFSET(::yoke::interface::v1::Delivering, _impl_.flowing_),
   PROTOBUF_FIELD_OFFSET(::yoke::interface::v1::Delivering, _impl_.arrives_),
   ~0u,  // no _has_bits_
@@ -498,17 +503,17 @@ static const ::_pbi::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protode
   { 59, -1, -1, sizeof(::yoke::interface::v1::Command)},
   { 68, -1, -1, sizeof(::yoke::interface::v1::Question)},
   { 77, -1, -1, sizeof(::yoke::interface::v1::UnitStream)},
-  { 85, -1, -1, sizeof(::yoke::interface::v1::StreamRelease)},
-  { 92, -1, -1, sizeof(::yoke::interface::v1::Reclaim)},
-  { 98, -1, -1, sizeof(::yoke::interface::v1::Response)},
-  { 116, -1, -1, sizeof(::yoke::interface::v1::Authenticated)},
-  { 125, -1, -1, sizeof(::yoke::interface::v1::Subscribed)},
-  { 135, -1, -1, sizeof(::yoke::interface::v1::Confirmed)},
-  { 141, -1, -1, sizeof(::yoke::interface::v1::Acknowledged)},
-  { 149, -1, -1, sizeof(::yoke::interface::v1::Answered)},
-  { 156, -1, -1, sizeof(::yoke::interface::v1::Delivering)},
-  { 168, -1, -1, sizeof(::yoke::interface::v1::Released)},
-  { 174, -1, -1, sizeof(::yoke::interface::v1::Reclaimed)},
+  { 86, -1, -1, sizeof(::yoke::interface::v1::StreamRelease)},
+  { 93, -1, -1, sizeof(::yoke::interface::v1::Reclaim)},
+  { 99, -1, -1, sizeof(::yoke::interface::v1::Response)},
+  { 117, -1, -1, sizeof(::yoke::interface::v1::Authenticated)},
+  { 126, -1, -1, sizeof(::yoke::interface::v1::Subscribed)},
+  { 136, -1, -1, sizeof(::yoke::interface::v1::Confirmed)},
+  { 142, -1, -1, sizeof(::yoke::interface::v1::Acknowledged)},
+  { 150, -1, -1, sizeof(::yoke::interface::v1::Answered)},
+  { 157, -1, -1, sizeof(::yoke::interface::v1::Delivering)},
+  { 171, -1, -1, sizeof(::yoke::interface::v1::Released)},
+  { 177, -1, -1, sizeof(::yoke::interface::v1::Reclaimed)},
 };
 
 static const ::_pb::Message* const file_default_instances[] = {
@@ -564,44 +569,48 @@ const char descriptor_table_protodef_yoke_2finterface_2fv1_2foperations_2eproto[
   "n\030\001 \001(\t\022\020\n\010sequence\030\002 \001(\004\"6\n\007Command\022\014\n\004"
   "unit\030\001 \001(\t\022\014\n\004type\030\002 \001(\t\022\017\n\007payload\030\003 \001("
   "\014\"7\n\010Question\022\014\n\004unit\030\001 \001(\t\022\014\n\004type\030\002 \001("
-  "\t\022\017\n\007payload\030\003 \001(\014\"*\n\nUnitStream\022\014\n\004unit"
-  "\030\001 \001(\t\022\016\n\006stream\030\002 \001(\t\"!\n\rStreamRelease\022"
-  "\020\n\010delivery\030\001 \001(\t\"\t\n\007Reclaim\"\331\004\n\010Respons"
-  "e\0228\n\014authenticate\030\001 \001(\0132 .yoke.interface"
-  ".v1.AuthenticatedH\000\022*\n\004read\030\002 \001(\0132\032.yoke"
-  ".interface.v1.RecordsH\000\0222\n\tsubscribe\030\003 \001"
-  "(\0132\035.yoke.interface.v1.SubscribedH\000\022/\n\007c"
-  "onfirm\030\004 \001(\0132\034.yoke.interface.v1.Confirm"
-  "edH\000\0222\n\007command\030\005 \001(\0132\037.yoke.interface.v"
-  "1.AcknowledgedH\000\022,\n\005query\030\006 \001(\0132\033.yoke.i"
-  "nterface.v1.AnsweredH\000\0227\n\014stream_start\030\007"
-  " \001(\0132\037.yoke.interface.v1.AcknowledgedH\000\022"
-  "6\n\013stream_stop\030\010 \001(\0132\037.yoke.interface.v1"
-  ".AcknowledgedH\000\0229\n\020stream_subscribe\030\t \001("
-  "\0132\035.yoke.interface.v1.DeliveringH\000\0229\n\022st"
-  "ream_unsubscribe\030\n \001(\0132\033.yoke.interface."
-  "v1.ReleasedH\000\022/\n\007reclaim\030\013 \001(\0132\034.yoke.in"
-  "terface.v1.ReclaimedH\000B\010\n\006answer\"\\\n\rAuth"
-  "enticated\022\017\n\007account\030\001 \001(\t\022\r\n\005token\030\002 \001("
-  "\t\022+\n\007expires\030\003 \001(\0132\032.google.protobuf.Tim"
-  "estamp\"\244\001\n\nSubscribed\022/\n\010snapshot\030\001 \001(\0132"
-  "\033.yoke.interface.v1.SnapshotH\000\022)\n\005event\030"
-  "\002 \001(\0132\030.yoke.interface.v1.EventH\000\022/\n\010ove"
-  "rflow\030\003 \001(\0132\033.yoke.interface.v1.Snapshot"
-  "H\000B\t\n\007carries\"\013\n\tConfirmed\"\266\001\n\014Acknowled"
-  "ged\0228\n\007outcome\030\001 \001(\0162\'.yoke.interface.v1"
-  ".Acknowledged.Outcome\022\014\n\004line\030\002 \001(\t\"^\n\007O"
-  "utcome\022\027\n\023OUTCOME_UNSPECIFIED\020\000\022\024\n\020OUTCO"
-  "ME_ACCEPTED\020\001\022\020\n\014OUTCOME_DONE\020\002\022\022\n\016OUTCO"
-  "ME_FAILED\020\003\"\033\n\010Answered\022\017\n\007payload\030\001 \001(\014"
-  "\"r\n\nDelivering\022\020\n\010delivery\030\001 \001(\t\022\020\n\006sock"
-  "et\030\002 \001(\tH\000\022\024\n\nconnection\030\003 \001(\010H\000\022\016\n\004path"
-  "\030\004 \001(\tH\000\022\017\n\007flowing\030\005 \001(\010B\t\n\007arrives\"\n\n\010"
-  "Released\"O\n\tReclaimed\0221\n\007channel\030\001 \001(\0132 "
-  ".yoke.interface.v1.ChannelRecord\022\017\n\007chan"
-  "ged\030\002 \001(\010BBZ@github.com/yoke-project/yok"
-  "e/proto/yoke/interface/v1;interfacev1b\006p"
-  "roto3"
+  "\t\022\017\n\007payload\030\003 \001(\014\"\260\001\n\nUnitStream\022\014\n\004uni"
+  "t\030\001 \001(\t\022\016\n\006stream\030\002 \001(\t\0222\n\005reads\030\003 \003(\0162#"
+  ".yoke.interface.v1.UnitStream.Reads\"P\n\005R"
+  "eads\022\025\n\021READS_UNSPECIFIED\020\000\022\027\n\023READS_STR"
+  "EAM_SOCKET\020\001\022\027\n\023READS_SHARED_OBJECT\020\002\"!\n"
+  "\rStreamRelease\022\020\n\010delivery\030\001 \001(\t\"\t\n\007Recl"
+  "aim\"\331\004\n\010Response\0228\n\014authenticate\030\001 \001(\0132 "
+  ".yoke.interface.v1.AuthenticatedH\000\022*\n\004re"
+  "ad\030\002 \001(\0132\032.yoke.interface.v1.RecordsH\000\0222"
+  "\n\tsubscribe\030\003 \001(\0132\035.yoke.interface.v1.Su"
+  "bscribedH\000\022/\n\007confirm\030\004 \001(\0132\034.yoke.inter"
+  "face.v1.ConfirmedH\000\0222\n\007command\030\005 \001(\0132\037.y"
+  "oke.interface.v1.AcknowledgedH\000\022,\n\005query"
+  "\030\006 \001(\0132\033.yoke.interface.v1.AnsweredH\000\0227\n"
+  "\014stream_start\030\007 \001(\0132\037.yoke.interface.v1."
+  "AcknowledgedH\000\0226\n\013stream_stop\030\010 \001(\0132\037.yo"
+  "ke.interface.v1.AcknowledgedH\000\0229\n\020stream"
+  "_subscribe\030\t \001(\0132\035.yoke.interface.v1.Del"
+  "iveringH\000\0229\n\022stream_unsubscribe\030\n \001(\0132\033."
+  "yoke.interface.v1.ReleasedH\000\022/\n\007reclaim\030"
+  "\013 \001(\0132\034.yoke.interface.v1.ReclaimedH\000B\010\n"
+  "\006answer\"\\\n\rAuthenticated\022\017\n\007account\030\001 \001("
+  "\t\022\r\n\005token\030\002 \001(\t\022+\n\007expires\030\003 \001(\0132\032.goog"
+  "le.protobuf.Timestamp\"\244\001\n\nSubscribed\022/\n\010"
+  "snapshot\030\001 \001(\0132\033.yoke.interface.v1.Snaps"
+  "hotH\000\022)\n\005event\030\002 \001(\0132\030.yoke.interface.v1"
+  ".EventH\000\022/\n\010overflow\030\003 \001(\0132\033.yoke.interf"
+  "ace.v1.SnapshotH\000B\t\n\007carries\"\013\n\tConfirme"
+  "d\"\266\001\n\014Acknowledged\0228\n\007outcome\030\001 \001(\0162\'.yo"
+  "ke.interface.v1.Acknowledged.Outcome\022\014\n\004"
+  "line\030\002 \001(\t\"^\n\007Outcome\022\027\n\023OUTCOME_UNSPECI"
+  "FIED\020\000\022\024\n\020OUTCOME_ACCEPTED\020\001\022\020\n\014OUTCOME_"
+  "DONE\020\002\022\022\n\016OUTCOME_FAILED\020\003\"\033\n\010Answered\022\017"
+  "\n\007payload\030\001 \001(\014\"\235\001\n\nDelivering\022\020\n\010delive"
+  "ry\030\001 \001(\t\022\020\n\006socket\030\002 \001(\tH\000\022\024\n\nconnection"
+  "\030\003 \001(\010H\000\022\016\n\004path\030\004 \001(\tH\000\022\027\n\rstream_socke"
+  "t\030\006 \001(\tH\000\022\020\n\006shared\030\007 \001(\tH\000\022\017\n\007flowing\030\005"
+  " \001(\010B\t\n\007arrives\"\n\n\010Released\"O\n\tReclaimed"
+  "\0221\n\007channel\030\001 \001(\0132 .yoke.interface.v1.Ch"
+  "annelRecord\022\017\n\007changed\030\002 \001(\010BBZ@github.c"
+  "om/yoke-project/yoke/proto/yoke/interfac"
+  "e/v1;interfacev1b\006proto3"
   ;
 static const ::_pbi::DescriptorTable* const descriptor_table_yoke_2finterface_2fv1_2foperations_2eproto_deps[3] = {
   &::descriptor_table_google_2fprotobuf_2ftimestamp_2eproto,
@@ -610,7 +619,7 @@ static const ::_pbi::DescriptorTable* const descriptor_table_yoke_2finterface_2f
 };
 static ::_pbi::once_flag descriptor_table_yoke_2finterface_2fv1_2foperations_2eproto_once;
 const ::_pbi::DescriptorTable descriptor_table_yoke_2finterface_2fv1_2foperations_2eproto = {
-    false, false, 2645, descriptor_table_protodef_yoke_2finterface_2fv1_2foperations_2eproto,
+    false, false, 2824, descriptor_table_protodef_yoke_2finterface_2fv1_2foperations_2eproto,
     "yoke/interface/v1/operations.proto",
     &descriptor_table_yoke_2finterface_2fv1_2foperations_2eproto_once, descriptor_table_yoke_2finterface_2fv1_2foperations_2eproto_deps, 3, 20,
     schemas, file_default_instances, TableStruct_yoke_2finterface_2fv1_2foperations_2eproto::offsets,
@@ -626,9 +635,32 @@ PROTOBUF_ATTRIBUTE_INIT_PRIORITY2 static ::_pbi::AddDescriptorsRunner dynamic_in
 namespace yoke {
 namespace interface {
 namespace v1 {
-const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* Acknowledged_Outcome_descriptor() {
+const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* UnitStream_Reads_descriptor() {
   ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&descriptor_table_yoke_2finterface_2fv1_2foperations_2eproto);
   return file_level_enum_descriptors_yoke_2finterface_2fv1_2foperations_2eproto[0];
+}
+bool UnitStream_Reads_IsValid(int value) {
+  switch (value) {
+    case 0:
+    case 1:
+    case 2:
+      return true;
+    default:
+      return false;
+  }
+}
+
+#if (__cplusplus < 201703) && (!defined(_MSC_VER) || (_MSC_VER >= 1900 && _MSC_VER < 1912))
+constexpr UnitStream_Reads UnitStream::READS_UNSPECIFIED;
+constexpr UnitStream_Reads UnitStream::READS_STREAM_SOCKET;
+constexpr UnitStream_Reads UnitStream::READS_SHARED_OBJECT;
+constexpr UnitStream_Reads UnitStream::Reads_MIN;
+constexpr UnitStream_Reads UnitStream::Reads_MAX;
+constexpr int UnitStream::Reads_ARRAYSIZE;
+#endif  // (__cplusplus < 201703) && (!defined(_MSC_VER) || (_MSC_VER >= 1900 && _MSC_VER < 1912))
+const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* Acknowledged_Outcome_descriptor() {
+  ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&descriptor_table_yoke_2finterface_2fv1_2foperations_2eproto);
+  return file_level_enum_descriptors_yoke_2finterface_2fv1_2foperations_2eproto[1];
 }
 bool Acknowledged_Outcome_IsValid(int value) {
   switch (value) {
@@ -3339,7 +3371,9 @@ UnitStream::UnitStream(const UnitStream& from)
   : ::PROTOBUF_NAMESPACE_ID::Message() {
   UnitStream* const _this = this; (void)_this;
   new (&_impl_) Impl_{
-      decltype(_impl_.unit_){}
+      decltype(_impl_.reads_){from._impl_.reads_}
+    , /*decltype(_impl_._reads_cached_byte_size_)*/{0}
+    , decltype(_impl_.unit_){}
     , decltype(_impl_.stream_){}
     , /*decltype(_impl_._cached_size_)*/{}};
 
@@ -3368,7 +3402,9 @@ inline void UnitStream::SharedCtor(
   (void)arena;
   (void)is_message_owned;
   new (&_impl_) Impl_{
-      decltype(_impl_.unit_){}
+      decltype(_impl_.reads_){arena}
+    , /*decltype(_impl_._reads_cached_byte_size_)*/{0}
+    , decltype(_impl_.unit_){}
     , decltype(_impl_.stream_){}
     , /*decltype(_impl_._cached_size_)*/{}
   };
@@ -3393,6 +3429,7 @@ UnitStream::~UnitStream() {
 
 inline void UnitStream::SharedDtor() {
   GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
+  _impl_.reads_.~RepeatedField();
   _impl_.unit_.Destroy();
   _impl_.stream_.Destroy();
 }
@@ -3407,6 +3444,7 @@ void UnitStream::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
+  _impl_.reads_.Clear();
   _impl_.unit_.ClearToEmpty();
   _impl_.stream_.ClearToEmpty();
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
@@ -3435,6 +3473,18 @@ const char* UnitStream::_InternalParse(const char* ptr, ::_pbi::ParseContext* ct
           ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
           CHK_(ptr);
           CHK_(::_pbi::VerifyUTF8(str, "yoke.interface.v1.UnitStream.stream"));
+        } else
+          goto handle_unusual;
+        continue;
+      // repeated .yoke.interface.v1.UnitStream.Reads reads = 3;
+      case 3:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 26)) {
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::PackedEnumParser(_internal_mutable_reads(), ptr, ctx);
+          CHK_(ptr);
+        } else if (static_cast<uint8_t>(tag) == 24) {
+          uint64_t val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+          _internal_add_reads(static_cast<::yoke::interface::v1::UnitStream_Reads>(val));
         } else
           goto handle_unusual;
         continue;
@@ -3487,6 +3537,15 @@ uint8_t* UnitStream::_InternalSerialize(
         2, this->_internal_stream(), target);
   }
 
+  // repeated .yoke.interface.v1.UnitStream.Reads reads = 3;
+  {
+    int byte_size = _impl_._reads_cached_byte_size_.load(std::memory_order_relaxed);
+    if (byte_size > 0) {
+      target = stream->WriteEnumPacked(
+          3, _impl_.reads_, byte_size, target);
+    }
+  }
+
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
@@ -3502,6 +3561,23 @@ size_t UnitStream::ByteSizeLong() const {
   uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
+
+  // repeated .yoke.interface.v1.UnitStream.Reads reads = 3;
+  {
+    size_t data_size = 0;
+    unsigned int count = static_cast<unsigned int>(this->_internal_reads_size());for (unsigned int i = 0; i < count; i++) {
+      data_size += ::_pbi::WireFormatLite::EnumSize(
+        this->_internal_reads(static_cast<int>(i)));
+    }
+    if (data_size > 0) {
+      total_size += 1 +
+        ::_pbi::WireFormatLite::Int32Size(static_cast<int32_t>(data_size));
+    }
+    int cached_size = ::_pbi::ToCachedSize(data_size);
+    _impl_._reads_cached_byte_size_.store(cached_size,
+                                    std::memory_order_relaxed);
+    total_size += data_size;
+  }
 
   // string unit = 1;
   if (!this->_internal_unit().empty()) {
@@ -3535,6 +3611,7 @@ void UnitStream::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PRO
   uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
+  _this->_impl_.reads_.MergeFrom(from._impl_.reads_);
   if (!from._internal_unit().empty()) {
     _this->_internal_set_unit(from._internal_unit());
   }
@@ -3560,6 +3637,7 @@ void UnitStream::InternalSwap(UnitStream* other) {
   auto* lhs_arena = GetArenaForAllocation();
   auto* rhs_arena = other->GetArenaForAllocation();
   _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  _impl_.reads_.InternalSwap(&other->_impl_.reads_);
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
       &_impl_.unit_, lhs_arena,
       &other->_impl_.unit_, rhs_arena
@@ -5863,6 +5941,14 @@ Delivering::Delivering(const Delivering& from)
       _this->_internal_set_path(from._internal_path());
       break;
     }
+    case kStreamSocket: {
+      _this->_internal_set_stream_socket(from._internal_stream_socket());
+      break;
+    }
+    case kShared: {
+      _this->_internal_set_shared(from._internal_shared());
+      break;
+    }
     case ARRIVES_NOT_SET: {
       break;
     }
@@ -5922,6 +6008,14 @@ void Delivering::clear_arrives() {
     }
     case kPath: {
       _impl_.arrives_.path_.Destroy();
+      break;
+    }
+    case kStreamSocket: {
+      _impl_.arrives_.stream_socket_.Destroy();
+      break;
+    }
+    case kShared: {
+      _impl_.arrives_.shared_.Destroy();
       break;
     }
     case ARRIVES_NOT_SET: {
@@ -5996,6 +6090,26 @@ const char* Delivering::_InternalParse(const char* ptr, ::_pbi::ParseContext* ct
         } else
           goto handle_unusual;
         continue;
+      // string stream_socket = 6;
+      case 6:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 50)) {
+          auto str = _internal_mutable_stream_socket();
+          ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(ptr);
+          CHK_(::_pbi::VerifyUTF8(str, "yoke.interface.v1.Delivering.stream_socket"));
+        } else
+          goto handle_unusual;
+        continue;
+      // string shared = 7;
+      case 7:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 58)) {
+          auto str = _internal_mutable_shared();
+          ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(ptr);
+          CHK_(::_pbi::VerifyUTF8(str, "yoke.interface.v1.Delivering.shared"));
+        } else
+          goto handle_unusual;
+        continue;
       default:
         goto handle_unusual;
     }  // switch
@@ -6067,6 +6181,26 @@ uint8_t* Delivering::_InternalSerialize(
     target = ::_pbi::WireFormatLite::WriteBoolToArray(5, this->_internal_flowing(), target);
   }
 
+  // string stream_socket = 6;
+  if (_internal_has_stream_socket()) {
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
+      this->_internal_stream_socket().data(), static_cast<int>(this->_internal_stream_socket().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
+      "yoke.interface.v1.Delivering.stream_socket");
+    target = stream->WriteStringMaybeAliased(
+        6, this->_internal_stream_socket(), target);
+  }
+
+  // string shared = 7;
+  if (_internal_has_shared()) {
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
+      this->_internal_shared().data(), static_cast<int>(this->_internal_shared().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
+      "yoke.interface.v1.Delivering.shared");
+    target = stream->WriteStringMaybeAliased(
+        7, this->_internal_shared(), target);
+  }
+
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
@@ -6115,6 +6249,20 @@ size_t Delivering::ByteSizeLong() const {
           this->_internal_path());
       break;
     }
+    // string stream_socket = 6;
+    case kStreamSocket: {
+      total_size += 1 +
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+          this->_internal_stream_socket());
+      break;
+    }
+    // string shared = 7;
+    case kShared: {
+      total_size += 1 +
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+          this->_internal_shared());
+      break;
+    }
     case ARRIVES_NOT_SET: {
       break;
     }
@@ -6154,6 +6302,14 @@ void Delivering::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PRO
     }
     case kPath: {
       _this->_internal_set_path(from._internal_path());
+      break;
+    }
+    case kStreamSocket: {
+      _this->_internal_set_stream_socket(from._internal_stream_socket());
+      break;
+    }
+    case kShared: {
+      _this->_internal_set_shared(from._internal_shared());
       break;
     }
     case ARRIVES_NOT_SET: {

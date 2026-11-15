@@ -58,6 +58,9 @@ extern AskedDefaultTypeInternal _Asked_default_instance_;
 class Changed;
 struct ChangedDefaultTypeInternal;
 extern ChangedDefaultTypeInternal _Changed_default_instance_;
+class Commanded;
+struct CommandedDefaultTypeInternal;
+extern CommandedDefaultTypeInternal _Commanded_default_instance_;
 class Consequence;
 struct ConsequenceDefaultTypeInternal;
 extern ConsequenceDefaultTypeInternal _Consequence_default_instance_;
@@ -109,6 +112,9 @@ extern UnitActDefaultTypeInternal _UnitAct_default_instance_;
 class UnitAsk;
 struct UnitAskDefaultTypeInternal;
 extern UnitAskDefaultTypeInternal _UnitAsk_default_instance_;
+class UnitCommand;
+struct UnitCommandDefaultTypeInternal;
+extern UnitCommandDefaultTypeInternal _UnitCommand_default_instance_;
 class UnitRetention;
 struct UnitRetentionDefaultTypeInternal;
 extern UnitRetentionDefaultTypeInternal _UnitRetention_default_instance_;
@@ -121,6 +127,7 @@ extern UnitStreamDefaultTypeInternal _UnitStream_default_instance_;
 PROTOBUF_NAMESPACE_OPEN
 template<> ::yoke::administrative::v1::Asked* Arena::CreateMaybeMessage<::yoke::administrative::v1::Asked>(Arena*);
 template<> ::yoke::administrative::v1::Changed* Arena::CreateMaybeMessage<::yoke::administrative::v1::Changed>(Arena*);
+template<> ::yoke::administrative::v1::Commanded* Arena::CreateMaybeMessage<::yoke::administrative::v1::Commanded>(Arena*);
 template<> ::yoke::administrative::v1::Consequence* Arena::CreateMaybeMessage<::yoke::administrative::v1::Consequence>(Arena*);
 template<> ::yoke::administrative::v1::Followed* Arena::CreateMaybeMessage<::yoke::administrative::v1::Followed>(Arena*);
 template<> ::yoke::administrative::v1::LogEntry* Arena::CreateMaybeMessage<::yoke::administrative::v1::LogEntry>(Arena*);
@@ -138,6 +145,7 @@ template<> ::yoke::administrative::v1::Subscribe* Arena::CreateMaybeMessage<::yo
 template<> ::yoke::administrative::v1::Subscribed* Arena::CreateMaybeMessage<::yoke::administrative::v1::Subscribed>(Arena*);
 template<> ::yoke::administrative::v1::UnitAct* Arena::CreateMaybeMessage<::yoke::administrative::v1::UnitAct>(Arena*);
 template<> ::yoke::administrative::v1::UnitAsk* Arena::CreateMaybeMessage<::yoke::administrative::v1::UnitAsk>(Arena*);
+template<> ::yoke::administrative::v1::UnitCommand* Arena::CreateMaybeMessage<::yoke::administrative::v1::UnitCommand>(Arena*);
 template<> ::yoke::administrative::v1::UnitRetention* Arena::CreateMaybeMessage<::yoke::administrative::v1::UnitRetention>(Arena*);
 template<> ::yoke::administrative::v1::UnitStream* Arena::CreateMaybeMessage<::yoke::administrative::v1::UnitStream>(Arena*);
 PROTOBUF_NAMESPACE_CLOSE
@@ -170,6 +178,33 @@ inline bool Changed_Effective_Parse(
     ::PROTOBUF_NAMESPACE_ID::ConstStringParam name, Changed_Effective* value) {
   return ::PROTOBUF_NAMESPACE_ID::internal::ParseNamedEnum<Changed_Effective>(
     Changed_Effective_descriptor(), name, value);
+}
+enum Commanded_Outcome : int {
+  Commanded_Outcome_OUTCOME_UNSPECIFIED = 0,
+  Commanded_Outcome_OUTCOME_ACCEPTED = 1,
+  Commanded_Outcome_OUTCOME_DONE = 2,
+  Commanded_Outcome_OUTCOME_FAILED = 3,
+  Commanded_Outcome_Commanded_Outcome_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<int32_t>::min(),
+  Commanded_Outcome_Commanded_Outcome_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<int32_t>::max()
+};
+bool Commanded_Outcome_IsValid(int value);
+constexpr Commanded_Outcome Commanded_Outcome_Outcome_MIN = Commanded_Outcome_OUTCOME_UNSPECIFIED;
+constexpr Commanded_Outcome Commanded_Outcome_Outcome_MAX = Commanded_Outcome_OUTCOME_FAILED;
+constexpr int Commanded_Outcome_Outcome_ARRAYSIZE = Commanded_Outcome_Outcome_MAX + 1;
+
+const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* Commanded_Outcome_descriptor();
+template<typename T>
+inline const std::string& Commanded_Outcome_Name(T enum_t_value) {
+  static_assert(::std::is_same<T, Commanded_Outcome>::value ||
+    ::std::is_integral<T>::value,
+    "Incorrect type passed to function Commanded_Outcome_Name.");
+  return ::PROTOBUF_NAMESPACE_ID::internal::NameOfEnum(
+    Commanded_Outcome_descriptor(), enum_t_value);
+}
+inline bool Commanded_Outcome_Parse(
+    ::PROTOBUF_NAMESPACE_ID::ConstStringParam name, Commanded_Outcome* value) {
+  return ::PROTOBUF_NAMESPACE_ID::internal::ParseNamedEnum<Commanded_Outcome>(
+    Commanded_Outcome_descriptor(), name, value);
 }
 // ===================================================================
 
@@ -233,6 +268,7 @@ class Request final :
     kLogQuery = 15,
     kLogFollow = 16,
     kSubscribe = 17,
+    kUnitCommand = 18,
     OPERATION_NOT_SET = 0,
   };
 
@@ -331,6 +367,7 @@ class Request final :
     kLogQueryFieldNumber = 15,
     kLogFollowFieldNumber = 16,
     kSubscribeFieldNumber = 17,
+    kUnitCommandFieldNumber = 18,
   };
   // uint32 version = 1;
   void clear_version();
@@ -629,6 +666,24 @@ class Request final :
       ::yoke::administrative::v1::Subscribe* subscribe);
   ::yoke::administrative::v1::Subscribe* unsafe_arena_release_subscribe();
 
+  // .yoke.administrative.v1.UnitCommand unit_command = 18;
+  bool has_unit_command() const;
+  private:
+  bool _internal_has_unit_command() const;
+  public:
+  void clear_unit_command();
+  const ::yoke::administrative::v1::UnitCommand& unit_command() const;
+  PROTOBUF_NODISCARD ::yoke::administrative::v1::UnitCommand* release_unit_command();
+  ::yoke::administrative::v1::UnitCommand* mutable_unit_command();
+  void set_allocated_unit_command(::yoke::administrative::v1::UnitCommand* unit_command);
+  private:
+  const ::yoke::administrative::v1::UnitCommand& _internal_unit_command() const;
+  ::yoke::administrative::v1::UnitCommand* _internal_mutable_unit_command();
+  public:
+  void unsafe_arena_set_allocated_unit_command(
+      ::yoke::administrative::v1::UnitCommand* unit_command);
+  ::yoke::administrative::v1::UnitCommand* unsafe_arena_release_unit_command();
+
   void clear_operation();
   OperationCase operation_case() const;
   // @@protoc_insertion_point(class_scope:yoke.administrative.v1.Request)
@@ -650,6 +705,7 @@ class Request final :
   void set_has_log_query();
   void set_has_log_follow();
   void set_has_subscribe();
+  void set_has_unit_command();
 
   inline bool has_operation() const;
   inline void clear_has_operation();
@@ -678,6 +734,7 @@ class Request final :
       ::yoke::administrative::v1::LogQuery* log_query_;
       ::yoke::administrative::v1::LogFollow* log_follow_;
       ::yoke::administrative::v1::Subscribe* subscribe_;
+      ::yoke::administrative::v1::UnitCommand* unit_command_;
     } operation_;
     mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
     uint32_t _oneof_case_[1];
@@ -1721,6 +1778,191 @@ class UnitAsk final :
 };
 // -------------------------------------------------------------------
 
+class UnitCommand final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:yoke.administrative.v1.UnitCommand) */ {
+ public:
+  inline UnitCommand() : UnitCommand(nullptr) {}
+  ~UnitCommand() override;
+  explicit PROTOBUF_CONSTEXPR UnitCommand(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+
+  UnitCommand(const UnitCommand& from);
+  UnitCommand(UnitCommand&& from) noexcept
+    : UnitCommand() {
+    *this = ::std::move(from);
+  }
+
+  inline UnitCommand& operator=(const UnitCommand& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline UnitCommand& operator=(UnitCommand&& from) noexcept {
+    if (this == &from) return *this;
+    if (GetOwningArena() == from.GetOwningArena()
+  #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
+        && GetOwningArena() != nullptr
+  #endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
+    ) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const UnitCommand& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const UnitCommand* internal_default_instance() {
+    return reinterpret_cast<const UnitCommand*>(
+               &_UnitCommand_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    7;
+
+  friend void swap(UnitCommand& a, UnitCommand& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(UnitCommand* other) {
+    if (other == this) return;
+  #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() != nullptr &&
+        GetOwningArena() == other->GetOwningArena()) {
+   #else  // PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() == other->GetOwningArena()) {
+  #endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(UnitCommand* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  UnitCommand* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
+    return CreateMaybeMessage<UnitCommand>(arena);
+  }
+  using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
+  void CopyFrom(const UnitCommand& from);
+  using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
+  void MergeFrom( const UnitCommand& from) {
+    UnitCommand::MergeImpl(*this, from);
+  }
+  private:
+  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg);
+  public:
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  uint8_t* _InternalSerialize(
+      uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _impl_._cached_size_.Get(); }
+
+  private:
+  void SharedCtor(::PROTOBUF_NAMESPACE_ID::Arena* arena, bool is_message_owned);
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(UnitCommand* other);
+
+  private:
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "yoke.administrative.v1.UnitCommand";
+  }
+  protected:
+  explicit UnitCommand(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                       bool is_message_owned = false);
+  public:
+
+  static const ClassData _class_data_;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kUnitFieldNumber = 1,
+    kTypeFieldNumber = 2,
+    kPayloadFieldNumber = 3,
+  };
+  // string unit = 1;
+  void clear_unit();
+  const std::string& unit() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_unit(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_unit();
+  PROTOBUF_NODISCARD std::string* release_unit();
+  void set_allocated_unit(std::string* unit);
+  private:
+  const std::string& _internal_unit() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_unit(const std::string& value);
+  std::string* _internal_mutable_unit();
+  public:
+
+  // string type = 2;
+  void clear_type();
+  const std::string& type() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_type(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_type();
+  PROTOBUF_NODISCARD std::string* release_type();
+  void set_allocated_type(std::string* type);
+  private:
+  const std::string& _internal_type() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_type(const std::string& value);
+  std::string* _internal_mutable_type();
+  public:
+
+  // bytes payload = 3;
+  void clear_payload();
+  const std::string& payload() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_payload(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_payload();
+  PROTOBUF_NODISCARD std::string* release_payload();
+  void set_allocated_payload(std::string* payload);
+  private:
+  const std::string& _internal_payload() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_payload(const std::string& value);
+  std::string* _internal_mutable_payload();
+  public:
+
+  // @@protoc_insertion_point(class_scope:yoke.administrative.v1.UnitCommand)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  struct Impl_ {
+    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr unit_;
+    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr type_;
+    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr payload_;
+    mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  };
+  union { Impl_ _impl_; };
+  friend struct ::TableStruct_yoke_2fadministrative_2fv1_2foperations_2eproto;
+};
+// -------------------------------------------------------------------
+
 class Read final :
     public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:yoke.administrative.v1.Read) */ {
  public:
@@ -1769,7 +2011,7 @@ class Read final :
                &_Read_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    7;
+    8;
 
   friend void swap(Read& a, Read& b) {
     a.Swap(&b);
@@ -1938,7 +2180,7 @@ class LogQuery final :
                &_LogQuery_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    8;
+    9;
 
   friend void swap(LogQuery& a, LogQuery& b) {
     a.Swap(&b);
@@ -2164,7 +2406,7 @@ class LogFollow final :
                &_LogFollow_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    9;
+    10;
 
   friend void swap(LogFollow& a, LogFollow& b) {
     a.Swap(&b);
@@ -2350,7 +2592,7 @@ class Subscribe final :
                &_Subscribe_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    10;
+    11;
 
   friend void swap(Subscribe& a, Subscribe& b) {
     a.Swap(&b);
@@ -2519,6 +2761,7 @@ class Response final :
     kLogQuery = 14,
     kLogFollow = 15,
     kSubscribe = 16,
+    kUnitCommand = 17,
     ANSWER_NOT_SET = 0,
   };
 
@@ -2527,7 +2770,7 @@ class Response final :
                &_Response_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    11;
+    12;
 
   friend void swap(Response& a, Response& b) {
     a.Swap(&b);
@@ -2616,6 +2859,7 @@ class Response final :
     kLogQueryFieldNumber = 14,
     kLogFollowFieldNumber = 15,
     kSubscribeFieldNumber = 16,
+    kUnitCommandFieldNumber = 17,
   };
   // .yoke.administrative.v1.Changed plugin_enable = 1;
   bool has_plugin_enable() const;
@@ -2905,6 +3149,24 @@ class Response final :
       ::yoke::administrative::v1::Subscribed* subscribe);
   ::yoke::administrative::v1::Subscribed* unsafe_arena_release_subscribe();
 
+  // .yoke.administrative.v1.Commanded unit_command = 17;
+  bool has_unit_command() const;
+  private:
+  bool _internal_has_unit_command() const;
+  public:
+  void clear_unit_command();
+  const ::yoke::administrative::v1::Commanded& unit_command() const;
+  PROTOBUF_NODISCARD ::yoke::administrative::v1::Commanded* release_unit_command();
+  ::yoke::administrative::v1::Commanded* mutable_unit_command();
+  void set_allocated_unit_command(::yoke::administrative::v1::Commanded* unit_command);
+  private:
+  const ::yoke::administrative::v1::Commanded& _internal_unit_command() const;
+  ::yoke::administrative::v1::Commanded* _internal_mutable_unit_command();
+  public:
+  void unsafe_arena_set_allocated_unit_command(
+      ::yoke::administrative::v1::Commanded* unit_command);
+  ::yoke::administrative::v1::Commanded* unsafe_arena_release_unit_command();
+
   void clear_answer();
   AnswerCase answer_case() const;
   // @@protoc_insertion_point(class_scope:yoke.administrative.v1.Response)
@@ -2926,6 +3188,7 @@ class Response final :
   void set_has_log_query();
   void set_has_log_follow();
   void set_has_subscribe();
+  void set_has_unit_command();
 
   inline bool has_answer() const;
   inline void clear_has_answer();
@@ -2953,6 +3216,7 @@ class Response final :
       ::yoke::administrative::v1::LogPage* log_query_;
       ::yoke::administrative::v1::Followed* log_follow_;
       ::yoke::administrative::v1::Subscribed* subscribe_;
+      ::yoke::administrative::v1::Commanded* unit_command_;
     } answer_;
     mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
     uint32_t _oneof_case_[1];
@@ -3011,7 +3275,7 @@ class Changed final :
                &_Changed_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    12;
+    13;
 
   friend void swap(Changed& a, Changed& b) {
     a.Swap(&b);
@@ -3239,7 +3503,7 @@ class Previously final :
                &_Previously_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    13;
+    14;
 
   friend void swap(Previously& a, Previously& b) {
     a.Swap(&b);
@@ -3461,7 +3725,7 @@ class Retention final :
                &_Retention_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    14;
+    15;
 
   friend void swap(Retention& a, Retention& b) {
     a.Swap(&b);
@@ -3649,7 +3913,7 @@ class Consequence final :
                &_Consequence_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    15;
+    16;
 
   friend void swap(Consequence& a, Consequence& b) {
     a.Swap(&b);
@@ -3829,7 +4093,7 @@ class Asked final :
                &_Asked_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    16;
+    17;
 
   friend void swap(Asked& a, Asked& b) {
     a.Swap(&b);
@@ -3934,6 +4198,204 @@ class Asked final :
 };
 // -------------------------------------------------------------------
 
+class Commanded final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:yoke.administrative.v1.Commanded) */ {
+ public:
+  inline Commanded() : Commanded(nullptr) {}
+  ~Commanded() override;
+  explicit PROTOBUF_CONSTEXPR Commanded(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+
+  Commanded(const Commanded& from);
+  Commanded(Commanded&& from) noexcept
+    : Commanded() {
+    *this = ::std::move(from);
+  }
+
+  inline Commanded& operator=(const Commanded& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline Commanded& operator=(Commanded&& from) noexcept {
+    if (this == &from) return *this;
+    if (GetOwningArena() == from.GetOwningArena()
+  #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
+        && GetOwningArena() != nullptr
+  #endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
+    ) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const Commanded& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const Commanded* internal_default_instance() {
+    return reinterpret_cast<const Commanded*>(
+               &_Commanded_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    18;
+
+  friend void swap(Commanded& a, Commanded& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(Commanded* other) {
+    if (other == this) return;
+  #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() != nullptr &&
+        GetOwningArena() == other->GetOwningArena()) {
+   #else  // PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() == other->GetOwningArena()) {
+  #endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(Commanded* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  Commanded* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
+    return CreateMaybeMessage<Commanded>(arena);
+  }
+  using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
+  void CopyFrom(const Commanded& from);
+  using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
+  void MergeFrom( const Commanded& from) {
+    Commanded::MergeImpl(*this, from);
+  }
+  private:
+  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg);
+  public:
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  uint8_t* _InternalSerialize(
+      uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _impl_._cached_size_.Get(); }
+
+  private:
+  void SharedCtor(::PROTOBUF_NAMESPACE_ID::Arena* arena, bool is_message_owned);
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(Commanded* other);
+
+  private:
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "yoke.administrative.v1.Commanded";
+  }
+  protected:
+  explicit Commanded(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                       bool is_message_owned = false);
+  public:
+
+  static const ClassData _class_data_;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  typedef Commanded_Outcome Outcome;
+  static constexpr Outcome OUTCOME_UNSPECIFIED =
+    Commanded_Outcome_OUTCOME_UNSPECIFIED;
+  static constexpr Outcome OUTCOME_ACCEPTED =
+    Commanded_Outcome_OUTCOME_ACCEPTED;
+  static constexpr Outcome OUTCOME_DONE =
+    Commanded_Outcome_OUTCOME_DONE;
+  static constexpr Outcome OUTCOME_FAILED =
+    Commanded_Outcome_OUTCOME_FAILED;
+  static inline bool Outcome_IsValid(int value) {
+    return Commanded_Outcome_IsValid(value);
+  }
+  static constexpr Outcome Outcome_MIN =
+    Commanded_Outcome_Outcome_MIN;
+  static constexpr Outcome Outcome_MAX =
+    Commanded_Outcome_Outcome_MAX;
+  static constexpr int Outcome_ARRAYSIZE =
+    Commanded_Outcome_Outcome_ARRAYSIZE;
+  static inline const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor*
+  Outcome_descriptor() {
+    return Commanded_Outcome_descriptor();
+  }
+  template<typename T>
+  static inline const std::string& Outcome_Name(T enum_t_value) {
+    static_assert(::std::is_same<T, Outcome>::value ||
+      ::std::is_integral<T>::value,
+      "Incorrect type passed to function Outcome_Name.");
+    return Commanded_Outcome_Name(enum_t_value);
+  }
+  static inline bool Outcome_Parse(::PROTOBUF_NAMESPACE_ID::ConstStringParam name,
+      Outcome* value) {
+    return Commanded_Outcome_Parse(name, value);
+  }
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kLineFieldNumber = 2,
+    kOutcomeFieldNumber = 1,
+  };
+  // string line = 2;
+  void clear_line();
+  const std::string& line() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_line(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_line();
+  PROTOBUF_NODISCARD std::string* release_line();
+  void set_allocated_line(std::string* line);
+  private:
+  const std::string& _internal_line() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_line(const std::string& value);
+  std::string* _internal_mutable_line();
+  public:
+
+  // .yoke.administrative.v1.Commanded.Outcome outcome = 1;
+  void clear_outcome();
+  ::yoke::administrative::v1::Commanded_Outcome outcome() const;
+  void set_outcome(::yoke::administrative::v1::Commanded_Outcome value);
+  private:
+  ::yoke::administrative::v1::Commanded_Outcome _internal_outcome() const;
+  void _internal_set_outcome(::yoke::administrative::v1::Commanded_Outcome value);
+  public:
+
+  // @@protoc_insertion_point(class_scope:yoke.administrative.v1.Commanded)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  struct Impl_ {
+    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr line_;
+    int outcome_;
+    mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  };
+  union { Impl_ _impl_; };
+  friend struct ::TableStruct_yoke_2fadministrative_2fv1_2foperations_2eproto;
+};
+// -------------------------------------------------------------------
+
 class LogPage final :
     public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:yoke.administrative.v1.LogPage) */ {
  public:
@@ -3982,7 +4444,7 @@ class LogPage final :
                &_LogPage_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    17;
+    19;
 
   friend void swap(LogPage& a, LogPage& b) {
     a.Swap(&b);
@@ -4161,7 +4623,7 @@ class LogEntry final :
                &_LogEntry_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    18;
+    20;
 
   friend void swap(LogEntry& a, LogEntry& b) {
     a.Swap(&b);
@@ -4496,7 +4958,7 @@ class Followed final :
                &_Followed_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    19;
+    21;
 
   friend void swap(Followed& a, Followed& b) {
     a.Swap(&b);
@@ -4688,7 +5150,7 @@ class Subscribed final :
                &_Subscribed_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    20;
+    22;
 
   friend void swap(Subscribed& a, Subscribed& b) {
     a.Swap(&b);
@@ -6064,6 +6526,80 @@ inline ::yoke::administrative::v1::Subscribe* Request::mutable_subscribe() {
   return _msg;
 }
 
+// .yoke.administrative.v1.UnitCommand unit_command = 18;
+inline bool Request::_internal_has_unit_command() const {
+  return operation_case() == kUnitCommand;
+}
+inline bool Request::has_unit_command() const {
+  return _internal_has_unit_command();
+}
+inline void Request::set_has_unit_command() {
+  _impl_._oneof_case_[0] = kUnitCommand;
+}
+inline void Request::clear_unit_command() {
+  if (_internal_has_unit_command()) {
+    if (GetArenaForAllocation() == nullptr) {
+      delete _impl_.operation_.unit_command_;
+    }
+    clear_has_operation();
+  }
+}
+inline ::yoke::administrative::v1::UnitCommand* Request::release_unit_command() {
+  // @@protoc_insertion_point(field_release:yoke.administrative.v1.Request.unit_command)
+  if (_internal_has_unit_command()) {
+    clear_has_operation();
+    ::yoke::administrative::v1::UnitCommand* temp = _impl_.operation_.unit_command_;
+    if (GetArenaForAllocation() != nullptr) {
+      temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+    }
+    _impl_.operation_.unit_command_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline const ::yoke::administrative::v1::UnitCommand& Request::_internal_unit_command() const {
+  return _internal_has_unit_command()
+      ? *_impl_.operation_.unit_command_
+      : reinterpret_cast< ::yoke::administrative::v1::UnitCommand&>(::yoke::administrative::v1::_UnitCommand_default_instance_);
+}
+inline const ::yoke::administrative::v1::UnitCommand& Request::unit_command() const {
+  // @@protoc_insertion_point(field_get:yoke.administrative.v1.Request.unit_command)
+  return _internal_unit_command();
+}
+inline ::yoke::administrative::v1::UnitCommand* Request::unsafe_arena_release_unit_command() {
+  // @@protoc_insertion_point(field_unsafe_arena_release:yoke.administrative.v1.Request.unit_command)
+  if (_internal_has_unit_command()) {
+    clear_has_operation();
+    ::yoke::administrative::v1::UnitCommand* temp = _impl_.operation_.unit_command_;
+    _impl_.operation_.unit_command_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline void Request::unsafe_arena_set_allocated_unit_command(::yoke::administrative::v1::UnitCommand* unit_command) {
+  clear_operation();
+  if (unit_command) {
+    set_has_unit_command();
+    _impl_.operation_.unit_command_ = unit_command;
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:yoke.administrative.v1.Request.unit_command)
+}
+inline ::yoke::administrative::v1::UnitCommand* Request::_internal_mutable_unit_command() {
+  if (!_internal_has_unit_command()) {
+    clear_operation();
+    set_has_unit_command();
+    _impl_.operation_.unit_command_ = CreateMaybeMessage< ::yoke::administrative::v1::UnitCommand >(GetArenaForAllocation());
+  }
+  return _impl_.operation_.unit_command_;
+}
+inline ::yoke::administrative::v1::UnitCommand* Request::mutable_unit_command() {
+  ::yoke::administrative::v1::UnitCommand* _msg = _internal_mutable_unit_command();
+  // @@protoc_insertion_point(field_mutable:yoke.administrative.v1.Request.unit_command)
+  return _msg;
+}
+
 inline bool Request::has_operation() const {
   return operation_case() != OPERATION_NOT_SET;
 }
@@ -6736,6 +7272,160 @@ inline void UnitAsk::set_allocated_question(std::string* question) {
   }
 #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
   // @@protoc_insertion_point(field_set_allocated:yoke.administrative.v1.UnitAsk.question)
+}
+
+// -------------------------------------------------------------------
+
+// UnitCommand
+
+// string unit = 1;
+inline void UnitCommand::clear_unit() {
+  _impl_.unit_.ClearToEmpty();
+}
+inline const std::string& UnitCommand::unit() const {
+  // @@protoc_insertion_point(field_get:yoke.administrative.v1.UnitCommand.unit)
+  return _internal_unit();
+}
+template <typename ArgT0, typename... ArgT>
+inline PROTOBUF_ALWAYS_INLINE
+void UnitCommand::set_unit(ArgT0&& arg0, ArgT... args) {
+ 
+ _impl_.unit_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:yoke.administrative.v1.UnitCommand.unit)
+}
+inline std::string* UnitCommand::mutable_unit() {
+  std::string* _s = _internal_mutable_unit();
+  // @@protoc_insertion_point(field_mutable:yoke.administrative.v1.UnitCommand.unit)
+  return _s;
+}
+inline const std::string& UnitCommand::_internal_unit() const {
+  return _impl_.unit_.Get();
+}
+inline void UnitCommand::_internal_set_unit(const std::string& value) {
+  
+  _impl_.unit_.Set(value, GetArenaForAllocation());
+}
+inline std::string* UnitCommand::_internal_mutable_unit() {
+  
+  return _impl_.unit_.Mutable(GetArenaForAllocation());
+}
+inline std::string* UnitCommand::release_unit() {
+  // @@protoc_insertion_point(field_release:yoke.administrative.v1.UnitCommand.unit)
+  return _impl_.unit_.Release();
+}
+inline void UnitCommand::set_allocated_unit(std::string* unit) {
+  if (unit != nullptr) {
+    
+  } else {
+    
+  }
+  _impl_.unit_.SetAllocated(unit, GetArenaForAllocation());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (_impl_.unit_.IsDefault()) {
+    _impl_.unit_.Set("", GetArenaForAllocation());
+  }
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  // @@protoc_insertion_point(field_set_allocated:yoke.administrative.v1.UnitCommand.unit)
+}
+
+// string type = 2;
+inline void UnitCommand::clear_type() {
+  _impl_.type_.ClearToEmpty();
+}
+inline const std::string& UnitCommand::type() const {
+  // @@protoc_insertion_point(field_get:yoke.administrative.v1.UnitCommand.type)
+  return _internal_type();
+}
+template <typename ArgT0, typename... ArgT>
+inline PROTOBUF_ALWAYS_INLINE
+void UnitCommand::set_type(ArgT0&& arg0, ArgT... args) {
+ 
+ _impl_.type_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:yoke.administrative.v1.UnitCommand.type)
+}
+inline std::string* UnitCommand::mutable_type() {
+  std::string* _s = _internal_mutable_type();
+  // @@protoc_insertion_point(field_mutable:yoke.administrative.v1.UnitCommand.type)
+  return _s;
+}
+inline const std::string& UnitCommand::_internal_type() const {
+  return _impl_.type_.Get();
+}
+inline void UnitCommand::_internal_set_type(const std::string& value) {
+  
+  _impl_.type_.Set(value, GetArenaForAllocation());
+}
+inline std::string* UnitCommand::_internal_mutable_type() {
+  
+  return _impl_.type_.Mutable(GetArenaForAllocation());
+}
+inline std::string* UnitCommand::release_type() {
+  // @@protoc_insertion_point(field_release:yoke.administrative.v1.UnitCommand.type)
+  return _impl_.type_.Release();
+}
+inline void UnitCommand::set_allocated_type(std::string* type) {
+  if (type != nullptr) {
+    
+  } else {
+    
+  }
+  _impl_.type_.SetAllocated(type, GetArenaForAllocation());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (_impl_.type_.IsDefault()) {
+    _impl_.type_.Set("", GetArenaForAllocation());
+  }
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  // @@protoc_insertion_point(field_set_allocated:yoke.administrative.v1.UnitCommand.type)
+}
+
+// bytes payload = 3;
+inline void UnitCommand::clear_payload() {
+  _impl_.payload_.ClearToEmpty();
+}
+inline const std::string& UnitCommand::payload() const {
+  // @@protoc_insertion_point(field_get:yoke.administrative.v1.UnitCommand.payload)
+  return _internal_payload();
+}
+template <typename ArgT0, typename... ArgT>
+inline PROTOBUF_ALWAYS_INLINE
+void UnitCommand::set_payload(ArgT0&& arg0, ArgT... args) {
+ 
+ _impl_.payload_.SetBytes(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:yoke.administrative.v1.UnitCommand.payload)
+}
+inline std::string* UnitCommand::mutable_payload() {
+  std::string* _s = _internal_mutable_payload();
+  // @@protoc_insertion_point(field_mutable:yoke.administrative.v1.UnitCommand.payload)
+  return _s;
+}
+inline const std::string& UnitCommand::_internal_payload() const {
+  return _impl_.payload_.Get();
+}
+inline void UnitCommand::_internal_set_payload(const std::string& value) {
+  
+  _impl_.payload_.Set(value, GetArenaForAllocation());
+}
+inline std::string* UnitCommand::_internal_mutable_payload() {
+  
+  return _impl_.payload_.Mutable(GetArenaForAllocation());
+}
+inline std::string* UnitCommand::release_payload() {
+  // @@protoc_insertion_point(field_release:yoke.administrative.v1.UnitCommand.payload)
+  return _impl_.payload_.Release();
+}
+inline void UnitCommand::set_allocated_payload(std::string* payload) {
+  if (payload != nullptr) {
+    
+  } else {
+    
+  }
+  _impl_.payload_.SetAllocated(payload, GetArenaForAllocation());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (_impl_.payload_.IsDefault()) {
+    _impl_.payload_.Set("", GetArenaForAllocation());
+  }
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  // @@protoc_insertion_point(field_set_allocated:yoke.administrative.v1.UnitCommand.payload)
 }
 
 // -------------------------------------------------------------------
@@ -8509,6 +9199,80 @@ inline ::yoke::administrative::v1::Subscribed* Response::mutable_subscribe() {
   return _msg;
 }
 
+// .yoke.administrative.v1.Commanded unit_command = 17;
+inline bool Response::_internal_has_unit_command() const {
+  return answer_case() == kUnitCommand;
+}
+inline bool Response::has_unit_command() const {
+  return _internal_has_unit_command();
+}
+inline void Response::set_has_unit_command() {
+  _impl_._oneof_case_[0] = kUnitCommand;
+}
+inline void Response::clear_unit_command() {
+  if (_internal_has_unit_command()) {
+    if (GetArenaForAllocation() == nullptr) {
+      delete _impl_.answer_.unit_command_;
+    }
+    clear_has_answer();
+  }
+}
+inline ::yoke::administrative::v1::Commanded* Response::release_unit_command() {
+  // @@protoc_insertion_point(field_release:yoke.administrative.v1.Response.unit_command)
+  if (_internal_has_unit_command()) {
+    clear_has_answer();
+    ::yoke::administrative::v1::Commanded* temp = _impl_.answer_.unit_command_;
+    if (GetArenaForAllocation() != nullptr) {
+      temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+    }
+    _impl_.answer_.unit_command_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline const ::yoke::administrative::v1::Commanded& Response::_internal_unit_command() const {
+  return _internal_has_unit_command()
+      ? *_impl_.answer_.unit_command_
+      : reinterpret_cast< ::yoke::administrative::v1::Commanded&>(::yoke::administrative::v1::_Commanded_default_instance_);
+}
+inline const ::yoke::administrative::v1::Commanded& Response::unit_command() const {
+  // @@protoc_insertion_point(field_get:yoke.administrative.v1.Response.unit_command)
+  return _internal_unit_command();
+}
+inline ::yoke::administrative::v1::Commanded* Response::unsafe_arena_release_unit_command() {
+  // @@protoc_insertion_point(field_unsafe_arena_release:yoke.administrative.v1.Response.unit_command)
+  if (_internal_has_unit_command()) {
+    clear_has_answer();
+    ::yoke::administrative::v1::Commanded* temp = _impl_.answer_.unit_command_;
+    _impl_.answer_.unit_command_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline void Response::unsafe_arena_set_allocated_unit_command(::yoke::administrative::v1::Commanded* unit_command) {
+  clear_answer();
+  if (unit_command) {
+    set_has_unit_command();
+    _impl_.answer_.unit_command_ = unit_command;
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:yoke.administrative.v1.Response.unit_command)
+}
+inline ::yoke::administrative::v1::Commanded* Response::_internal_mutable_unit_command() {
+  if (!_internal_has_unit_command()) {
+    clear_answer();
+    set_has_unit_command();
+    _impl_.answer_.unit_command_ = CreateMaybeMessage< ::yoke::administrative::v1::Commanded >(GetArenaForAllocation());
+  }
+  return _impl_.answer_.unit_command_;
+}
+inline ::yoke::administrative::v1::Commanded* Response::mutable_unit_command() {
+  ::yoke::administrative::v1::Commanded* _msg = _internal_mutable_unit_command();
+  // @@protoc_insertion_point(field_mutable:yoke.administrative.v1.Response.unit_command)
+  return _msg;
+}
+
 inline bool Response::has_answer() const {
   return answer_case() != ANSWER_NOT_SET;
 }
@@ -9233,6 +9997,80 @@ inline void Asked::set_allocated_answer(std::string* answer) {
   }
 #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
   // @@protoc_insertion_point(field_set_allocated:yoke.administrative.v1.Asked.answer)
+}
+
+// -------------------------------------------------------------------
+
+// Commanded
+
+// .yoke.administrative.v1.Commanded.Outcome outcome = 1;
+inline void Commanded::clear_outcome() {
+  _impl_.outcome_ = 0;
+}
+inline ::yoke::administrative::v1::Commanded_Outcome Commanded::_internal_outcome() const {
+  return static_cast< ::yoke::administrative::v1::Commanded_Outcome >(_impl_.outcome_);
+}
+inline ::yoke::administrative::v1::Commanded_Outcome Commanded::outcome() const {
+  // @@protoc_insertion_point(field_get:yoke.administrative.v1.Commanded.outcome)
+  return _internal_outcome();
+}
+inline void Commanded::_internal_set_outcome(::yoke::administrative::v1::Commanded_Outcome value) {
+  
+  _impl_.outcome_ = value;
+}
+inline void Commanded::set_outcome(::yoke::administrative::v1::Commanded_Outcome value) {
+  _internal_set_outcome(value);
+  // @@protoc_insertion_point(field_set:yoke.administrative.v1.Commanded.outcome)
+}
+
+// string line = 2;
+inline void Commanded::clear_line() {
+  _impl_.line_.ClearToEmpty();
+}
+inline const std::string& Commanded::line() const {
+  // @@protoc_insertion_point(field_get:yoke.administrative.v1.Commanded.line)
+  return _internal_line();
+}
+template <typename ArgT0, typename... ArgT>
+inline PROTOBUF_ALWAYS_INLINE
+void Commanded::set_line(ArgT0&& arg0, ArgT... args) {
+ 
+ _impl_.line_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:yoke.administrative.v1.Commanded.line)
+}
+inline std::string* Commanded::mutable_line() {
+  std::string* _s = _internal_mutable_line();
+  // @@protoc_insertion_point(field_mutable:yoke.administrative.v1.Commanded.line)
+  return _s;
+}
+inline const std::string& Commanded::_internal_line() const {
+  return _impl_.line_.Get();
+}
+inline void Commanded::_internal_set_line(const std::string& value) {
+  
+  _impl_.line_.Set(value, GetArenaForAllocation());
+}
+inline std::string* Commanded::_internal_mutable_line() {
+  
+  return _impl_.line_.Mutable(GetArenaForAllocation());
+}
+inline std::string* Commanded::release_line() {
+  // @@protoc_insertion_point(field_release:yoke.administrative.v1.Commanded.line)
+  return _impl_.line_.Release();
+}
+inline void Commanded::set_allocated_line(std::string* line) {
+  if (line != nullptr) {
+    
+  } else {
+    
+  }
+  _impl_.line_.SetAllocated(line, GetArenaForAllocation());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (_impl_.line_.IsDefault()) {
+    _impl_.line_.Set("", GetArenaForAllocation());
+  }
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  // @@protoc_insertion_point(field_set_allocated:yoke.administrative.v1.Commanded.line)
 }
 
 // -------------------------------------------------------------------
@@ -10267,6 +11105,10 @@ inline Subscribed::CarriesCase Subscribed::carries_case() const {
 
 // -------------------------------------------------------------------
 
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
 
 // @@protoc_insertion_point(namespace_scope)
 
@@ -10280,6 +11122,11 @@ template <> struct is_proto_enum< ::yoke::administrative::v1::Changed_Effective>
 template <>
 inline const EnumDescriptor* GetEnumDescriptor< ::yoke::administrative::v1::Changed_Effective>() {
   return ::yoke::administrative::v1::Changed_Effective_descriptor();
+}
+template <> struct is_proto_enum< ::yoke::administrative::v1::Commanded_Outcome> : ::std::true_type {};
+template <>
+inline const EnumDescriptor* GetEnumDescriptor< ::yoke::administrative::v1::Commanded_Outcome>() {
+  return ::yoke::administrative::v1::Commanded_Outcome_descriptor();
 }
 
 PROTOBUF_NAMESPACE_CLOSE

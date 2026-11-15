@@ -481,42 +481,43 @@ const char descriptor_table_protodef_yoke_2fplugin_2fv1_2ffamilies_2eproto[] PRO
   "PECIFIED\020\000\022\027\n\023CAUSE_LIVENESS_LOST\020\001\022\031\n\025C"
   "AUSE_PLUGIN_DISABLED\020\002\022\030\n\024CAUSE_SCOPE_EX"
   "CEEDED\020\003\022\032\n\026CAUSE_PROTOCOL_FAILURE\020\004B\006\n\004"
-  "kind\"\312\003\n\007Control\0222\n\007command\030\001 \001(\0132\037.yoke"
+  "kind\"\206\004\n\007Control\0222\n\007command\030\001 \001(\0132\037.yoke"
   ".plugin.v1.Control.CommandH\000\0224\n\010activate"
   "\030\002 \001(\0132 .yoke.plugin.v1.Control.Activate"
   "H\000\022,\n\004stop\030\003 \001(\0132\034.yoke.plugin.v1.Contro"
   "l.StopH\000\032(\n\007Command\022\014\n\004type\030\001 \001(\t\022\017\n\007pay"
-  "load\030\002 \001(\014\032\334\001\n\010Activate\022\016\n\006stream\030\001 \001(\t\022"
+  "load\030\002 \001(\014\032\230\002\n\010Activate\022\016\n\006stream\030\001 \001(\t\022"
   "=\n\ttransport\030\002 \001(\0162*.yoke.plugin.v1.Cont"
   "rol.Activate.Transport\022\017\n\007address\030\003 \001(\t\""
-  "p\n\tTransport\022\031\n\025TRANSPORT_UNSPECIFIED\020\000\022"
-  "\025\n\021TRANSPORT_ORDERED\020\001\022\024\n\020TRANSPORT_FRAM"
-  "ED\020\002\022\033\n\027TRANSPORT_SHARED_OBJECT\020\003\032\026\n\004Sto"
-  "p\022\016\n\006stream\030\001 \001(\tB\006\n\004kind\"\241\001\n\003Ack\022,\n\007out"
-  "come\030\001 \001(\0162\033.yoke.plugin.v1.Ack.Outcome\022"
-  "\014\n\004line\030\002 \001(\t\"^\n\007Outcome\022\027\n\023OUTCOME_UNSP"
-  "ECIFIED\020\000\022\024\n\020OUTCOME_ACCEPTED\020\001\022\020\n\014OUTCO"
-  "ME_DONE\020\002\022\022\n\016OUTCOME_FAILED\020\003\"\271\001\n\005Query\022"
-  "2\n\010question\030\001 \001(\0132\036.yoke.plugin.v1.Query"
-  ".QuestionH\000\022.\n\006answer\030\002 \001(\0132\034.yoke.plugi"
-  "n.v1.Query.AnswerH\000\032)\n\010Question\022\014\n\004type\030"
-  "\001 \001(\t\022\017\n\007payload\030\002 \001(\014\032\031\n\006Answer\022\017\n\007payl"
-  "oad\030\001 \001(\014B\006\n\004kind\")\n\004Data\022\020\n\010sequence\030\001 "
-  "\001(\004\022\017\n\007payload\030\002 \001(\014\"%\n\006Health\022\r\n\005grade\030"
-  "\001 \001(\r\022\014\n\004line\030\002 \001(\t\"K\n\005Event\022\022\n\noccurren"
-  "ce\030\001 \001(\t\022\020\n\010severity\030\002 \001(\r\022\014\n\004line\030\003 \001(\t"
-  "\022\016\n\006detail\030\004 \001(\014\"\322\001\n\005Error\022\014\n\004code\030\001 \001(\t"
-  "\022\017\n\007message\030\002 \001(\t\0225\n\tdivergent\030\003 \001(\0132 .y"
-  "oke.plugin.v1.Error.DivergenceH\000\0222\n\010with"
-  "held\030\004 \001(\0132\036.yoke.plugin.v1.Error.Withhe"
-  "ldH\000\032\033\n\nDivergence\022\r\n\005items\030\001 \003(\t\032\030\n\010Wit"
-  "hheld\022\014\n\004item\030\001 \001(\tB\010\n\006detailB<Z:github."
-  "com/yoke-project/yoke/proto/yoke/plugin/"
-  "v1;pluginv1b\006proto3"
+  "\253\001\n\tTransport\022\031\n\025TRANSPORT_UNSPECIFIED\020\000"
+  "\022\025\n\021TRANSPORT_ORDERED\020\001\022\024\n\020TRANSPORT_FRA"
+  "MED\020\002\022\033\n\027TRANSPORT_SHARED_OBJECT\020\003\022\034\n\030TR"
+  "ANSPORT_ORDERED_STREAM\020\004\022\033\n\027TRANSPORT_FR"
+  "AMED_STREAM\020\005\032\026\n\004Stop\022\016\n\006stream\030\001 \001(\tB\006\n"
+  "\004kind\"\241\001\n\003Ack\022,\n\007outcome\030\001 \001(\0162\033.yoke.pl"
+  "ugin.v1.Ack.Outcome\022\014\n\004line\030\002 \001(\t\"^\n\007Out"
+  "come\022\027\n\023OUTCOME_UNSPECIFIED\020\000\022\024\n\020OUTCOME"
+  "_ACCEPTED\020\001\022\020\n\014OUTCOME_DONE\020\002\022\022\n\016OUTCOME"
+  "_FAILED\020\003\"\271\001\n\005Query\0222\n\010question\030\001 \001(\0132\036."
+  "yoke.plugin.v1.Query.QuestionH\000\022.\n\006answe"
+  "r\030\002 \001(\0132\034.yoke.plugin.v1.Query.AnswerH\000\032"
+  ")\n\010Question\022\014\n\004type\030\001 \001(\t\022\017\n\007payload\030\002 \001"
+  "(\014\032\031\n\006Answer\022\017\n\007payload\030\001 \001(\014B\006\n\004kind\")\n"
+  "\004Data\022\020\n\010sequence\030\001 \001(\004\022\017\n\007payload\030\002 \001(\014"
+  "\"%\n\006Health\022\r\n\005grade\030\001 \001(\r\022\014\n\004line\030\002 \001(\t\""
+  "K\n\005Event\022\022\n\noccurrence\030\001 \001(\t\022\020\n\010severity"
+  "\030\002 \001(\r\022\014\n\004line\030\003 \001(\t\022\016\n\006detail\030\004 \001(\014\"\322\001\n"
+  "\005Error\022\014\n\004code\030\001 \001(\t\022\017\n\007message\030\002 \001(\t\0225\n"
+  "\tdivergent\030\003 \001(\0132 .yoke.plugin.v1.Error."
+  "DivergenceH\000\0222\n\010withheld\030\004 \001(\0132\036.yoke.pl"
+  "ugin.v1.Error.WithheldH\000\032\033\n\nDivergence\022\r"
+  "\n\005items\030\001 \003(\t\032\030\n\010Withheld\022\014\n\004item\030\001 \001(\tB"
+  "\010\n\006detailB<Z:github.com/yoke-project/yok"
+  "e/proto/yoke/plugin/v1;pluginv1b\006proto3"
   ;
 static ::_pbi::once_flag descriptor_table_yoke_2fplugin_2fv1_2ffamilies_2eproto_once;
 const ::_pbi::DescriptorTable descriptor_table_yoke_2fplugin_2fv1_2ffamilies_2eproto = {
-    false, false, 1739, descriptor_table_protodef_yoke_2fplugin_2fv1_2ffamilies_2eproto,
+    false, false, 1799, descriptor_table_protodef_yoke_2fplugin_2fv1_2ffamilies_2eproto,
     "yoke/plugin/v1/families.proto",
     &descriptor_table_yoke_2fplugin_2fv1_2ffamilies_2eproto_once, nullptr, 0, 18,
     schemas, file_default_instances, TableStruct_yoke_2fplugin_2fv1_2ffamilies_2eproto::offsets,
@@ -569,6 +570,8 @@ bool Control_Activate_Transport_IsValid(int value) {
     case 1:
     case 2:
     case 3:
+    case 4:
+    case 5:
       return true;
     default:
       return false;
@@ -580,6 +583,8 @@ constexpr Control_Activate_Transport Control_Activate::TRANSPORT_UNSPECIFIED;
 constexpr Control_Activate_Transport Control_Activate::TRANSPORT_ORDERED;
 constexpr Control_Activate_Transport Control_Activate::TRANSPORT_FRAMED;
 constexpr Control_Activate_Transport Control_Activate::TRANSPORT_SHARED_OBJECT;
+constexpr Control_Activate_Transport Control_Activate::TRANSPORT_ORDERED_STREAM;
+constexpr Control_Activate_Transport Control_Activate::TRANSPORT_FRAMED_STREAM;
 constexpr Control_Activate_Transport Control_Activate::Transport_MIN;
 constexpr Control_Activate_Transport Control_Activate::Transport_MAX;
 constexpr int Control_Activate::Transport_ARRAYSIZE;

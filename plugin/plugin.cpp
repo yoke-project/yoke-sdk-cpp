@@ -130,7 +130,7 @@ class Ring {
     // Maps the ring a descriptor names, for writing, and reads its geometry from its header; null, and the
     // reason, when the memory is not a ring this library writes.
     static std::unique_ptr<Ring> open(int fd, std::string *why) {
-        struct stat info {};
+        struct stat info{};
         if (::fstat(fd, &info) != 0 || info.st_size < static_cast<off_t>(header_size)) {
             *why = "the memory handed is shorter than a ring's header";
             return nullptr;
@@ -209,6 +209,8 @@ class Ring {
 struct Flow {
     int fd = -1;
     bool framed = false;
+    // A stream socket: each message is written whole, after its length as a u32 little-endian.
+    bool lengthed = false;
     std::unique_ptr<Ring> ring;
     std::mutex mu;
     std::uint64_t next = 0;
@@ -280,6 +282,10 @@ std::shared_ptr<Flow> connect_flow(const pluginv1::Control::Activate &a, std::st
     case pluginv1::Control::Activate::TRANSPORT_FRAMED:
         type = SOCK_DGRAM;
         break;
+    case pluginv1::Control::Activate::TRANSPORT_ORDERED_STREAM:
+    case pluginv1::Control::Activate::TRANSPORT_FRAMED_STREAM:
+        type = SOCK_STREAM;
+        break;
     default:
         *why = "the transport " +
                spoken(pluginv1::Control::Activate::Transport_Name(a.transport()), "TRANSPORT_") + " of " +
@@ -295,7 +301,8 @@ std::shared_ptr<Flow> connect_flow(const pluginv1::Control::Activate &a, std::st
     }
     std::memcpy(addr.sun_path, a.address().c_str(), a.address().size() + 1);
     auto f = std::make_shared<Flow>();
-    f->framed = type == SOCK_DGRAM;
+    f->framed = type == SOCK_DGRAM || a.transport() == pluginv1::Control::Activate::TRANSPORT_FRAMED_STREAM;
+    f->lengthed = type == SOCK_STREAM;
     f->fd = ::socket(AF_UNIX, type | SOCK_CLOEXEC, 0);
     if (f->fd < 0 || ::connect(f->fd, reinterpret_cast<sockaddr *>(&addr), sizeof addr) != 0) {
         *why = "the transport of " + a.stream() + " at " + a.address() +
@@ -325,6 +332,9 @@ std::string Declaration::manifest() const {
             }
             if (s.tolerates_reorder) {
                 out << "    tolerates_reorder: true\n";
+            }
+            if (s.max_frame > 0) {
+                out << "    max_frame: " << s.max_frame << "\n";
             }
         }
     }
@@ -581,6 +591,8 @@ std::unique_ptr<Unit> Unit::start(const Declaration &declaration, const Getenv &
     request.set_sdk_line(sdk_line);
     // This library writes the shared ring, so a stream of it that tolerates loss may be carried there.
     request.add_transports(pluginv1::Control::Activate::TRANSPORT_SHARED_OBJECT);
+    request.add_transports(pluginv1::Control::Activate::TRANSPORT_ORDERED_STREAM);
+    request.add_transports(pluginv1::Control::Activate::TRANSPORT_FRAMED_STREAM);
     // The surface the registration claims: the declaration again, from the same value.
     auto *claimed = request.mutable_declared();
     for (const auto &c : declaration.capabilities) {
@@ -790,6 +802,27 @@ void Unit::emit(std::string_view stream, std::string_view payload) {
         e.mutable_data()->set_payload(std::string(payload));
         s.envelopes->seal(e);
         message = e.SerializeAsString();
+    }
+    if (f->lengthed) {
+        // On a stream socket the message follows its length, and is written whole.
+        std::string prefixed(4, '\0');
+        for (int i = 0; i < 4; i++) {
+            prefixed[i] = static_cast<char>(message.size() >> (8 * i));
+        }
+        prefixed.append(message);
+        std::size_t sent = 0;
+        while (sent < prefixed.size()) {
+            ssize_t n = ::send(f->fd, prefixed.data() + sent, prefixed.size() - sent, MSG_NOSIGNAL);
+            if (n < 0 && errno == EINTR) {
+                continue;
+            }
+            if (n < 0) {
+                throw Refusal("stream.inactive", "the transport of " + std::string(stream) +
+                                                     " took nothing: " + std::strerror(errno));
+            }
+            sent += static_cast<std::size_t>(n);
+        }
+        return;
     }
     if (::send(f->fd, message.data(), message.size(), MSG_NOSIGNAL) < 0) {
         throw Refusal("stream.inactive",

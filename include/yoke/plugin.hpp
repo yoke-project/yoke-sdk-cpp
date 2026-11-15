@@ -14,6 +14,7 @@
 #define YOKE_PLUGIN_HPP
 
 #include <chrono>
+#include <cstdint>
 #include <memory>
 #include <optional>
 #include <string>
@@ -30,6 +31,8 @@ struct Stream {
     std::string id;
     bool tolerates_loss = false;
     bool tolerates_reorder = false;
+    // The largest payload the stream emits, in bytes; zero is the Core's default, 1 MiB.
+    std::uint64_t max_frame = 0;
 };
 
 // The kind of the one thing a capability governs.
