@@ -293,7 +293,7 @@ int serve(const yoke::Getenv &getenv) {
         return 1;
     }
     asked_pipe = h.wake[1];
-    struct sigaction sa{};
+    struct sigaction sa {};
     sa.sa_handler = on_term;
     sigaction(SIGTERM, &sa, nullptr);
 
