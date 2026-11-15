@@ -1,5 +1,6 @@
 #include "harness.hpp"
 #include <algorithm>
+#include <cstdlib>
 
 #include <atomic>
 #include <cerrno>
@@ -21,8 +22,26 @@ namespace harness {
 using json = nlohmann::json;
 namespace plugin = yoke::plugin;
 
-const plugin::Declaration &declaration() {
-    static const plugin::Declaration d{
+namespace {
+// Whether the suite running the harness names a feature in CONFORMANCE_FEATURES, comma-separated.
+bool named(const std::string &feature) {
+    const char *list = std::getenv("CONFORMANCE_FEATURES");
+    std::string rest = list ? list : "";
+    for (std::size_t at = 0; at <= rest.size();) {
+        std::size_t end = rest.find(',', at);
+        if (end == std::string::npos) {
+            end = rest.size();
+        }
+        if (rest.compare(at, end - at, feature) == 0 && end - at == feature.size()) {
+            return true;
+        }
+        at = end + 1;
+    }
+    return false;
+}
+
+plugin::Declaration declared() {
+    plugin::Declaration d{
         "com.yoke.conformance.cpp",
         {},
         {{"conformance.data"}, {"conformance.frames", true}},
@@ -37,6 +56,20 @@ const plugin::Declaration &declaration() {
             {"event.drift.report", {plugin::Governs::occurrence, "conformance.drift"}},
         },
     };
+    // The large stream is declared only to a suite that names max_frame: a Core of an earlier release
+    // refuses a Manifest key it does not know.
+    if (named("max_frame")) {
+        plugin::Stream large{"conformance.large", true};
+        large.max_frame = 4u << 20;
+        d.streams.push_back(large);
+        d.capabilities.push_back({"stream.large.publish", {plugin::Governs::stream, "conformance.large"}});
+    }
+    return d;
+}
+} // namespace
+
+const plugin::Declaration &declaration() {
+    static const plugin::Declaration d = declared();
     return d;
 }
 
@@ -161,8 +194,8 @@ struct Harness {
                                    {"withheld", scope(a.withheld)}};
                 return;
             }
-            static const char *const acts[] = {"close", "emit",   "report-health", "report",
-                                               "ack",   "answer", "fail"};
+            static const char *const acts[] = {"close",  "emit", "emit-sized", "report-health",
+                                               "report", "ack",  "answer",     "fail"};
             bool known = false;
             for (const char *a : acts) {
                 known = known || verb == a;
@@ -179,6 +212,16 @@ struct Harness {
                 unit->close();
             } else if (verb == "emit") {
                 unit->emit(arg(args, "stream"), arg(args, "payload"));
+            } else if (verb == "emit-sized") {
+                // A payload of the size asked, byte i being i mod 251, as the suite checks it.
+                std::size_t size = args.contains("bytes") && args["bytes"].is_number()
+                                       ? args["bytes"].get<std::size_t>()
+                                       : 0;
+                std::string payload(size, '\0');
+                for (std::size_t i = 0; i < size; i++) {
+                    payload[i] = static_cast<char>(i % 251);
+                }
+                unit->emit(arg(args, "stream"), payload);
             } else if (verb == "report-health") {
                 unsigned grade =
                     args.contains("grade") && args["grade"].is_number() ? args["grade"].get<unsigned>() : 0;
@@ -250,7 +293,7 @@ int serve(const yoke::Getenv &getenv) {
         return 1;
     }
     asked_pipe = h.wake[1];
-    struct sigaction sa {};
+    struct sigaction sa{};
     sa.sa_handler = on_term;
     sigaction(SIGTERM, &sa, nullptr);
 

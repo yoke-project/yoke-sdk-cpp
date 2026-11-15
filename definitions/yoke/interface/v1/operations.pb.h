@@ -141,6 +141,32 @@ namespace yoke {
 namespace interface {
 namespace v1 {
 
+enum UnitStream_Reads : int {
+  UnitStream_Reads_READS_UNSPECIFIED = 0,
+  UnitStream_Reads_READS_STREAM_SOCKET = 1,
+  UnitStream_Reads_READS_SHARED_OBJECT = 2,
+  UnitStream_Reads_UnitStream_Reads_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<int32_t>::min(),
+  UnitStream_Reads_UnitStream_Reads_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<int32_t>::max()
+};
+bool UnitStream_Reads_IsValid(int value);
+constexpr UnitStream_Reads UnitStream_Reads_Reads_MIN = UnitStream_Reads_READS_UNSPECIFIED;
+constexpr UnitStream_Reads UnitStream_Reads_Reads_MAX = UnitStream_Reads_READS_SHARED_OBJECT;
+constexpr int UnitStream_Reads_Reads_ARRAYSIZE = UnitStream_Reads_Reads_MAX + 1;
+
+const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* UnitStream_Reads_descriptor();
+template<typename T>
+inline const std::string& UnitStream_Reads_Name(T enum_t_value) {
+  static_assert(::std::is_same<T, UnitStream_Reads>::value ||
+    ::std::is_integral<T>::value,
+    "Incorrect type passed to function UnitStream_Reads_Name.");
+  return ::PROTOBUF_NAMESPACE_ID::internal::NameOfEnum(
+    UnitStream_Reads_descriptor(), enum_t_value);
+}
+inline bool UnitStream_Reads_Parse(
+    ::PROTOBUF_NAMESPACE_ID::ConstStringParam name, UnitStream_Reads* value) {
+  return ::PROTOBUF_NAMESPACE_ID::internal::ParseNamedEnum<UnitStream_Reads>(
+    UnitStream_Reads_descriptor(), name, value);
+}
 enum Acknowledged_Outcome : int {
   Acknowledged_Outcome_OUTCOME_UNSPECIFIED = 0,
   Acknowledged_Outcome_OUTCOME_ACCEPTED = 1,
@@ -1920,12 +1946,62 @@ class UnitStream final :
 
   // nested types ----------------------------------------------------
 
+  typedef UnitStream_Reads Reads;
+  static constexpr Reads READS_UNSPECIFIED =
+    UnitStream_Reads_READS_UNSPECIFIED;
+  static constexpr Reads READS_STREAM_SOCKET =
+    UnitStream_Reads_READS_STREAM_SOCKET;
+  static constexpr Reads READS_SHARED_OBJECT =
+    UnitStream_Reads_READS_SHARED_OBJECT;
+  static inline bool Reads_IsValid(int value) {
+    return UnitStream_Reads_IsValid(value);
+  }
+  static constexpr Reads Reads_MIN =
+    UnitStream_Reads_Reads_MIN;
+  static constexpr Reads Reads_MAX =
+    UnitStream_Reads_Reads_MAX;
+  static constexpr int Reads_ARRAYSIZE =
+    UnitStream_Reads_Reads_ARRAYSIZE;
+  static inline const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor*
+  Reads_descriptor() {
+    return UnitStream_Reads_descriptor();
+  }
+  template<typename T>
+  static inline const std::string& Reads_Name(T enum_t_value) {
+    static_assert(::std::is_same<T, Reads>::value ||
+      ::std::is_integral<T>::value,
+      "Incorrect type passed to function Reads_Name.");
+    return UnitStream_Reads_Name(enum_t_value);
+  }
+  static inline bool Reads_Parse(::PROTOBUF_NAMESPACE_ID::ConstStringParam name,
+      Reads* value) {
+    return UnitStream_Reads_Parse(name, value);
+  }
+
   // accessors -------------------------------------------------------
 
   enum : int {
+    kReadsFieldNumber = 3,
     kUnitFieldNumber = 1,
     kStreamFieldNumber = 2,
   };
+  // repeated .yoke.interface.v1.UnitStream.Reads reads = 3;
+  int reads_size() const;
+  private:
+  int _internal_reads_size() const;
+  public:
+  void clear_reads();
+  private:
+  ::yoke::interface::v1::UnitStream_Reads _internal_reads(int index) const;
+  void _internal_add_reads(::yoke::interface::v1::UnitStream_Reads value);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField<int>* _internal_mutable_reads();
+  public:
+  ::yoke::interface::v1::UnitStream_Reads reads(int index) const;
+  void set_reads(int index, ::yoke::interface::v1::UnitStream_Reads value);
+  void add_reads(::yoke::interface::v1::UnitStream_Reads value);
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField<int>& reads() const;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField<int>* mutable_reads();
+
   // string unit = 1;
   void clear_unit();
   const std::string& unit() const;
@@ -1962,6 +2038,8 @@ class UnitStream final :
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
   struct Impl_ {
+    ::PROTOBUF_NAMESPACE_ID::RepeatedField<int> reads_;
+    mutable std::atomic<int> _reads_cached_byte_size_;
     ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr unit_;
     ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr stream_;
     mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
@@ -3559,6 +3637,8 @@ class Delivering final :
     kSocket = 2,
     kConnection = 3,
     kPath = 4,
+    kStreamSocket = 6,
+    kShared = 7,
     ARRIVES_NOT_SET = 0,
   };
 
@@ -3645,6 +3725,8 @@ class Delivering final :
     kSocketFieldNumber = 2,
     kConnectionFieldNumber = 3,
     kPathFieldNumber = 4,
+    kStreamSocketFieldNumber = 6,
+    kSharedFieldNumber = 7,
   };
   // string delivery = 1;
   void clear_delivery();
@@ -3718,6 +3800,42 @@ class Delivering final :
   std::string* _internal_mutable_path();
   public:
 
+  // string stream_socket = 6;
+  bool has_stream_socket() const;
+  private:
+  bool _internal_has_stream_socket() const;
+  public:
+  void clear_stream_socket();
+  const std::string& stream_socket() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_stream_socket(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_stream_socket();
+  PROTOBUF_NODISCARD std::string* release_stream_socket();
+  void set_allocated_stream_socket(std::string* stream_socket);
+  private:
+  const std::string& _internal_stream_socket() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_stream_socket(const std::string& value);
+  std::string* _internal_mutable_stream_socket();
+  public:
+
+  // string shared = 7;
+  bool has_shared() const;
+  private:
+  bool _internal_has_shared() const;
+  public:
+  void clear_shared();
+  const std::string& shared() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_shared(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_shared();
+  PROTOBUF_NODISCARD std::string* release_shared();
+  void set_allocated_shared(std::string* shared);
+  private:
+  const std::string& _internal_shared() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_shared(const std::string& value);
+  std::string* _internal_mutable_shared();
+  public:
+
   void clear_arrives();
   ArrivesCase arrives_case() const;
   // @@protoc_insertion_point(class_scope:yoke.interface.v1.Delivering)
@@ -3726,6 +3844,8 @@ class Delivering final :
   void set_has_socket();
   void set_has_connection();
   void set_has_path();
+  void set_has_stream_socket();
+  void set_has_shared();
 
   inline bool has_arrives() const;
   inline void clear_has_arrives();
@@ -3742,6 +3862,8 @@ class Delivering final :
       ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr socket_;
       bool connection_;
       ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr path_;
+      ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr stream_socket_;
+      ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr shared_;
     } arrives_;
     mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
     uint32_t _oneof_case_[1];
@@ -5837,6 +5959,49 @@ inline void UnitStream::set_allocated_stream(std::string* stream) {
   // @@protoc_insertion_point(field_set_allocated:yoke.interface.v1.UnitStream.stream)
 }
 
+// repeated .yoke.interface.v1.UnitStream.Reads reads = 3;
+inline int UnitStream::_internal_reads_size() const {
+  return _impl_.reads_.size();
+}
+inline int UnitStream::reads_size() const {
+  return _internal_reads_size();
+}
+inline void UnitStream::clear_reads() {
+  _impl_.reads_.Clear();
+}
+inline ::yoke::interface::v1::UnitStream_Reads UnitStream::_internal_reads(int index) const {
+  return static_cast< ::yoke::interface::v1::UnitStream_Reads >(_impl_.reads_.Get(index));
+}
+inline ::yoke::interface::v1::UnitStream_Reads UnitStream::reads(int index) const {
+  // @@protoc_insertion_point(field_get:yoke.interface.v1.UnitStream.reads)
+  return _internal_reads(index);
+}
+inline void UnitStream::set_reads(int index, ::yoke::interface::v1::UnitStream_Reads value) {
+  _impl_.reads_.Set(index, value);
+  // @@protoc_insertion_point(field_set:yoke.interface.v1.UnitStream.reads)
+}
+inline void UnitStream::_internal_add_reads(::yoke::interface::v1::UnitStream_Reads value) {
+  _impl_.reads_.Add(value);
+}
+inline void UnitStream::add_reads(::yoke::interface::v1::UnitStream_Reads value) {
+  _internal_add_reads(value);
+  // @@protoc_insertion_point(field_add:yoke.interface.v1.UnitStream.reads)
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField<int>&
+UnitStream::reads() const {
+  // @@protoc_insertion_point(field_list:yoke.interface.v1.UnitStream.reads)
+  return _impl_.reads_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField<int>*
+UnitStream::_internal_mutable_reads() {
+  return &_impl_.reads_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField<int>*
+UnitStream::mutable_reads() {
+  // @@protoc_insertion_point(field_mutable_list:yoke.interface.v1.UnitStream.reads)
+  return _internal_mutable_reads();
+}
+
 // -------------------------------------------------------------------
 
 // StreamRelease
@@ -7492,6 +7657,160 @@ inline void Delivering::set_allocated_path(std::string* path) {
   // @@protoc_insertion_point(field_set_allocated:yoke.interface.v1.Delivering.path)
 }
 
+// string stream_socket = 6;
+inline bool Delivering::_internal_has_stream_socket() const {
+  return arrives_case() == kStreamSocket;
+}
+inline bool Delivering::has_stream_socket() const {
+  return _internal_has_stream_socket();
+}
+inline void Delivering::set_has_stream_socket() {
+  _impl_._oneof_case_[0] = kStreamSocket;
+}
+inline void Delivering::clear_stream_socket() {
+  if (_internal_has_stream_socket()) {
+    _impl_.arrives_.stream_socket_.Destroy();
+    clear_has_arrives();
+  }
+}
+inline const std::string& Delivering::stream_socket() const {
+  // @@protoc_insertion_point(field_get:yoke.interface.v1.Delivering.stream_socket)
+  return _internal_stream_socket();
+}
+template <typename ArgT0, typename... ArgT>
+inline void Delivering::set_stream_socket(ArgT0&& arg0, ArgT... args) {
+  if (!_internal_has_stream_socket()) {
+    clear_arrives();
+    set_has_stream_socket();
+    _impl_.arrives_.stream_socket_.InitDefault();
+  }
+  _impl_.arrives_.stream_socket_.Set( static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:yoke.interface.v1.Delivering.stream_socket)
+}
+inline std::string* Delivering::mutable_stream_socket() {
+  std::string* _s = _internal_mutable_stream_socket();
+  // @@protoc_insertion_point(field_mutable:yoke.interface.v1.Delivering.stream_socket)
+  return _s;
+}
+inline const std::string& Delivering::_internal_stream_socket() const {
+  if (_internal_has_stream_socket()) {
+    return _impl_.arrives_.stream_socket_.Get();
+  }
+  return ::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited();
+}
+inline void Delivering::_internal_set_stream_socket(const std::string& value) {
+  if (!_internal_has_stream_socket()) {
+    clear_arrives();
+    set_has_stream_socket();
+    _impl_.arrives_.stream_socket_.InitDefault();
+  }
+  _impl_.arrives_.stream_socket_.Set(value, GetArenaForAllocation());
+}
+inline std::string* Delivering::_internal_mutable_stream_socket() {
+  if (!_internal_has_stream_socket()) {
+    clear_arrives();
+    set_has_stream_socket();
+    _impl_.arrives_.stream_socket_.InitDefault();
+  }
+  return _impl_.arrives_.stream_socket_.Mutable(      GetArenaForAllocation());
+}
+inline std::string* Delivering::release_stream_socket() {
+  // @@protoc_insertion_point(field_release:yoke.interface.v1.Delivering.stream_socket)
+  if (_internal_has_stream_socket()) {
+    clear_has_arrives();
+    return _impl_.arrives_.stream_socket_.Release();
+  } else {
+    return nullptr;
+  }
+}
+inline void Delivering::set_allocated_stream_socket(std::string* stream_socket) {
+  if (has_arrives()) {
+    clear_arrives();
+  }
+  if (stream_socket != nullptr) {
+    set_has_stream_socket();
+    _impl_.arrives_.stream_socket_.InitAllocated(stream_socket, GetArenaForAllocation());
+  }
+  // @@protoc_insertion_point(field_set_allocated:yoke.interface.v1.Delivering.stream_socket)
+}
+
+// string shared = 7;
+inline bool Delivering::_internal_has_shared() const {
+  return arrives_case() == kShared;
+}
+inline bool Delivering::has_shared() const {
+  return _internal_has_shared();
+}
+inline void Delivering::set_has_shared() {
+  _impl_._oneof_case_[0] = kShared;
+}
+inline void Delivering::clear_shared() {
+  if (_internal_has_shared()) {
+    _impl_.arrives_.shared_.Destroy();
+    clear_has_arrives();
+  }
+}
+inline const std::string& Delivering::shared() const {
+  // @@protoc_insertion_point(field_get:yoke.interface.v1.Delivering.shared)
+  return _internal_shared();
+}
+template <typename ArgT0, typename... ArgT>
+inline void Delivering::set_shared(ArgT0&& arg0, ArgT... args) {
+  if (!_internal_has_shared()) {
+    clear_arrives();
+    set_has_shared();
+    _impl_.arrives_.shared_.InitDefault();
+  }
+  _impl_.arrives_.shared_.Set( static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:yoke.interface.v1.Delivering.shared)
+}
+inline std::string* Delivering::mutable_shared() {
+  std::string* _s = _internal_mutable_shared();
+  // @@protoc_insertion_point(field_mutable:yoke.interface.v1.Delivering.shared)
+  return _s;
+}
+inline const std::string& Delivering::_internal_shared() const {
+  if (_internal_has_shared()) {
+    return _impl_.arrives_.shared_.Get();
+  }
+  return ::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited();
+}
+inline void Delivering::_internal_set_shared(const std::string& value) {
+  if (!_internal_has_shared()) {
+    clear_arrives();
+    set_has_shared();
+    _impl_.arrives_.shared_.InitDefault();
+  }
+  _impl_.arrives_.shared_.Set(value, GetArenaForAllocation());
+}
+inline std::string* Delivering::_internal_mutable_shared() {
+  if (!_internal_has_shared()) {
+    clear_arrives();
+    set_has_shared();
+    _impl_.arrives_.shared_.InitDefault();
+  }
+  return _impl_.arrives_.shared_.Mutable(      GetArenaForAllocation());
+}
+inline std::string* Delivering::release_shared() {
+  // @@protoc_insertion_point(field_release:yoke.interface.v1.Delivering.shared)
+  if (_internal_has_shared()) {
+    clear_has_arrives();
+    return _impl_.arrives_.shared_.Release();
+  } else {
+    return nullptr;
+  }
+}
+inline void Delivering::set_allocated_shared(std::string* shared) {
+  if (has_arrives()) {
+    clear_arrives();
+  }
+  if (shared != nullptr) {
+    set_has_shared();
+    _impl_.arrives_.shared_.InitAllocated(shared, GetArenaForAllocation());
+  }
+  // @@protoc_insertion_point(field_set_allocated:yoke.interface.v1.Delivering.shared)
+}
+
 // bool flowing = 5;
 inline void Delivering::clear_flowing() {
   _impl_.flowing_ = false;
@@ -7684,6 +8003,11 @@ inline void Reclaimed::set_changed(bool value) {
 
 PROTOBUF_NAMESPACE_OPEN
 
+template <> struct is_proto_enum< ::yoke::interface::v1::UnitStream_Reads> : ::std::true_type {};
+template <>
+inline const EnumDescriptor* GetEnumDescriptor< ::yoke::interface::v1::UnitStream_Reads>() {
+  return ::yoke::interface::v1::UnitStream_Reads_descriptor();
+}
 template <> struct is_proto_enum< ::yoke::interface::v1::Acknowledged_Outcome> : ::std::true_type {};
 template <>
 inline const EnumDescriptor* GetEnumDescriptor< ::yoke::interface::v1::Acknowledged_Outcome>() {

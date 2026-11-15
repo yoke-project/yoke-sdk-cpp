@@ -163,12 +163,14 @@ enum Control_Activate_Transport : int {
   Control_Activate_Transport_TRANSPORT_ORDERED = 1,
   Control_Activate_Transport_TRANSPORT_FRAMED = 2,
   Control_Activate_Transport_TRANSPORT_SHARED_OBJECT = 3,
+  Control_Activate_Transport_TRANSPORT_ORDERED_STREAM = 4,
+  Control_Activate_Transport_TRANSPORT_FRAMED_STREAM = 5,
   Control_Activate_Transport_Control_Activate_Transport_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<int32_t>::min(),
   Control_Activate_Transport_Control_Activate_Transport_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<int32_t>::max()
 };
 bool Control_Activate_Transport_IsValid(int value);
 constexpr Control_Activate_Transport Control_Activate_Transport_Transport_MIN = Control_Activate_Transport_TRANSPORT_UNSPECIFIED;
-constexpr Control_Activate_Transport Control_Activate_Transport_Transport_MAX = Control_Activate_Transport_TRANSPORT_SHARED_OBJECT;
+constexpr Control_Activate_Transport Control_Activate_Transport_Transport_MAX = Control_Activate_Transport_TRANSPORT_FRAMED_STREAM;
 constexpr int Control_Activate_Transport_Transport_ARRAYSIZE = Control_Activate_Transport_Transport_MAX + 1;
 
 const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* Control_Activate_Transport_descriptor();
@@ -1168,6 +1170,10 @@ class Control_Activate final :
     Control_Activate_Transport_TRANSPORT_FRAMED;
   static constexpr Transport TRANSPORT_SHARED_OBJECT =
     Control_Activate_Transport_TRANSPORT_SHARED_OBJECT;
+  static constexpr Transport TRANSPORT_ORDERED_STREAM =
+    Control_Activate_Transport_TRANSPORT_ORDERED_STREAM;
+  static constexpr Transport TRANSPORT_FRAMED_STREAM =
+    Control_Activate_Transport_TRANSPORT_FRAMED_STREAM;
   static inline bool Transport_IsValid(int value) {
     return Control_Activate_Transport_IsValid(value);
   }

@@ -124,6 +124,21 @@ struct UnitAskDefaultTypeInternal {
   };
 };
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 UnitAskDefaultTypeInternal _UnitAsk_default_instance_;
+PROTOBUF_CONSTEXPR UnitCommand::UnitCommand(
+    ::_pbi::ConstantInitialized): _impl_{
+    /*decltype(_impl_.unit_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
+  , /*decltype(_impl_.type_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
+  , /*decltype(_impl_.payload_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
+  , /*decltype(_impl_._cached_size_)*/{}} {}
+struct UnitCommandDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR UnitCommandDefaultTypeInternal()
+      : _instance(::_pbi::ConstantInitialized{}) {}
+  ~UnitCommandDefaultTypeInternal() {}
+  union {
+    UnitCommand _instance;
+  };
+};
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 UnitCommandDefaultTypeInternal _UnitCommand_default_instance_;
 PROTOBUF_CONSTEXPR Read::Read(
     ::_pbi::ConstantInitialized): _impl_{
     /*decltype(_impl_.kind_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
@@ -272,6 +287,20 @@ struct AskedDefaultTypeInternal {
   };
 };
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 AskedDefaultTypeInternal _Asked_default_instance_;
+PROTOBUF_CONSTEXPR Commanded::Commanded(
+    ::_pbi::ConstantInitialized): _impl_{
+    /*decltype(_impl_.line_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
+  , /*decltype(_impl_.outcome_)*/0
+  , /*decltype(_impl_._cached_size_)*/{}} {}
+struct CommandedDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR CommandedDefaultTypeInternal()
+      : _instance(::_pbi::ConstantInitialized{}) {}
+  ~CommandedDefaultTypeInternal() {}
+  union {
+    Commanded _instance;
+  };
+};
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 CommandedDefaultTypeInternal _Commanded_default_instance_;
 PROTOBUF_CONSTEXPR LogPage::LogPage(
     ::_pbi::ConstantInitialized): _impl_{
     /*decltype(_impl_.entries_)*/{}
@@ -343,8 +372,8 @@ PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORIT
 }  // namespace v1
 }  // namespace administrative
 }  // namespace yoke
-static ::_pb::Metadata file_level_metadata_yoke_2fadministrative_2fv1_2foperations_2eproto[21];
-static const ::_pb::EnumDescriptor* file_level_enum_descriptors_yoke_2fadministrative_2fv1_2foperations_2eproto[1];
+static ::_pb::Metadata file_level_metadata_yoke_2fadministrative_2fv1_2foperations_2eproto[23];
+static const ::_pb::EnumDescriptor* file_level_enum_descriptors_yoke_2fadministrative_2fv1_2foperations_2eproto[2];
 static constexpr ::_pb::ServiceDescriptor const** file_level_service_descriptors_yoke_2fadministrative_2fv1_2foperations_2eproto = nullptr;
 
 const uint32_t TableStruct_yoke_2fadministrative_2fv1_2foperations_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
@@ -355,6 +384,7 @@ const uint32_t TableStruct_yoke_2fadministrative_2fv1_2foperations_2eproto::offs
   ~0u,  // no _weak_field_map_
   ~0u,  // no _inlined_string_donated_
   PROTOBUF_FIELD_OFFSET(::yoke::administrative::v1::Request, _impl_.version_),
+  ::_pbi::kInvalidFieldOffsetTag,
   ::_pbi::kInvalidFieldOffsetTag,
   ::_pbi::kInvalidFieldOffsetTag,
   ::_pbi::kInvalidFieldOffsetTag,
@@ -426,6 +456,15 @@ const uint32_t TableStruct_yoke_2fadministrative_2fv1_2foperations_2eproto::offs
   PROTOBUF_FIELD_OFFSET(::yoke::administrative::v1::UnitAsk, _impl_.type_),
   PROTOBUF_FIELD_OFFSET(::yoke::administrative::v1::UnitAsk, _impl_.question_),
   ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::yoke::administrative::v1::UnitCommand, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  ~0u,  // no _inlined_string_donated_
+  PROTOBUF_FIELD_OFFSET(::yoke::administrative::v1::UnitCommand, _impl_.unit_),
+  PROTOBUF_FIELD_OFFSET(::yoke::administrative::v1::UnitCommand, _impl_.type_),
+  PROTOBUF_FIELD_OFFSET(::yoke::administrative::v1::UnitCommand, _impl_.payload_),
+  ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::yoke::administrative::v1::Read, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
@@ -468,6 +507,7 @@ const uint32_t TableStruct_yoke_2fadministrative_2fv1_2foperations_2eproto::offs
   PROTOBUF_FIELD_OFFSET(::yoke::administrative::v1::Response, _impl_._oneof_case_[0]),
   ~0u,  // no _weak_field_map_
   ~0u,  // no _inlined_string_donated_
+  ::_pbi::kInvalidFieldOffsetTag,
   ::_pbi::kInvalidFieldOffsetTag,
   ::_pbi::kInvalidFieldOffsetTag,
   ::_pbi::kInvalidFieldOffsetTag,
@@ -534,6 +574,14 @@ const uint32_t TableStruct_yoke_2fadministrative_2fv1_2foperations_2eproto::offs
   ~0u,  // no _inlined_string_donated_
   PROTOBUF_FIELD_OFFSET(::yoke::administrative::v1::Asked, _impl_.answer_),
   ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::yoke::administrative::v1::Commanded, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  ~0u,  // no _inlined_string_donated_
+  PROTOBUF_FIELD_OFFSET(::yoke::administrative::v1::Commanded, _impl_.outcome_),
+  PROTOBUF_FIELD_OFFSET(::yoke::administrative::v1::Commanded, _impl_.line_),
+  ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::yoke::administrative::v1::LogPage, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
@@ -583,26 +631,28 @@ const uint32_t TableStruct_yoke_2fadministrative_2fv1_2foperations_2eproto::offs
 };
 static const ::_pbi::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, -1, sizeof(::yoke::administrative::v1::Request)},
-  { 24, -1, -1, sizeof(::yoke::administrative::v1::PluginPolicy)},
-  { 31, -1, -1, sizeof(::yoke::administrative::v1::PluginGrant)},
-  { 39, -1, -1, sizeof(::yoke::administrative::v1::UnitAct)},
-  { 46, -1, -1, sizeof(::yoke::administrative::v1::UnitStream)},
-  { 54, 64, -1, sizeof(::yoke::administrative::v1::UnitRetention)},
-  { 68, -1, -1, sizeof(::yoke::administrative::v1::UnitAsk)},
-  { 77, -1, -1, sizeof(::yoke::administrative::v1::Read)},
-  { 85, -1, -1, sizeof(::yoke::administrative::v1::LogQuery)},
-  { 97, -1, -1, sizeof(::yoke::administrative::v1::LogFollow)},
-  { 107, -1, -1, sizeof(::yoke::administrative::v1::Subscribe)},
-  { 114, -1, -1, sizeof(::yoke::administrative::v1::Response)},
-  { 137, -1, -1, sizeof(::yoke::administrative::v1::Changed)},
-  { 146, -1, -1, sizeof(::yoke::administrative::v1::Previously)},
-  { 157, 166, -1, sizeof(::yoke::administrative::v1::Retention)},
-  { 169, -1, -1, sizeof(::yoke::administrative::v1::Consequence)},
-  { 178, -1, -1, sizeof(::yoke::administrative::v1::Asked)},
-  { 185, -1, -1, sizeof(::yoke::administrative::v1::LogPage)},
-  { 194, -1, -1, sizeof(::yoke::administrative::v1::LogEntry)},
-  { 213, -1, -1, sizeof(::yoke::administrative::v1::Followed)},
-  { 222, -1, -1, sizeof(::yoke::administrative::v1::Subscribed)},
+  { 25, -1, -1, sizeof(::yoke::administrative::v1::PluginPolicy)},
+  { 32, -1, -1, sizeof(::yoke::administrative::v1::PluginGrant)},
+  { 40, -1, -1, sizeof(::yoke::administrative::v1::UnitAct)},
+  { 47, -1, -1, sizeof(::yoke::administrative::v1::UnitStream)},
+  { 55, 65, -1, sizeof(::yoke::administrative::v1::UnitRetention)},
+  { 69, -1, -1, sizeof(::yoke::administrative::v1::UnitAsk)},
+  { 78, -1, -1, sizeof(::yoke::administrative::v1::UnitCommand)},
+  { 87, -1, -1, sizeof(::yoke::administrative::v1::Read)},
+  { 95, -1, -1, sizeof(::yoke::administrative::v1::LogQuery)},
+  { 107, -1, -1, sizeof(::yoke::administrative::v1::LogFollow)},
+  { 117, -1, -1, sizeof(::yoke::administrative::v1::Subscribe)},
+  { 124, -1, -1, sizeof(::yoke::administrative::v1::Response)},
+  { 148, -1, -1, sizeof(::yoke::administrative::v1::Changed)},
+  { 157, -1, -1, sizeof(::yoke::administrative::v1::Previously)},
+  { 168, 177, -1, sizeof(::yoke::administrative::v1::Retention)},
+  { 180, -1, -1, sizeof(::yoke::administrative::v1::Consequence)},
+  { 189, -1, -1, sizeof(::yoke::administrative::v1::Asked)},
+  { 196, -1, -1, sizeof(::yoke::administrative::v1::Commanded)},
+  { 204, -1, -1, sizeof(::yoke::administrative::v1::LogPage)},
+  { 213, -1, -1, sizeof(::yoke::administrative::v1::LogEntry)},
+  { 232, -1, -1, sizeof(::yoke::administrative::v1::Followed)},
+  { 241, -1, -1, sizeof(::yoke::administrative::v1::Subscribed)},
 };
 
 static const ::_pb::Message* const file_default_instances[] = {
@@ -613,6 +663,7 @@ static const ::_pb::Message* const file_default_instances[] = {
   &::yoke::administrative::v1::_UnitStream_default_instance_._instance,
   &::yoke::administrative::v1::_UnitRetention_default_instance_._instance,
   &::yoke::administrative::v1::_UnitAsk_default_instance_._instance,
+  &::yoke::administrative::v1::_UnitCommand_default_instance_._instance,
   &::yoke::administrative::v1::_Read_default_instance_._instance,
   &::yoke::administrative::v1::_LogQuery_default_instance_._instance,
   &::yoke::administrative::v1::_LogFollow_default_instance_._instance,
@@ -623,6 +674,7 @@ static const ::_pb::Message* const file_default_instances[] = {
   &::yoke::administrative::v1::_Retention_default_instance_._instance,
   &::yoke::administrative::v1::_Consequence_default_instance_._instance,
   &::yoke::administrative::v1::_Asked_default_instance_._instance,
+  &::yoke::administrative::v1::_Commanded_default_instance_._instance,
   &::yoke::administrative::v1::_LogPage_default_instance_._instance,
   &::yoke::administrative::v1::_LogEntry_default_instance_._instance,
   &::yoke::administrative::v1::_Followed_default_instance_._instance,
@@ -635,7 +687,7 @@ const char descriptor_table_protodef_yoke_2fadministrative_2fv1_2foperations_2ep
   "uf/duration.proto\032\037google/protobuf/times"
   "tamp.proto\032#yoke/administrative/v1/event"
   "s.proto\032$yoke/administrative/v1/records."
-  "proto\"\333\007\n\007Request\022\017\n\007version\030\001 \001(\r\022=\n\rpl"
+  "proto\"\230\010\n\007Request\022\017\n\007version\030\001 \001(\r\022=\n\rpl"
   "ugin_enable\030\002 \001(\0132$.yoke.administrative."
   "v1.PluginPolicyH\000\022>\n\016plugin_disable\030\003 \001("
   "\0132$.yoke.administrative.v1.PluginPolicyH"
@@ -659,82 +711,91 @@ const char descriptor_table_protodef_yoke_2fadministrative_2fv1_2foperations_2ep
   ".administrative.v1.LogQueryH\000\0227\n\nlog_fol"
   "low\030\020 \001(\0132!.yoke.administrative.v1.LogFo"
   "llowH\000\0226\n\tsubscribe\030\021 \001(\0132!.yoke.adminis"
-  "trative.v1.SubscribeH\000B\013\n\toperation\"\036\n\014P"
-  "luginPolicy\022\016\n\006plugin\030\001 \001(\t\"1\n\013PluginGra"
-  "nt\022\016\n\006plugin\030\001 \001(\t\022\022\n\ncapability\030\002 \001(\t\"\027"
-  "\n\007UnitAct\022\014\n\004unit\030\001 \001(\t\"*\n\nUnitStream\022\014\n"
-  "\004unit\030\001 \001(\t\022\016\n\006stream\030\002 \001(\t\"\205\001\n\rUnitRete"
-  "ntion\022\014\n\004unit\030\001 \001(\t\022&\n\003age\030\002 \001(\0132\031.googl"
-  "e.protobuf.Duration\022\022\n\005bytes\030\003 \001(\004H\000\210\001\001\022"
-  "\024\n\007entries\030\004 \001(\004H\001\210\001\001B\010\n\006_bytesB\n\n\010_entr"
-  "ies\"7\n\007UnitAsk\022\014\n\004unit\030\001 \001(\t\022\014\n\004type\030\002 \001"
-  "(\t\022\020\n\010question\030\003 \001(\014\"&\n\004Read\022\014\n\004kind\030\001 \001"
-  "(\t\022\020\n\010identity\030\002 \001(\t\"\241\001\n\010LogQuery\022\014\n\004uni"
-  "t\030\001 \001(\t\022\023\n\013incarnation\030\002 \001(\004\022(\n\004from\030\003 \001"
-  "(\0132\032.google.protobuf.Timestamp\022)\n\005until\030"
-  "\004 \001(\0132\032.google.protobuf.Timestamp\022\r\n\005flo"
-  "or\030\005 \001(\r\022\016\n\006cursor\030\006 \001(\004\"M\n\tLogFollow\022\014\n"
-  "\004unit\030\001 \001(\t\022\023\n\013incarnation\030\002 \001(\004\022\r\n\005floo"
-  "r\030\003 \001(\r\022\016\n\006cursor\030\004 \001(\004\";\n\tSubscribe\022.\n\006"
-  "filter\030\001 \001(\0132\036.yoke.administrative.v1.Fi"
-  "lter\"\252\007\n\010Response\0228\n\rplugin_enable\030\001 \001(\013"
-  "2\037.yoke.administrative.v1.ChangedH\000\0229\n\016p"
-  "lugin_disable\030\002 \001(\0132\037.yoke.administrativ"
-  "e.v1.ChangedH\000\0227\n\014plugin_grant\030\003 \001(\0132\037.y"
-  "oke.administrative.v1.ChangedH\000\022:\n\017plugi"
-  "n_withdraw\030\004 \001(\0132\037.yoke.administrative.v"
-  "1.ChangedH\000\0225\n\nunit_start\030\005 \001(\0132\037.yoke.a"
-  "dministrative.v1.ChangedH\000\0224\n\tunit_stop\030"
-  "\006 \001(\0132\037.yoke.administrative.v1.ChangedH\000"
-  "\0227\n\014unit_restart\030\007 \001(\0132\037.yoke.administra"
-  "tive.v1.ChangedH\000\022<\n\021unit_stream_start\030\010"
-  " \001(\0132\037.yoke.administrative.v1.ChangedH\000\022"
-  ";\n\020unit_stream_stop\030\t \001(\0132\037.yoke.adminis"
-  "trative.v1.ChangedH\000\022=\n\022unit_retention_s"
-  "et\030\n \001(\0132\037.yoke.administrative.v1.Change"
-  "dH\000\022\?\n\024unit_retention_clear\030\013 \001(\0132\037.yoke"
-  ".administrative.v1.ChangedH\000\0221\n\010unit_ask"
-  "\030\014 \001(\0132\035.yoke.administrative.v1.AskedH\000\022"
-  "/\n\004read\030\r \001(\0132\037.yoke.administrative.v1.R"
-  "ecordsH\000\0224\n\tlog_query\030\016 \001(\0132\037.yoke.admin"
-  "istrative.v1.LogPageH\000\0226\n\nlog_follow\030\017 \001"
-  "(\0132 .yoke.administrative.v1.FollowedH\000\0227"
-  "\n\tsubscribe\030\020 \001(\0132\".yoke.administrative."
-  "v1.SubscribedH\000B\010\n\006answer\"\236\002\n\007Changed\0226\n"
-  "\npreviously\030\001 \001(\0132\".yoke.administrative."
-  "v1.Previously\022<\n\teffective\030\002 \001(\0162).yoke."
-  "administrative.v1.Changed.Effective\0229\n\014c"
-  "onsequences\030\003 \003(\0132#.yoke.administrative."
-  "v1.Consequence\"b\n\tEffective\022\031\n\025EFFECTIVE"
-  "_UNSPECIFIED\020\000\022\031\n\025EFFECTIVE_IMMEDIATELY\020"
-  "\001\022\037\n\033EFFECTIVE_AT_NEXT_ADMISSION\020\002\"\204\001\n\nP"
-  "reviously\022\021\n\007enabled\030\001 \001(\010H\000\022\021\n\007granted\030"
-  "\002 \001(\010H\000\022\017\n\005state\030\003 \001(\tH\000\0226\n\tretention\030\004 "
-  "\001(\0132!.yoke.administrative.v1.RetentionH\000"
-  "B\007\n\005value\"s\n\tRetention\022&\n\003age\030\001 \001(\0132\031.go"
-  "ogle.protobuf.Duration\022\022\n\005bytes\030\002 \001(\004H\000\210"
-  "\001\001\022\024\n\007entries\030\003 \001(\004H\001\210\001\001B\010\n\006_bytesB\n\n\010_e"
-  "ntries\">\n\013Consequence\022\014\n\004unit\030\001 \001(\t\022\023\n\013i"
-  "ncarnation\030\002 \001(\004\022\014\n\004what\030\003 \001(\t\"\027\n\005Asked\022"
-  "\016\n\006answer\030\001 \001(\014\"[\n\007LogPage\0221\n\007entries\030\001 "
-  "\003(\0132 .yoke.administrative.v1.LogEntry\022\014\n"
-  "\004next\030\002 \001(\004\022\017\n\007resumed\030\003 \001(\010\"\373\001\n\010LogEntr"
-  "y\022\013\n\003seq\030\001 \001(\004\022&\n\002at\030\002 \001(\0132\032.google.prot"
-  "obuf.Timestamp\022\014\n\004unit\030\003 \001(\t\022\023\n\013incarnat"
-  "ion\030\004 \001(\004\022\016\n\006source\030\005 \001(\t\022\020\n\010severity\030\006 "
-  "\001(\r\022\014\n\004type\030\007 \001(\t\022\024\n\014subject_kind\030\010 \001(\t\022"
-  "\022\n\nsubject_id\030\t \001(\t\022\r\n\005actor\030\n \001(\t\022\r\n\005ca"
-  "use\030\013 \001(\004\022\017\n\007message\030\014 \001(\t\022\016\n\006detail\030\r \001"
-  "(\014\"]\n\010Followed\0221\n\005entry\030\001 \001(\0132 .yoke.adm"
-  "inistrative.v1.LogEntryH\000\022\023\n\tbehind_at\030\002"
-  " \001(\004H\000B\t\n\007carries\"\263\001\n\nSubscribed\0224\n\010snap"
-  "shot\030\001 \001(\0132 .yoke.administrative.v1.Snap"
-  "shotH\000\022.\n\005event\030\002 \001(\0132\035.yoke.administrat"
-  "ive.v1.EventH\000\0224\n\010overflow\030\003 \001(\0132 .yoke."
-  "administrative.v1.SnapshotH\000B\t\n\007carriesB"
-  "LZJgithub.com/yoke-project/yoke/proto/yo"
-  "ke/administrative/v1;administrativev1b\006p"
-  "roto3"
+  "trative.v1.SubscribeH\000\022;\n\014unit_command\030\022"
+  " \001(\0132#.yoke.administrative.v1.UnitComman"
+  "dH\000B\013\n\toperation\"\036\n\014PluginPolicy\022\016\n\006plug"
+  "in\030\001 \001(\t\"1\n\013PluginGrant\022\016\n\006plugin\030\001 \001(\t\022"
+  "\022\n\ncapability\030\002 \001(\t\"\027\n\007UnitAct\022\014\n\004unit\030\001"
+  " \001(\t\"*\n\nUnitStream\022\014\n\004unit\030\001 \001(\t\022\016\n\006stre"
+  "am\030\002 \001(\t\"\205\001\n\rUnitRetention\022\014\n\004unit\030\001 \001(\t"
+  "\022&\n\003age\030\002 \001(\0132\031.google.protobuf.Duration"
+  "\022\022\n\005bytes\030\003 \001(\004H\000\210\001\001\022\024\n\007entries\030\004 \001(\004H\001\210"
+  "\001\001B\010\n\006_bytesB\n\n\010_entries\"7\n\007UnitAsk\022\014\n\004u"
+  "nit\030\001 \001(\t\022\014\n\004type\030\002 \001(\t\022\020\n\010question\030\003 \001("
+  "\014\":\n\013UnitCommand\022\014\n\004unit\030\001 \001(\t\022\014\n\004type\030\002"
+  " \001(\t\022\017\n\007payload\030\003 \001(\014\"&\n\004Read\022\014\n\004kind\030\001 "
+  "\001(\t\022\020\n\010identity\030\002 \001(\t\"\241\001\n\010LogQuery\022\014\n\004un"
+  "it\030\001 \001(\t\022\023\n\013incarnation\030\002 \001(\004\022(\n\004from\030\003 "
+  "\001(\0132\032.google.protobuf.Timestamp\022)\n\005until"
+  "\030\004 \001(\0132\032.google.protobuf.Timestamp\022\r\n\005fl"
+  "oor\030\005 \001(\r\022\016\n\006cursor\030\006 \001(\004\"M\n\tLogFollow\022\014"
+  "\n\004unit\030\001 \001(\t\022\023\n\013incarnation\030\002 \001(\004\022\r\n\005flo"
+  "or\030\003 \001(\r\022\016\n\006cursor\030\004 \001(\004\";\n\tSubscribe\022.\n"
+  "\006filter\030\001 \001(\0132\036.yoke.administrative.v1.F"
+  "ilter\"\345\007\n\010Response\0228\n\rplugin_enable\030\001 \001("
+  "\0132\037.yoke.administrative.v1.ChangedH\000\0229\n\016"
+  "plugin_disable\030\002 \001(\0132\037.yoke.administrati"
+  "ve.v1.ChangedH\000\0227\n\014plugin_grant\030\003 \001(\0132\037."
+  "yoke.administrative.v1.ChangedH\000\022:\n\017plug"
+  "in_withdraw\030\004 \001(\0132\037.yoke.administrative."
+  "v1.ChangedH\000\0225\n\nunit_start\030\005 \001(\0132\037.yoke."
+  "administrative.v1.ChangedH\000\0224\n\tunit_stop"
+  "\030\006 \001(\0132\037.yoke.administrative.v1.ChangedH"
+  "\000\0227\n\014unit_restart\030\007 \001(\0132\037.yoke.administr"
+  "ative.v1.ChangedH\000\022<\n\021unit_stream_start\030"
+  "\010 \001(\0132\037.yoke.administrative.v1.ChangedH\000"
+  "\022;\n\020unit_stream_stop\030\t \001(\0132\037.yoke.admini"
+  "strative.v1.ChangedH\000\022=\n\022unit_retention_"
+  "set\030\n \001(\0132\037.yoke.administrative.v1.Chang"
+  "edH\000\022\?\n\024unit_retention_clear\030\013 \001(\0132\037.yok"
+  "e.administrative.v1.ChangedH\000\0221\n\010unit_as"
+  "k\030\014 \001(\0132\035.yoke.administrative.v1.AskedH\000"
+  "\022/\n\004read\030\r \001(\0132\037.yoke.administrative.v1."
+  "RecordsH\000\0224\n\tlog_query\030\016 \001(\0132\037.yoke.admi"
+  "nistrative.v1.LogPageH\000\0226\n\nlog_follow\030\017 "
+  "\001(\0132 .yoke.administrative.v1.FollowedH\000\022"
+  "7\n\tsubscribe\030\020 \001(\0132\".yoke.administrative"
+  ".v1.SubscribedH\000\0229\n\014unit_command\030\021 \001(\0132!"
+  ".yoke.administrative.v1.CommandedH\000B\010\n\006a"
+  "nswer\"\236\002\n\007Changed\0226\n\npreviously\030\001 \001(\0132\"."
+  "yoke.administrative.v1.Previously\022<\n\teff"
+  "ective\030\002 \001(\0162).yoke.administrative.v1.Ch"
+  "anged.Effective\0229\n\014consequences\030\003 \003(\0132#."
+  "yoke.administrative.v1.Consequence\"b\n\tEf"
+  "fective\022\031\n\025EFFECTIVE_UNSPECIFIED\020\000\022\031\n\025EF"
+  "FECTIVE_IMMEDIATELY\020\001\022\037\n\033EFFECTIVE_AT_NE"
+  "XT_ADMISSION\020\002\"\204\001\n\nPreviously\022\021\n\007enabled"
+  "\030\001 \001(\010H\000\022\021\n\007granted\030\002 \001(\010H\000\022\017\n\005state\030\003 \001"
+  "(\tH\000\0226\n\tretention\030\004 \001(\0132!.yoke.administr"
+  "ative.v1.RetentionH\000B\007\n\005value\"s\n\tRetenti"
+  "on\022&\n\003age\030\001 \001(\0132\031.google.protobuf.Durati"
+  "on\022\022\n\005bytes\030\002 \001(\004H\000\210\001\001\022\024\n\007entries\030\003 \001(\004H"
+  "\001\210\001\001B\010\n\006_bytesB\n\n\010_entries\">\n\013Consequenc"
+  "e\022\014\n\004unit\030\001 \001(\t\022\023\n\013incarnation\030\002 \001(\004\022\014\n\004"
+  "what\030\003 \001(\t\"\027\n\005Asked\022\016\n\006answer\030\001 \001(\014\"\265\001\n\t"
+  "Commanded\022:\n\007outcome\030\001 \001(\0162).yoke.admini"
+  "strative.v1.Commanded.Outcome\022\014\n\004line\030\002 "
+  "\001(\t\"^\n\007Outcome\022\027\n\023OUTCOME_UNSPECIFIED\020\000\022"
+  "\024\n\020OUTCOME_ACCEPTED\020\001\022\020\n\014OUTCOME_DONE\020\002\022"
+  "\022\n\016OUTCOME_FAILED\020\003\"[\n\007LogPage\0221\n\007entrie"
+  "s\030\001 \003(\0132 .yoke.administrative.v1.LogEntr"
+  "y\022\014\n\004next\030\002 \001(\004\022\017\n\007resumed\030\003 \001(\010\"\373\001\n\010Log"
+  "Entry\022\013\n\003seq\030\001 \001(\004\022&\n\002at\030\002 \001(\0132\032.google."
+  "protobuf.Timestamp\022\014\n\004unit\030\003 \001(\t\022\023\n\013inca"
+  "rnation\030\004 \001(\004\022\016\n\006source\030\005 \001(\t\022\020\n\010severit"
+  "y\030\006 \001(\r\022\014\n\004type\030\007 \001(\t\022\024\n\014subject_kind\030\010 "
+  "\001(\t\022\022\n\nsubject_id\030\t \001(\t\022\r\n\005actor\030\n \001(\t\022\r"
+  "\n\005cause\030\013 \001(\004\022\017\n\007message\030\014 \001(\t\022\016\n\006detail"
+  "\030\r \001(\014\"]\n\010Followed\0221\n\005entry\030\001 \001(\0132 .yoke"
+  ".administrative.v1.LogEntryH\000\022\023\n\tbehind_"
+  "at\030\002 \001(\004H\000B\t\n\007carries\"\263\001\n\nSubscribed\0224\n\010"
+  "snapshot\030\001 \001(\0132 .yoke.administrative.v1."
+  "SnapshotH\000\022.\n\005event\030\002 \001(\0132\035.yoke.adminis"
+  "trative.v1.EventH\000\0224\n\010overflow\030\003 \001(\0132 .y"
+  "oke.administrative.v1.SnapshotH\000B\t\n\007carr"
+  "iesBLZJgithub.com/yoke-project/yoke/prot"
+  "o/yoke/administrative/v1;administrativev"
+  "1b\006proto3"
   ;
 static const ::_pbi::DescriptorTable* const descriptor_table_yoke_2fadministrative_2fv1_2foperations_2eproto_deps[4] = {
   &::descriptor_table_google_2fprotobuf_2fduration_2eproto,
@@ -744,9 +805,9 @@ static const ::_pbi::DescriptorTable* const descriptor_table_yoke_2fadministrati
 };
 static ::_pbi::once_flag descriptor_table_yoke_2fadministrative_2fv1_2foperations_2eproto_once;
 const ::_pbi::DescriptorTable descriptor_table_yoke_2fadministrative_2fv1_2foperations_2eproto = {
-    false, false, 4165, descriptor_table_protodef_yoke_2fadministrative_2fv1_2foperations_2eproto,
+    false, false, 4529, descriptor_table_protodef_yoke_2fadministrative_2fv1_2foperations_2eproto,
     "yoke/administrative/v1/operations.proto",
-    &descriptor_table_yoke_2fadministrative_2fv1_2foperations_2eproto_once, descriptor_table_yoke_2fadministrative_2fv1_2foperations_2eproto_deps, 4, 21,
+    &descriptor_table_yoke_2fadministrative_2fv1_2foperations_2eproto_once, descriptor_table_yoke_2fadministrative_2fv1_2foperations_2eproto_deps, 4, 23,
     schemas, file_default_instances, TableStruct_yoke_2fadministrative_2fv1_2foperations_2eproto::offsets,
     file_level_metadata_yoke_2fadministrative_2fv1_2foperations_2eproto, file_level_enum_descriptors_yoke_2fadministrative_2fv1_2foperations_2eproto,
     file_level_service_descriptors_yoke_2fadministrative_2fv1_2foperations_2eproto,
@@ -783,6 +844,31 @@ constexpr Changed_Effective Changed::Effective_MIN;
 constexpr Changed_Effective Changed::Effective_MAX;
 constexpr int Changed::Effective_ARRAYSIZE;
 #endif  // (__cplusplus < 201703) && (!defined(_MSC_VER) || (_MSC_VER >= 1900 && _MSC_VER < 1912))
+const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* Commanded_Outcome_descriptor() {
+  ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&descriptor_table_yoke_2fadministrative_2fv1_2foperations_2eproto);
+  return file_level_enum_descriptors_yoke_2fadministrative_2fv1_2foperations_2eproto[1];
+}
+bool Commanded_Outcome_IsValid(int value) {
+  switch (value) {
+    case 0:
+    case 1:
+    case 2:
+    case 3:
+      return true;
+    default:
+      return false;
+  }
+}
+
+#if (__cplusplus < 201703) && (!defined(_MSC_VER) || (_MSC_VER >= 1900 && _MSC_VER < 1912))
+constexpr Commanded_Outcome Commanded::OUTCOME_UNSPECIFIED;
+constexpr Commanded_Outcome Commanded::OUTCOME_ACCEPTED;
+constexpr Commanded_Outcome Commanded::OUTCOME_DONE;
+constexpr Commanded_Outcome Commanded::OUTCOME_FAILED;
+constexpr Commanded_Outcome Commanded::Outcome_MIN;
+constexpr Commanded_Outcome Commanded::Outcome_MAX;
+constexpr int Commanded::Outcome_ARRAYSIZE;
+#endif  // (__cplusplus < 201703) && (!defined(_MSC_VER) || (_MSC_VER >= 1900 && _MSC_VER < 1912))
 
 // ===================================================================
 
@@ -804,6 +890,7 @@ class Request::_Internal {
   static const ::yoke::administrative::v1::LogQuery& log_query(const Request* msg);
   static const ::yoke::administrative::v1::LogFollow& log_follow(const Request* msg);
   static const ::yoke::administrative::v1::Subscribe& subscribe(const Request* msg);
+  static const ::yoke::administrative::v1::UnitCommand& unit_command(const Request* msg);
 };
 
 const ::yoke::administrative::v1::PluginPolicy&
@@ -869,6 +956,10 @@ Request::_Internal::log_follow(const Request* msg) {
 const ::yoke::administrative::v1::Subscribe&
 Request::_Internal::subscribe(const Request* msg) {
   return *msg->_impl_.operation_.subscribe_;
+}
+const ::yoke::administrative::v1::UnitCommand&
+Request::_Internal::unit_command(const Request* msg) {
+  return *msg->_impl_.operation_.unit_command_;
 }
 void Request::set_allocated_plugin_enable(::yoke::administrative::v1::PluginPolicy* plugin_enable) {
   ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArenaForAllocation();
@@ -1110,6 +1201,21 @@ void Request::set_allocated_subscribe(::yoke::administrative::v1::Subscribe* sub
   }
   // @@protoc_insertion_point(field_set_allocated:yoke.administrative.v1.Request.subscribe)
 }
+void Request::set_allocated_unit_command(::yoke::administrative::v1::UnitCommand* unit_command) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArenaForAllocation();
+  clear_operation();
+  if (unit_command) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+      ::PROTOBUF_NAMESPACE_ID::Arena::InternalGetOwningArena(unit_command);
+    if (message_arena != submessage_arena) {
+      unit_command = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, unit_command, submessage_arena);
+    }
+    set_has_unit_command();
+    _impl_.operation_.unit_command_ = unit_command;
+  }
+  // @@protoc_insertion_point(field_set_allocated:yoke.administrative.v1.Request.unit_command)
+}
 Request::Request(::PROTOBUF_NAMESPACE_ID::Arena* arena,
                          bool is_message_owned)
   : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
@@ -1207,6 +1313,11 @@ Request::Request(const Request& from)
     case kSubscribe: {
       _this->_internal_mutable_subscribe()->::yoke::administrative::v1::Subscribe::MergeFrom(
           from._internal_subscribe());
+      break;
+    }
+    case kUnitCommand: {
+      _this->_internal_mutable_unit_command()->::yoke::administrative::v1::UnitCommand::MergeFrom(
+          from._internal_unit_command());
       break;
     }
     case OPERATION_NOT_SET: {
@@ -1345,6 +1456,12 @@ void Request::clear_operation() {
     case kSubscribe: {
       if (GetArenaForAllocation() == nullptr) {
         delete _impl_.operation_.subscribe_;
+      }
+      break;
+    }
+    case kUnitCommand: {
+      if (GetArenaForAllocation() == nullptr) {
+        delete _impl_.operation_.unit_command_;
       }
       break;
     }
@@ -1509,6 +1626,14 @@ const char* Request::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) 
         } else
           goto handle_unusual;
         continue;
+      // .yoke.administrative.v1.UnitCommand unit_command = 18;
+      case 18:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 146)) {
+          ptr = ctx->ParseMessage(_internal_mutable_unit_command(), ptr);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
       default:
         goto handle_unusual;
     }  // switch
@@ -1656,6 +1781,13 @@ uint8_t* Request::_InternalSerialize(
         _Internal::subscribe(this).GetCachedSize(), target, stream);
   }
 
+  // .yoke.administrative.v1.UnitCommand unit_command = 18;
+  if (_internal_has_unit_command()) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(18, _Internal::unit_command(this),
+        _Internal::unit_command(this).GetCachedSize(), target, stream);
+  }
+
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
@@ -1790,6 +1922,13 @@ size_t Request::ByteSizeLong() const {
           *_impl_.operation_.subscribe_);
       break;
     }
+    // .yoke.administrative.v1.UnitCommand unit_command = 18;
+    case kUnitCommand: {
+      total_size += 2 +
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
+          *_impl_.operation_.unit_command_);
+      break;
+    }
     case OPERATION_NOT_SET: {
       break;
     }
@@ -1894,6 +2033,11 @@ void Request::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOB
     case kSubscribe: {
       _this->_internal_mutable_subscribe()->::yoke::administrative::v1::Subscribe::MergeFrom(
           from._internal_subscribe());
+      break;
+    }
+    case kUnitCommand: {
+      _this->_internal_mutable_unit_command()->::yoke::administrative::v1::UnitCommand::MergeFrom(
+          from._internal_unit_command());
       break;
     }
     case OPERATION_NOT_SET: {
@@ -3475,6 +3619,304 @@ void UnitAsk::InternalSwap(UnitAsk* other) {
 
 // ===================================================================
 
+class UnitCommand::_Internal {
+ public:
+};
+
+UnitCommand::UnitCommand(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                         bool is_message_owned)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
+  SharedCtor(arena, is_message_owned);
+  // @@protoc_insertion_point(arena_constructor:yoke.administrative.v1.UnitCommand)
+}
+UnitCommand::UnitCommand(const UnitCommand& from)
+  : ::PROTOBUF_NAMESPACE_ID::Message() {
+  UnitCommand* const _this = this; (void)_this;
+  new (&_impl_) Impl_{
+      decltype(_impl_.unit_){}
+    , decltype(_impl_.type_){}
+    , decltype(_impl_.payload_){}
+    , /*decltype(_impl_._cached_size_)*/{}};
+
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  _impl_.unit_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.unit_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (!from._internal_unit().empty()) {
+    _this->_impl_.unit_.Set(from._internal_unit(), 
+      _this->GetArenaForAllocation());
+  }
+  _impl_.type_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.type_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (!from._internal_type().empty()) {
+    _this->_impl_.type_.Set(from._internal_type(), 
+      _this->GetArenaForAllocation());
+  }
+  _impl_.payload_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.payload_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (!from._internal_payload().empty()) {
+    _this->_impl_.payload_.Set(from._internal_payload(), 
+      _this->GetArenaForAllocation());
+  }
+  // @@protoc_insertion_point(copy_constructor:yoke.administrative.v1.UnitCommand)
+}
+
+inline void UnitCommand::SharedCtor(
+    ::_pb::Arena* arena, bool is_message_owned) {
+  (void)arena;
+  (void)is_message_owned;
+  new (&_impl_) Impl_{
+      decltype(_impl_.unit_){}
+    , decltype(_impl_.type_){}
+    , decltype(_impl_.payload_){}
+    , /*decltype(_impl_._cached_size_)*/{}
+  };
+  _impl_.unit_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.unit_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  _impl_.type_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.type_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  _impl_.payload_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.payload_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+}
+
+UnitCommand::~UnitCommand() {
+  // @@protoc_insertion_point(destructor:yoke.administrative.v1.UnitCommand)
+  if (auto *arena = _internal_metadata_.DeleteReturnArena<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>()) {
+  (void)arena;
+    return;
+  }
+  SharedDtor();
+}
+
+inline void UnitCommand::SharedDtor() {
+  GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
+  _impl_.unit_.Destroy();
+  _impl_.type_.Destroy();
+  _impl_.payload_.Destroy();
+}
+
+void UnitCommand::SetCachedSize(int size) const {
+  _impl_._cached_size_.Set(size);
+}
+
+void UnitCommand::Clear() {
+// @@protoc_insertion_point(message_clear_start:yoke.administrative.v1.UnitCommand)
+  uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  _impl_.unit_.ClearToEmpty();
+  _impl_.type_.ClearToEmpty();
+  _impl_.payload_.ClearToEmpty();
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+const char* UnitCommand::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  while (!ctx->Done(&ptr)) {
+    uint32_t tag;
+    ptr = ::_pbi::ReadTag(ptr, &tag);
+    switch (tag >> 3) {
+      // string unit = 1;
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 10)) {
+          auto str = _internal_mutable_unit();
+          ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(ptr);
+          CHK_(::_pbi::VerifyUTF8(str, "yoke.administrative.v1.UnitCommand.unit"));
+        } else
+          goto handle_unusual;
+        continue;
+      // string type = 2;
+      case 2:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 18)) {
+          auto str = _internal_mutable_type();
+          ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(ptr);
+          CHK_(::_pbi::VerifyUTF8(str, "yoke.administrative.v1.UnitCommand.type"));
+        } else
+          goto handle_unusual;
+        continue;
+      // bytes payload = 3;
+      case 3:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 26)) {
+          auto str = _internal_mutable_payload();
+          ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      default:
+        goto handle_unusual;
+    }  // switch
+  handle_unusual:
+    if ((tag == 0) || ((tag & 7) == 4)) {
+      CHK_(ptr);
+      ctx->SetLastTag(tag);
+      goto message_done;
+    }
+    ptr = UnknownFieldParse(
+        tag,
+        _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+        ptr, ctx);
+    CHK_(ptr != nullptr);
+  }  // while
+message_done:
+  return ptr;
+failure:
+  ptr = nullptr;
+  goto message_done;
+#undef CHK_
+}
+
+uint8_t* UnitCommand::_InternalSerialize(
+    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+  // @@protoc_insertion_point(serialize_to_array_start:yoke.administrative.v1.UnitCommand)
+  uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // string unit = 1;
+  if (!this->_internal_unit().empty()) {
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
+      this->_internal_unit().data(), static_cast<int>(this->_internal_unit().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
+      "yoke.administrative.v1.UnitCommand.unit");
+    target = stream->WriteStringMaybeAliased(
+        1, this->_internal_unit(), target);
+  }
+
+  // string type = 2;
+  if (!this->_internal_type().empty()) {
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
+      this->_internal_type().data(), static_cast<int>(this->_internal_type().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
+      "yoke.administrative.v1.UnitCommand.type");
+    target = stream->WriteStringMaybeAliased(
+        2, this->_internal_type(), target);
+  }
+
+  // bytes payload = 3;
+  if (!this->_internal_payload().empty()) {
+    target = stream->WriteBytesMaybeAliased(
+        3, this->_internal_payload(), target);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:yoke.administrative.v1.UnitCommand)
+  return target;
+}
+
+size_t UnitCommand::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:yoke.administrative.v1.UnitCommand)
+  size_t total_size = 0;
+
+  uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // string unit = 1;
+  if (!this->_internal_unit().empty()) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+        this->_internal_unit());
+  }
+
+  // string type = 2;
+  if (!this->_internal_type().empty()) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+        this->_internal_type());
+  }
+
+  // bytes payload = 3;
+  if (!this->_internal_payload().empty()) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::BytesSize(
+        this->_internal_payload());
+  }
+
+  return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
+}
+
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData UnitCommand::_class_data_ = {
+    ::PROTOBUF_NAMESPACE_ID::Message::CopyWithSourceCheck,
+    UnitCommand::MergeImpl
+};
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*UnitCommand::GetClassData() const { return &_class_data_; }
+
+
+void UnitCommand::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg) {
+  auto* const _this = static_cast<UnitCommand*>(&to_msg);
+  auto& from = static_cast<const UnitCommand&>(from_msg);
+  // @@protoc_insertion_point(class_specific_merge_from_start:yoke.administrative.v1.UnitCommand)
+  GOOGLE_DCHECK_NE(&from, _this);
+  uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (!from._internal_unit().empty()) {
+    _this->_internal_set_unit(from._internal_unit());
+  }
+  if (!from._internal_type().empty()) {
+    _this->_internal_set_type(from._internal_type());
+  }
+  if (!from._internal_payload().empty()) {
+    _this->_internal_set_payload(from._internal_payload());
+  }
+  _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+}
+
+void UnitCommand::CopyFrom(const UnitCommand& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:yoke.administrative.v1.UnitCommand)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool UnitCommand::IsInitialized() const {
+  return true;
+}
+
+void UnitCommand::InternalSwap(UnitCommand* other) {
+  using std::swap;
+  auto* lhs_arena = GetArenaForAllocation();
+  auto* rhs_arena = other->GetArenaForAllocation();
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
+      &_impl_.unit_, lhs_arena,
+      &other->_impl_.unit_, rhs_arena
+  );
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
+      &_impl_.type_, lhs_arena,
+      &other->_impl_.type_, rhs_arena
+  );
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
+      &_impl_.payload_, lhs_arena,
+      &other->_impl_.payload_, rhs_arena
+  );
+}
+
+::PROTOBUF_NAMESPACE_ID::Metadata UnitCommand::GetMetadata() const {
+  return ::_pbi::AssignDescriptors(
+      &descriptor_table_yoke_2fadministrative_2fv1_2foperations_2eproto_getter, &descriptor_table_yoke_2fadministrative_2fv1_2foperations_2eproto_once,
+      file_level_metadata_yoke_2fadministrative_2fv1_2foperations_2eproto[7]);
+}
+
+// ===================================================================
+
 class Read::_Internal {
  public:
 };
@@ -3723,7 +4165,7 @@ void Read::InternalSwap(Read* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata Read::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_yoke_2fadministrative_2fv1_2foperations_2eproto_getter, &descriptor_table_yoke_2fadministrative_2fv1_2foperations_2eproto_once,
-      file_level_metadata_yoke_2fadministrative_2fv1_2foperations_2eproto[7]);
+      file_level_metadata_yoke_2fadministrative_2fv1_2foperations_2eproto[8]);
 }
 
 // ===================================================================
@@ -4104,7 +4546,7 @@ void LogQuery::InternalSwap(LogQuery* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata LogQuery::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_yoke_2fadministrative_2fv1_2foperations_2eproto_getter, &descriptor_table_yoke_2fadministrative_2fv1_2foperations_2eproto_once,
-      file_level_metadata_yoke_2fadministrative_2fv1_2foperations_2eproto[8]);
+      file_level_metadata_yoke_2fadministrative_2fv1_2foperations_2eproto[9]);
 }
 
 // ===================================================================
@@ -4391,7 +4833,7 @@ void LogFollow::InternalSwap(LogFollow* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata LogFollow::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_yoke_2fadministrative_2fv1_2foperations_2eproto_getter, &descriptor_table_yoke_2fadministrative_2fv1_2foperations_2eproto_once,
-      file_level_metadata_yoke_2fadministrative_2fv1_2foperations_2eproto[9]);
+      file_level_metadata_yoke_2fadministrative_2fv1_2foperations_2eproto[10]);
 }
 
 // ===================================================================
@@ -4590,7 +5032,7 @@ void Subscribe::InternalSwap(Subscribe* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata Subscribe::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_yoke_2fadministrative_2fv1_2foperations_2eproto_getter, &descriptor_table_yoke_2fadministrative_2fv1_2foperations_2eproto_once,
-      file_level_metadata_yoke_2fadministrative_2fv1_2foperations_2eproto[10]);
+      file_level_metadata_yoke_2fadministrative_2fv1_2foperations_2eproto[11]);
 }
 
 // ===================================================================
@@ -4613,6 +5055,7 @@ class Response::_Internal {
   static const ::yoke::administrative::v1::LogPage& log_query(const Response* msg);
   static const ::yoke::administrative::v1::Followed& log_follow(const Response* msg);
   static const ::yoke::administrative::v1::Subscribed& subscribe(const Response* msg);
+  static const ::yoke::administrative::v1::Commanded& unit_command(const Response* msg);
 };
 
 const ::yoke::administrative::v1::Changed&
@@ -4678,6 +5121,10 @@ Response::_Internal::log_follow(const Response* msg) {
 const ::yoke::administrative::v1::Subscribed&
 Response::_Internal::subscribe(const Response* msg) {
   return *msg->_impl_.answer_.subscribe_;
+}
+const ::yoke::administrative::v1::Commanded&
+Response::_Internal::unit_command(const Response* msg) {
+  return *msg->_impl_.answer_.unit_command_;
 }
 void Response::set_allocated_plugin_enable(::yoke::administrative::v1::Changed* plugin_enable) {
   ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArenaForAllocation();
@@ -4928,6 +5375,21 @@ void Response::set_allocated_subscribe(::yoke::administrative::v1::Subscribed* s
   }
   // @@protoc_insertion_point(field_set_allocated:yoke.administrative.v1.Response.subscribe)
 }
+void Response::set_allocated_unit_command(::yoke::administrative::v1::Commanded* unit_command) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArenaForAllocation();
+  clear_answer();
+  if (unit_command) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+      ::PROTOBUF_NAMESPACE_ID::Arena::InternalGetOwningArena(unit_command);
+    if (message_arena != submessage_arena) {
+      unit_command = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, unit_command, submessage_arena);
+    }
+    set_has_unit_command();
+    _impl_.answer_.unit_command_ = unit_command;
+  }
+  // @@protoc_insertion_point(field_set_allocated:yoke.administrative.v1.Response.unit_command)
+}
 Response::Response(::PROTOBUF_NAMESPACE_ID::Arena* arena,
                          bool is_message_owned)
   : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
@@ -5023,6 +5485,11 @@ Response::Response(const Response& from)
     case kSubscribe: {
       _this->_internal_mutable_subscribe()->::yoke::administrative::v1::Subscribed::MergeFrom(
           from._internal_subscribe());
+      break;
+    }
+    case kUnitCommand: {
+      _this->_internal_mutable_unit_command()->::yoke::administrative::v1::Commanded::MergeFrom(
+          from._internal_unit_command());
       break;
     }
     case ANSWER_NOT_SET: {
@@ -5160,6 +5627,12 @@ void Response::clear_answer() {
     case kSubscribe: {
       if (GetArenaForAllocation() == nullptr) {
         delete _impl_.answer_.subscribe_;
+      }
+      break;
+    }
+    case kUnitCommand: {
+      if (GetArenaForAllocation() == nullptr) {
+        delete _impl_.answer_.unit_command_;
       }
       break;
     }
@@ -5315,6 +5788,14 @@ const char* Response::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx)
         } else
           goto handle_unusual;
         continue;
+      // .yoke.administrative.v1.Commanded unit_command = 17;
+      case 17:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 138)) {
+          ptr = ctx->ParseMessage(_internal_mutable_unit_command(), ptr);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
       default:
         goto handle_unusual;
     }  // switch
@@ -5456,6 +5937,13 @@ uint8_t* Response::_InternalSerialize(
         _Internal::subscribe(this).GetCachedSize(), target, stream);
   }
 
+  // .yoke.administrative.v1.Commanded unit_command = 17;
+  if (_internal_has_unit_command()) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(17, _Internal::unit_command(this),
+        _Internal::unit_command(this).GetCachedSize(), target, stream);
+  }
+
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
@@ -5585,6 +6073,13 @@ size_t Response::ByteSizeLong() const {
           *_impl_.answer_.subscribe_);
       break;
     }
+    // .yoke.administrative.v1.Commanded unit_command = 17;
+    case kUnitCommand: {
+      total_size += 2 +
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
+          *_impl_.answer_.unit_command_);
+      break;
+    }
     case ANSWER_NOT_SET: {
       break;
     }
@@ -5688,6 +6183,11 @@ void Response::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTO
           from._internal_subscribe());
       break;
     }
+    case kUnitCommand: {
+      _this->_internal_mutable_unit_command()->::yoke::administrative::v1::Commanded::MergeFrom(
+          from._internal_unit_command());
+      break;
+    }
     case ANSWER_NOT_SET: {
       break;
     }
@@ -5716,7 +6216,7 @@ void Response::InternalSwap(Response* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata Response::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_yoke_2fadministrative_2fv1_2foperations_2eproto_getter, &descriptor_table_yoke_2fadministrative_2fv1_2foperations_2eproto_once,
-      file_level_metadata_yoke_2fadministrative_2fv1_2foperations_2eproto[11]);
+      file_level_metadata_yoke_2fadministrative_2fv1_2foperations_2eproto[12]);
 }
 
 // ===================================================================
@@ -5977,7 +6477,7 @@ void Changed::InternalSwap(Changed* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata Changed::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_yoke_2fadministrative_2fv1_2foperations_2eproto_getter, &descriptor_table_yoke_2fadministrative_2fv1_2foperations_2eproto_once,
-      file_level_metadata_yoke_2fadministrative_2fv1_2foperations_2eproto[12]);
+      file_level_metadata_yoke_2fadministrative_2fv1_2foperations_2eproto[13]);
 }
 
 // ===================================================================
@@ -6325,7 +6825,7 @@ void Previously::InternalSwap(Previously* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata Previously::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_yoke_2fadministrative_2fv1_2foperations_2eproto_getter, &descriptor_table_yoke_2fadministrative_2fv1_2foperations_2eproto_once,
-      file_level_metadata_yoke_2fadministrative_2fv1_2foperations_2eproto[13]);
+      file_level_metadata_yoke_2fadministrative_2fv1_2foperations_2eproto[14]);
 }
 
 // ===================================================================
@@ -6608,7 +7108,7 @@ void Retention::InternalSwap(Retention* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata Retention::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_yoke_2fadministrative_2fv1_2foperations_2eproto_getter, &descriptor_table_yoke_2fadministrative_2fv1_2foperations_2eproto_once,
-      file_level_metadata_yoke_2fadministrative_2fv1_2foperations_2eproto[14]);
+      file_level_metadata_yoke_2fadministrative_2fv1_2foperations_2eproto[15]);
 }
 
 // ===================================================================
@@ -6888,7 +7388,7 @@ void Consequence::InternalSwap(Consequence* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata Consequence::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_yoke_2fadministrative_2fv1_2foperations_2eproto_getter, &descriptor_table_yoke_2fadministrative_2fv1_2foperations_2eproto_once,
-      file_level_metadata_yoke_2fadministrative_2fv1_2foperations_2eproto[15]);
+      file_level_metadata_yoke_2fadministrative_2fv1_2foperations_2eproto[16]);
 }
 
 // ===================================================================
@@ -7086,7 +7586,240 @@ void Asked::InternalSwap(Asked* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata Asked::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_yoke_2fadministrative_2fv1_2foperations_2eproto_getter, &descriptor_table_yoke_2fadministrative_2fv1_2foperations_2eproto_once,
-      file_level_metadata_yoke_2fadministrative_2fv1_2foperations_2eproto[16]);
+      file_level_metadata_yoke_2fadministrative_2fv1_2foperations_2eproto[17]);
+}
+
+// ===================================================================
+
+class Commanded::_Internal {
+ public:
+};
+
+Commanded::Commanded(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                         bool is_message_owned)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
+  SharedCtor(arena, is_message_owned);
+  // @@protoc_insertion_point(arena_constructor:yoke.administrative.v1.Commanded)
+}
+Commanded::Commanded(const Commanded& from)
+  : ::PROTOBUF_NAMESPACE_ID::Message() {
+  Commanded* const _this = this; (void)_this;
+  new (&_impl_) Impl_{
+      decltype(_impl_.line_){}
+    , decltype(_impl_.outcome_){}
+    , /*decltype(_impl_._cached_size_)*/{}};
+
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  _impl_.line_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.line_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (!from._internal_line().empty()) {
+    _this->_impl_.line_.Set(from._internal_line(), 
+      _this->GetArenaForAllocation());
+  }
+  _this->_impl_.outcome_ = from._impl_.outcome_;
+  // @@protoc_insertion_point(copy_constructor:yoke.administrative.v1.Commanded)
+}
+
+inline void Commanded::SharedCtor(
+    ::_pb::Arena* arena, bool is_message_owned) {
+  (void)arena;
+  (void)is_message_owned;
+  new (&_impl_) Impl_{
+      decltype(_impl_.line_){}
+    , decltype(_impl_.outcome_){0}
+    , /*decltype(_impl_._cached_size_)*/{}
+  };
+  _impl_.line_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.line_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+}
+
+Commanded::~Commanded() {
+  // @@protoc_insertion_point(destructor:yoke.administrative.v1.Commanded)
+  if (auto *arena = _internal_metadata_.DeleteReturnArena<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>()) {
+  (void)arena;
+    return;
+  }
+  SharedDtor();
+}
+
+inline void Commanded::SharedDtor() {
+  GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
+  _impl_.line_.Destroy();
+}
+
+void Commanded::SetCachedSize(int size) const {
+  _impl_._cached_size_.Set(size);
+}
+
+void Commanded::Clear() {
+// @@protoc_insertion_point(message_clear_start:yoke.administrative.v1.Commanded)
+  uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  _impl_.line_.ClearToEmpty();
+  _impl_.outcome_ = 0;
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+const char* Commanded::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  while (!ctx->Done(&ptr)) {
+    uint32_t tag;
+    ptr = ::_pbi::ReadTag(ptr, &tag);
+    switch (tag >> 3) {
+      // .yoke.administrative.v1.Commanded.Outcome outcome = 1;
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 8)) {
+          uint64_t val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+          _internal_set_outcome(static_cast<::yoke::administrative::v1::Commanded_Outcome>(val));
+        } else
+          goto handle_unusual;
+        continue;
+      // string line = 2;
+      case 2:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 18)) {
+          auto str = _internal_mutable_line();
+          ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(ptr);
+          CHK_(::_pbi::VerifyUTF8(str, "yoke.administrative.v1.Commanded.line"));
+        } else
+          goto handle_unusual;
+        continue;
+      default:
+        goto handle_unusual;
+    }  // switch
+  handle_unusual:
+    if ((tag == 0) || ((tag & 7) == 4)) {
+      CHK_(ptr);
+      ctx->SetLastTag(tag);
+      goto message_done;
+    }
+    ptr = UnknownFieldParse(
+        tag,
+        _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+        ptr, ctx);
+    CHK_(ptr != nullptr);
+  }  // while
+message_done:
+  return ptr;
+failure:
+  ptr = nullptr;
+  goto message_done;
+#undef CHK_
+}
+
+uint8_t* Commanded::_InternalSerialize(
+    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+  // @@protoc_insertion_point(serialize_to_array_start:yoke.administrative.v1.Commanded)
+  uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // .yoke.administrative.v1.Commanded.Outcome outcome = 1;
+  if (this->_internal_outcome() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::_pbi::WireFormatLite::WriteEnumToArray(
+      1, this->_internal_outcome(), target);
+  }
+
+  // string line = 2;
+  if (!this->_internal_line().empty()) {
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
+      this->_internal_line().data(), static_cast<int>(this->_internal_line().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
+      "yoke.administrative.v1.Commanded.line");
+    target = stream->WriteStringMaybeAliased(
+        2, this->_internal_line(), target);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:yoke.administrative.v1.Commanded)
+  return target;
+}
+
+size_t Commanded::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:yoke.administrative.v1.Commanded)
+  size_t total_size = 0;
+
+  uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // string line = 2;
+  if (!this->_internal_line().empty()) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+        this->_internal_line());
+  }
+
+  // .yoke.administrative.v1.Commanded.Outcome outcome = 1;
+  if (this->_internal_outcome() != 0) {
+    total_size += 1 +
+      ::_pbi::WireFormatLite::EnumSize(this->_internal_outcome());
+  }
+
+  return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
+}
+
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData Commanded::_class_data_ = {
+    ::PROTOBUF_NAMESPACE_ID::Message::CopyWithSourceCheck,
+    Commanded::MergeImpl
+};
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*Commanded::GetClassData() const { return &_class_data_; }
+
+
+void Commanded::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg) {
+  auto* const _this = static_cast<Commanded*>(&to_msg);
+  auto& from = static_cast<const Commanded&>(from_msg);
+  // @@protoc_insertion_point(class_specific_merge_from_start:yoke.administrative.v1.Commanded)
+  GOOGLE_DCHECK_NE(&from, _this);
+  uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (!from._internal_line().empty()) {
+    _this->_internal_set_line(from._internal_line());
+  }
+  if (from._internal_outcome() != 0) {
+    _this->_internal_set_outcome(from._internal_outcome());
+  }
+  _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+}
+
+void Commanded::CopyFrom(const Commanded& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:yoke.administrative.v1.Commanded)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool Commanded::IsInitialized() const {
+  return true;
+}
+
+void Commanded::InternalSwap(Commanded* other) {
+  using std::swap;
+  auto* lhs_arena = GetArenaForAllocation();
+  auto* rhs_arena = other->GetArenaForAllocation();
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
+      &_impl_.line_, lhs_arena,
+      &other->_impl_.line_, rhs_arena
+  );
+  swap(_impl_.outcome_, other->_impl_.outcome_);
+}
+
+::PROTOBUF_NAMESPACE_ID::Metadata Commanded::GetMetadata() const {
+  return ::_pbi::AssignDescriptors(
+      &descriptor_table_yoke_2fadministrative_2fv1_2foperations_2eproto_getter, &descriptor_table_yoke_2fadministrative_2fv1_2foperations_2eproto_once,
+      file_level_metadata_yoke_2fadministrative_2fv1_2foperations_2eproto[18]);
 }
 
 // ===================================================================
@@ -7331,7 +8064,7 @@ void LogPage::InternalSwap(LogPage* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata LogPage::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_yoke_2fadministrative_2fv1_2foperations_2eproto_getter, &descriptor_table_yoke_2fadministrative_2fv1_2foperations_2eproto_once,
-      file_level_metadata_yoke_2fadministrative_2fv1_2foperations_2eproto[17]);
+      file_level_metadata_yoke_2fadministrative_2fv1_2foperations_2eproto[19]);
 }
 
 // ===================================================================
@@ -8034,7 +8767,7 @@ void LogEntry::InternalSwap(LogEntry* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata LogEntry::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_yoke_2fadministrative_2fv1_2foperations_2eproto_getter, &descriptor_table_yoke_2fadministrative_2fv1_2foperations_2eproto_once,
-      file_level_metadata_yoke_2fadministrative_2fv1_2foperations_2eproto[18]);
+      file_level_metadata_yoke_2fadministrative_2fv1_2foperations_2eproto[20]);
 }
 
 // ===================================================================
@@ -8312,7 +9045,7 @@ void Followed::InternalSwap(Followed* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata Followed::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_yoke_2fadministrative_2fv1_2foperations_2eproto_getter, &descriptor_table_yoke_2fadministrative_2fv1_2foperations_2eproto_once,
-      file_level_metadata_yoke_2fadministrative_2fv1_2foperations_2eproto[19]);
+      file_level_metadata_yoke_2fadministrative_2fv1_2foperations_2eproto[21]);
 }
 
 // ===================================================================
@@ -8702,7 +9435,7 @@ void Subscribed::InternalSwap(Subscribed* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata Subscribed::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_yoke_2fadministrative_2fv1_2foperations_2eproto_getter, &descriptor_table_yoke_2fadministrative_2fv1_2foperations_2eproto_once,
-      file_level_metadata_yoke_2fadministrative_2fv1_2foperations_2eproto[20]);
+      file_level_metadata_yoke_2fadministrative_2fv1_2foperations_2eproto[22]);
 }
 
 // @@protoc_insertion_point(namespace_scope)
@@ -8737,6 +9470,10 @@ Arena::CreateMaybeMessage< ::yoke::administrative::v1::UnitRetention >(Arena* ar
 template<> PROTOBUF_NOINLINE ::yoke::administrative::v1::UnitAsk*
 Arena::CreateMaybeMessage< ::yoke::administrative::v1::UnitAsk >(Arena* arena) {
   return Arena::CreateMessageInternal< ::yoke::administrative::v1::UnitAsk >(arena);
+}
+template<> PROTOBUF_NOINLINE ::yoke::administrative::v1::UnitCommand*
+Arena::CreateMaybeMessage< ::yoke::administrative::v1::UnitCommand >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::yoke::administrative::v1::UnitCommand >(arena);
 }
 template<> PROTOBUF_NOINLINE ::yoke::administrative::v1::Read*
 Arena::CreateMaybeMessage< ::yoke::administrative::v1::Read >(Arena* arena) {
@@ -8777,6 +9514,10 @@ Arena::CreateMaybeMessage< ::yoke::administrative::v1::Consequence >(Arena* aren
 template<> PROTOBUF_NOINLINE ::yoke::administrative::v1::Asked*
 Arena::CreateMaybeMessage< ::yoke::administrative::v1::Asked >(Arena* arena) {
   return Arena::CreateMessageInternal< ::yoke::administrative::v1::Asked >(arena);
+}
+template<> PROTOBUF_NOINLINE ::yoke::administrative::v1::Commanded*
+Arena::CreateMaybeMessage< ::yoke::administrative::v1::Commanded >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::yoke::administrative::v1::Commanded >(arena);
 }
 template<> PROTOBUF_NOINLINE ::yoke::administrative::v1::LogPage*
 Arena::CreateMaybeMessage< ::yoke::administrative::v1::LogPage >(Arena* arena) {
