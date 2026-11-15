@@ -140,6 +140,8 @@ class Delivery {
     const std::string &id() const;
     // Whether the stream was flowing when the subscription was answered.
     bool flowing() const;
+    // Where the Core said the delivery arrives: "socket", "stream_socket", "shared" or "connection".
+    const std::string &arrives() const;
 
     // The next frame, in order; nothing once the delivery ended. Throws Ended once the attachment did.
     std::optional<Frame> next();
@@ -210,6 +212,12 @@ class Attachment {
     // socket the Core listens on, or the attachment's own connection.
     std::unique_ptr<Delivery> subscribe_stream(std::string_view unit, std::string_view stream,
                                                std::chrono::milliseconds wait = answer_within);
+    // subscribe_stream naming only the deliveries given — a stream socket, each frame after its length,
+    // and the stream's ring itself, handed on a lifeline at each activation; subscribe_stream names both,
+    // and none is the packet socket.
+    std::unique_ptr<Delivery> subscribe_stream_reading(std::string_view unit, std::string_view stream,
+                                                       const std::vector<v1::UnitStream::Reads> &reads,
+                                                       std::chrono::milliseconds wait = answer_within);
     // Takes control back for a channel bound as a local socket.
     v1::Reclaimed reclaim(std::chrono::milliseconds wait = answer_within);
 

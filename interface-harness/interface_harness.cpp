@@ -270,7 +270,21 @@ struct Harness {
                 return {{"value", plain(a->stop_stream(text(args, "unit"), text(args, "stream")))}};
             }
             if (verb == "stream-subscribe") {
-                deliveries.push_back(a->subscribe_stream(text(args, "unit"), text(args, "stream")));
+                // The suite may name what the library is to read; otherwise it names everything it reads.
+                if (args.contains("reads") && args["reads"].is_array()) {
+                    std::vector<yoke::interface::v1::UnitStream::Reads> reads;
+                    for (const auto &r : args["reads"]) {
+                        if (r == "stream_socket") {
+                            reads.push_back(yoke::interface::v1::UnitStream::READS_STREAM_SOCKET);
+                        } else if (r == "shared_object") {
+                            reads.push_back(yoke::interface::v1::UnitStream::READS_SHARED_OBJECT);
+                        }
+                    }
+                    deliveries.push_back(
+                        a->subscribe_stream_reading(text(args, "unit"), text(args, "stream"), reads));
+                } else {
+                    deliveries.push_back(a->subscribe_stream(text(args, "unit"), text(args, "stream")));
+                }
                 yi::Delivery *d = deliveries.back().get();
                 reporting.emplace_back([this, d] {
                     for (;;) {
@@ -289,7 +303,8 @@ struct Harness {
                                           {"payload", f->payload}});
                     }
                 });
-                return {{"value", {{"delivery", d->id()}, {"flowing", d->flowing()}}}};
+                return {
+                    {"value", {{"delivery", d->id()}, {"flowing", d->flowing()}, {"arrives", d->arrives()}}}};
             }
             return {{"value", plain(a->reclaim())}};
         } catch (...) {

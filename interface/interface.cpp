@@ -8,12 +8,17 @@
 #include <mutex>
 #include <thread>
 
+#include <algorithm>
+#include <cstdint>
 #include <google/protobuf/any.pb.h>
 #include <google/protobuf/io/coded_stream.h>
 #include <google/protobuf/wire_format_lite.h>
 #include <grpcpp/create_channel_posix.h>
 #include <grpcpp/grpcpp.h>
+#include <poll.h>
+#include <sys/mman.h>
 #include <sys/socket.h>
+#include <sys/stat.h>
 #include <sys/un.h>
 #include <unistd.h>
 
@@ -481,22 +486,136 @@ std::uint64_t little(const char *p) {
     return v;
 }
 
+// A u32, little-endian.
+std::size_t little32(const char *p) {
+    std::uint32_t v = 0;
+    for (int i = 0; i < 4; i++) {
+        v |= static_cast<std::uint32_t>(static_cast<unsigned char>(p[i])) << (8 * i);
+    }
+    return v;
+}
+
 } // namespace
 
 struct Delivery::State {
     std::shared_ptr<Attachment::State> a;
     std::string id;
     bool flowing = false;
+    std::string arrives = "socket";
     int socket = -1;
     std::shared_ptr<Queue> frames;
     std::string buf;
+    // A stream socket: each frame after its length.
+    bool lengthed = false;
+    // On the shared ring: the socket is the lifeline, and the ring of the activation being read is mapped.
+    bool shared = false;
+    unsigned char *ring = nullptr;
+    std::size_t ring_size = 0;
+    std::uint32_t slots = 0, capacity = 0;
+    std::uint64_t next = 1;
 
+    void unmap() {
+        if (ring != nullptr) {
+            ::munmap(ring, ring_size);
+            ring = nullptr;
+        }
+    }
     ~State() {
         if (socket >= 0) {
             ::close(socket);
         }
+        unmap();
     }
 };
+
+namespace {
+
+// Reads exactly n bytes from a stream socket; false at its end.
+bool read_exactly(int fd, char *buf, std::size_t n) {
+    std::size_t got = 0;
+    while (got < n) {
+        ssize_t r = ::recv(fd, buf + got, n - got, 0);
+        if (r < 0 && errno == EINTR) {
+            continue;
+        }
+        if (r <= 0) {
+            return false;
+        }
+        got += static_cast<std::size_t>(r);
+    }
+    return true;
+}
+
+// The descriptor a message carried, or -1.
+int handed(msghdr &m) {
+    int fd = -1;
+    for (cmsghdr *c = CMSG_FIRSTHDR(&m); c != nullptr; c = CMSG_NXTHDR(&m, c)) {
+        if (c->cmsg_level == SOL_SOCKET && c->cmsg_type == SCM_RIGHTS) {
+            std::memcpy(&fd, CMSG_DATA(c), sizeof fd);
+        }
+    }
+    return fd;
+}
+
+// Maps a ring the lifeline handed, for reading alone.
+void map_ring(Delivery::State &st, int fd) {
+    struct stat info {};
+    if (::fstat(fd, &info) != 0 || info.st_size < 64) {
+        throw std::runtime_error("the ring handed cannot be read");
+    }
+    auto *mem = static_cast<unsigned char *>(
+        ::mmap(nullptr, static_cast<std::size_t>(info.st_size), PROT_READ, MAP_SHARED, fd, 0));
+    if (mem == MAP_FAILED) {
+        throw std::runtime_error(std::string("the ring handed cannot be mapped: ") + std::strerror(errno));
+    }
+    std::uint32_t version, slots, capacity;
+    std::memcpy(&version, mem + 8, 4);
+    std::memcpy(&slots, mem + 12, 4);
+    std::memcpy(&capacity, mem + 16, 4);
+    if (std::memcmp(mem, "YOKERING", 8) != 0 || version != 1 || slots == 0 ||
+        64 + static_cast<std::uint64_t>(slots) * (32 + static_cast<std::uint64_t>(capacity)) >
+            static_cast<std::uint64_t>(info.st_size)) {
+        ::munmap(mem, static_cast<std::size_t>(info.st_size));
+        throw std::runtime_error("the memory handed is not a ring this library reads");
+    }
+    st.unmap();
+    st.ring = mem;
+    st.ring_size = static_cast<std::size_t>(info.st_size);
+    st.slots = slots;
+    st.capacity = capacity;
+    st.next = 1;
+}
+
+// One frame of the mapped ring, if one is published: a lap by the producer, or a slot overwritten while it
+// was copied, is a gap the sequence shows.
+std::optional<Frame> read_ring(Delivery::State &st) {
+    for (;;) {
+        auto published = __atomic_load_n(reinterpret_cast<std::uint64_t *>(st.ring + 24), __ATOMIC_ACQUIRE);
+        if (published < st.next) {
+            return std::nullopt;
+        }
+        if (published >= st.slots && st.next < published - st.slots + 1) {
+            st.next = published - st.slots + 1;
+        }
+        std::uint64_t n = st.next++;
+        unsigned char *slot =
+            st.ring + 64 + ((n - 1) % st.slots) * (32 + static_cast<std::size_t>(st.capacity));
+        auto before = __atomic_load_n(reinterpret_cast<std::uint64_t *>(slot), __ATOMIC_ACQUIRE);
+        std::uint64_t clock;
+        std::uint32_t length;
+        std::memcpy(&clock, slot + 8, 8);
+        std::memcpy(&length, slot + 16, 4);
+        length = std::min(length, st.capacity);
+        std::string payload(reinterpret_cast<const char *>(slot + 32), length);
+        auto after = __atomic_load_n(reinterpret_cast<std::uint64_t *>(slot), __ATOMIC_ACQUIRE);
+        if (before != n || after != n) {
+            continue;
+        }
+        return Frame{n, clock, std::move(payload)};
+    }
+}
+
+} // namespace
 
 void Attachment::State::end_deliveries() {
     std::lock_guard<std::mutex> hold(mu);
@@ -516,7 +635,81 @@ const std::string &Delivery::id() const { return state_->id; }
 
 bool Delivery::flowing() const { return state_->flowing; }
 
+const std::string &Delivery::arrives() const { return state_->arrives; }
+
 std::optional<Frame> Delivery::next() {
+    if (state_->shared) {
+        // The lifeline's messages as they come — a ring on one byte, a stop of length zero, the end at its
+        // closing — and the ring read at a bounded interval between them.
+        for (;;) {
+            pollfd p{state_->socket, POLLIN, 0};
+            if (::poll(&p, 1, state_->ring != nullptr ? 2 : 100) > 0) {
+                unsigned char head[4];
+                char space[CMSG_SPACE(sizeof(int))];
+                iovec io{head, 4};
+                msghdr m{};
+                m.msg_iov = &io;
+                m.msg_iovlen = 1;
+                m.msg_control = space;
+                m.msg_controllen = sizeof space;
+                if (::recvmsg(state_->socket, &m, MSG_WAITALL) <= 0) {
+                    state_->unmap();
+                    return std::nullopt;
+                }
+                int fd = handed(m);
+                std::uint32_t length =
+                    head[0] | head[1] << 8 | head[2] << 16 | static_cast<std::uint32_t>(head[3]) << 24;
+                if (length == 0) {
+                    state_->unmap();
+                    continue;
+                }
+                char body[16];
+                iovec bio{body, std::min<std::size_t>(length, sizeof body)};
+                msghdr bm{};
+                bm.msg_iov = &bio;
+                bm.msg_iovlen = 1;
+                bm.msg_control = space;
+                bm.msg_controllen = sizeof space;
+                if (::recvmsg(state_->socket, &bm, MSG_WAITALL) <= 0) {
+                    state_->unmap();
+                    return std::nullopt;
+                }
+                if (fd < 0) {
+                    fd = handed(bm);
+                }
+                if (fd >= 0) {
+                    try {
+                        map_ring(*state_, fd);
+                    } catch (...) {
+                        ::close(fd);
+                        throw;
+                    }
+                    ::close(fd);
+                }
+                continue;
+            }
+            if (state_->ring != nullptr) {
+                if (auto f = read_ring(*state_)) {
+                    return f;
+                }
+            }
+        }
+    }
+    if (state_->socket >= 0 && state_->lengthed) {
+        char head[4];
+        if (!read_exactly(state_->socket, head, 4)) {
+            return std::nullopt;
+        }
+        std::string body(little32(head), '\0');
+        if (!read_exactly(state_->socket, body.data(), body.size())) {
+            return std::nullopt;
+        }
+        if (body.size() < header) {
+            throw std::runtime_error("a frame of " + std::to_string(body.size()) +
+                                     " bytes is shorter than its header");
+        }
+        return Frame{little(body.data()), little(body.data() + 8), body.substr(header)};
+    }
     if (state_->socket >= 0) {
         ssize_t n;
         do {
@@ -764,9 +957,20 @@ v1::Acknowledged Attachment::stop_stream(std::string_view unit, std::string_view
 
 std::unique_ptr<Delivery> Attachment::subscribe_stream(std::string_view unit, std::string_view stream,
                                                        std::chrono::milliseconds wait) {
+    return subscribe_stream_reading(
+        unit, stream, {v1::UnitStream::READS_STREAM_SOCKET, v1::UnitStream::READS_SHARED_OBJECT}, wait);
+}
+
+std::unique_ptr<Delivery>
+Attachment::subscribe_stream_reading(std::string_view unit, std::string_view stream,
+                                     const std::vector<v1::UnitStream::Reads> &reads,
+                                     std::chrono::milliseconds wait) {
     v1::Request r;
     r.mutable_stream_subscribe()->set_unit(std::string(unit));
     r.mutable_stream_subscribe()->set_stream(std::string(stream));
+    for (auto read : reads) {
+        r.mutable_stream_subscribe()->add_reads(read);
+    }
     const v1::Delivering d = state_->call(std::move(r), wait).stream_subscribe();
     auto st = std::make_shared<Delivery::State>();
     st->a = state_;
@@ -792,8 +996,33 @@ std::unique_ptr<Delivery> Attachment::subscribe_stream(std::string_view unit, st
         }
         break;
     }
+    case v1::Delivering::kStreamSocket:
+    case v1::Delivering::kShared: {
+        const std::string &path =
+            d.arrives_case() == v1::Delivering::kShared ? d.shared() : d.stream_socket();
+        sockaddr_un addr{};
+        if (path.size() >= sizeof addr.sun_path) {
+            throw std::runtime_error("the delivery's socket " + path + " is too long a path to reach");
+        }
+        addr.sun_family = AF_UNIX;
+        std::memcpy(addr.sun_path, path.data(), path.size());
+        st->socket = ::socket(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0);
+        if (st->socket < 0 || ::connect(st->socket, reinterpret_cast<sockaddr *>(&addr), sizeof addr) != 0) {
+            throw std::runtime_error("the delivery's socket " + path +
+                                     " cannot be reached: " + std::strerror(errno));
+        }
+        st->shared = d.arrives_case() == v1::Delivering::kShared;
+        st->lengthed = !st->shared;
+        st->arrives = st->shared ? "shared" : "stream_socket";
+        {
+            std::lock_guard<std::mutex> hold(state_->mu);
+            state_->deliveries.push_back(st);
+        }
+        break;
+    }
     case v1::Delivering::kConnection:
         // Enrolled by the reader as the answer arrived, so no frame of it was missed.
+        st->arrives = "connection";
         st->frames = state_->enroll(st->id);
         break;
     default:
