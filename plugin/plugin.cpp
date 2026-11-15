@@ -130,7 +130,7 @@ class Ring {
     // Maps the ring a descriptor names, for writing, and reads its geometry from its header; null, and the
     // reason, when the memory is not a ring this library writes.
     static std::unique_ptr<Ring> open(int fd, std::string *why) {
-        struct stat info{};
+        struct stat info {};
         if (::fstat(fd, &info) != 0 || info.st_size < static_cast<off_t>(header_size)) {
             *why = "the memory handed is shorter than a ring's header";
             return nullptr;
