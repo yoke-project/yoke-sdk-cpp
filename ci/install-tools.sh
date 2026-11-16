@@ -9,3 +9,5 @@ sudo apt-get update
 # library compiles against, and its build system.
 sudo apt-get install -y --no-install-recommends protobuf-compiler protobuf-compiler-grpc libprotobuf-dev libgrpc++-dev libssl-dev nlohmann-json3-dev \
   pkg-config cmake
+# Qt 6's QML, which the family's QML binding is built with and its cases run in.
+sudo apt-get install -y --no-install-recommends qt6-declarative-dev qml6-module-qtqml qml6-module-qtqml-models qml6-module-qtqml-workerscript

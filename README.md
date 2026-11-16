@@ -16,6 +16,14 @@ its source: an archive of the tagged tree, which `cmake --install` turns into th
 a CMake package config for `find_package(yoke-sdk-cpp)` and a `yoke-sdk-cpp.pc` for `pkg-config`. No
 package manager is involved.
 
+The interface library has a **QML binding**, an optional component built only where it is asked for,
+with `-DYOKE_SDK_CPP_QML=ON` and Qt 6.4 or newer: a QML module, `Yoke.Interface`, whose `Attachment`,
+`Subscription` and `Delivery` a QML document instantiates to attach to a channel, read what it sees as
+properties, issue every operation as a call that answers later, and follow subscriptions and streams as
+signals. It is installed under `lib/qt6/qml` — `YOKE_SDK_CPP_QML_DIR` moves it — and a consumer finds it
+with `find_package(yoke-sdk-cpp COMPONENTS qml)`, which sets `YOKE_SDK_CPP_QML_IMPORT_PATH`. Built
+without it, the family is what it was, and nothing of the plugin or interface library links Qt.
+
 ## What is where
 
 | Path | What it holds |
@@ -26,6 +34,7 @@ package manager is involved.
 | `harness/` | The plugin library's harness for the conformance suite |
 | `interface/` | The library an interface client is written with, and the TLS 1.3 it carries itself |
 | `interface-harness/` | The interface library's harness for the conformance suite |
+| `qml/` | The interface library's QML binding, the module `Yoke.Interface` |
 | `definitions/` | The generated C++ of every contract, and `record`, which pins the definitions' version, digest and generators |
 | `testing/` | What the programs that run the cases share |
 | `cmake/` | The package config and the pkg-config file `cmake --install` writes |
@@ -37,14 +46,15 @@ A test's description sits beside the test, as a `.std.md` file.
 ## Working on it
 
 A C++ compiler, CMake and `pkg-config`; the development packages of protobuf, gRPC for C++, OpenSSL 3
-and nlohmann-json; `clang-format` 18.1.8 for `just fmt`, which `ci/install-tools.sh` installs; and
+and nlohmann-json; Qt 6's QML (on Debian and Ubuntu `qt6-declarative-dev`, with the modules
+`qml6-module-qtqml`, `-models` and `-workerscript` its cases load); `clang-format` 18.1.8 for `just fmt`, which `ci/install-tools.sh` installs; and
 [`just`](https://just.systems) 1.58.0 or newer. `just develop` also puts the published verification
 tool, `yoke-verify`, on the `PATH`, which `just test` needs. The `Containerfile` builds a container
 with all of it.
 
 | Command | What it does |
 | --- | --- |
-| `just build` | Configures and builds, with CMake, the definitions, the base, the two libraries, their harnesses and the programs that run their cases |
+| `just build` | Configures and builds, with CMake, the definitions, the base, the two libraries, the QML binding, their harnesses and the programs that run their cases |
 | `just test` | Runs the checks and the programs `just build` made, and checks each description against its tests |
 | `just lint` | Parses every shell script |
 | `just fmt` | Fails, naming each file, when a C++ file is not formatted |
