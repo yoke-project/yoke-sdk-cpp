@@ -1,14 +1,14 @@
 # The six verbs every repository defines.
 # A verb with nothing to do says so in one line, so a fan-out can tell a gap from a statement.
 
-# Build this repository's codebase: the generated definitions, the base and the plugin library, and
-# the programs that run their cases.
+# Build this repository's codebase: the generated definitions, the base and the plugin library, the
+# interface library and its QML binding, and the programs that run their cases.
 build:
     #!/usr/bin/env bash
     set -euo pipefail
-    cmake -S . -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo > /dev/null
+    cmake -S . -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo -DYOKE_SDK_CPP_QML=ON > /dev/null
     cmake --build build --parallel
-    echo "build: the definitions, the base, the plugin and the interface libraries compile"
+    echo "build: the definitions, the base, the plugin and the interface libraries and the QML binding compile"
 
 # Run this repository's own checks, with no sibling present.
 test:
@@ -29,7 +29,7 @@ test:
     (
       failed=0
       bash checks/run.sh || failed=1
-      for program in base_test plugin_test harness_test interface_test routable_test interface_harness_test; do
+      for program in base_test plugin_test harness_test interface_test routable_test interface_harness_test qml_test; do
         if [[ -x "build/$program" ]]; then
           "build/$program" || failed=1
         else

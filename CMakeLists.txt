@@ -13,6 +13,7 @@ pkg_check_modules(GRPCXX REQUIRED IMPORTED_TARGET grpc++)
 pkg_check_modules(PROTOBUF REQUIRED IMPORTED_TARGET protobuf)
 find_package(Threads REQUIRED)
 find_package(OpenSSL 3 REQUIRED)
+include(GNUInstallDirs)
 
 # The generated definitions of the two contracts the library speaks, compiled as they were generated. The
 # administrative contract's are generated beside them and compiled into nothing: a panel built on the
@@ -29,6 +30,32 @@ target_include_directories(yoke-cpp
     PRIVATE base interface)
 target_link_libraries(yoke-cpp PUBLIC PkgConfig::GRPCXX PkgConfig::PROTOBUF Threads::Threads PRIVATE OpenSSL::SSL)
 set_source_files_properties(base/base.cpp plugin/plugin.cpp interface/interface.cpp interface/tls.cpp PROPERTIES COMPILE_OPTIONS "-Wall;-Wextra;-Werror")
+
+# The QML binding, an optional component of the family: built only where it is asked for, since it needs
+# Qt 6, and nothing of the plugin or interface library links Qt. It is a QML module, Yoke.Interface, whose
+# plugin carries the interface library with it, so the library is compiled position-independent here.
+option(YOKE_SDK_CPP_QML "build the QML binding of the interface library, which needs Qt 6" OFF)
+set(YOKE_SDK_CPP_QML_DIR "${CMAKE_INSTALL_LIBDIR}/qt6/qml" CACHE STRING
+    "where the QML module is installed, relative to the prefix: a directory on the QML import path")
+if(YOKE_SDK_CPP_QML)
+    find_package(Qt6 6.4 REQUIRED COMPONENTS Qml)
+    if(COMMAND qt_policy)
+        qt_policy(SET QTP0001 NEW)
+    endif()
+    set_target_properties(yoke-cpp PROPERTIES POSITION_INDEPENDENT_CODE ON)
+    # The module is its own plugin, a shared object a QML engine loads from the import path alone.
+    set(YOKE_SDK_CPP_QML_SOURCES qml/binding.hpp qml/binding.cpp qml/convert.hpp qml/convert.cpp)
+    qt_add_qml_module(yoke-cpp-qml
+        URI Yoke.Interface
+        VERSION ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
+        PLUGIN_TARGET yoke-cpp-qml
+        OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/qml/Yoke/Interface
+        SOURCES ${YOKE_SDK_CPP_QML_SOURCES})
+    set_target_properties(yoke-cpp-qml PROPERTIES AUTOMOC ON)
+    target_include_directories(yoke-cpp-qml PRIVATE qml)
+    target_link_libraries(yoke-cpp-qml PRIVATE yoke-cpp Qt6::Qml)
+    set_source_files_properties(qml/binding.cpp qml/convert.cpp PROPERTIES COMPILE_OPTIONS "-Wall;-Wextra;-Werror")
+endif()
 
 # The harnesses and the cases are this repository's own build; a consumer of the source release turns
 # them off, and then needs only what the library links.
@@ -78,12 +105,26 @@ target_compile_definitions(interface_harness_test PRIVATE SOURCE_DIR="${PROJECT_
 target_compile_options(interface_harness_test PRIVATE -Wall -Wextra -Werror)
 target_link_libraries(interface_harness_test PRIVATE yoke-cpp-iharness yoke-cpp-testing)
 
+# The binding's cases, which compile the binding in and register its types into the case's own engine rather
+# than load its plugin, so the interface library is linked once.
+if(YOKE_SDK_CPP_QML)
+    # A consumer that links nothing but Qt, which a case loads the installed module with.
+    add_executable(qml_load qml/qml_load.cpp)
+    target_compile_options(qml_load PRIVATE -Wall -Wextra -Werror)
+    target_link_libraries(qml_load PRIVATE Qt6::Qml)
+    add_executable(qml_test qml/qml_test.cpp ${YOKE_SDK_CPP_QML_SOURCES})
+    set_target_properties(qml_test PROPERTIES AUTOMOC ON)
+    target_include_directories(qml_test PRIVATE qml)
+    target_compile_definitions(qml_test PRIVATE YOKE_CPP_LIBRARY="$<TARGET_FILE:yoke-cpp>")
+    target_compile_options(qml_test PRIVATE -Wall -Wextra -Werror)
+    target_link_libraries(qml_test PRIVATE yoke-cpp-testing Qt6::Qml)
+endif()
+
 endif()
 
 # What a consumer installs: the library, its public headers, a CMake package config `find_package` resolves,
 # and a pkg-config file for every build that is not CMake. Of the definitions, the interface contract's
 # messages are installed, because the interface library surfaces them; the rest are the library's own.
-include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 install(TARGETS yoke-cpp EXPORT yoke-sdk-cpp-targets ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
 install(DIRECTORY include/yoke DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
@@ -91,10 +132,17 @@ install(DIRECTORY definitions/yoke/interface/v1 DESTINATION ${CMAKE_INSTALL_INCL
     FILES_MATCHING PATTERN "*.pb.h" PATTERN "*.grpc.pb.h" EXCLUDE)
 install(EXPORT yoke-sdk-cpp-targets NAMESPACE yoke:: DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/yoke-sdk-cpp)
 configure_package_config_file(cmake/yoke-sdk-cpp-config.cmake.in ${PROJECT_BINARY_DIR}/yoke-sdk-cpp-config.cmake
-    INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/yoke-sdk-cpp)
+    INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/yoke-sdk-cpp PATH_VARS YOKE_SDK_CPP_QML_DIR)
 write_basic_package_version_file(${PROJECT_BINARY_DIR}/yoke-sdk-cpp-config-version.cmake COMPATIBILITY SameMinorVersion)
 install(FILES ${PROJECT_BINARY_DIR}/yoke-sdk-cpp-config.cmake ${PROJECT_BINARY_DIR}/yoke-sdk-cpp-config-version.cmake
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/yoke-sdk-cpp)
+# The QML module, where asked for: its plugin, its qmldir and its type description, under the import path.
+if(YOKE_SDK_CPP_QML)
+    qt_query_qml_module(yoke-cpp-qml QMLDIR qml_qmldir TYPEINFO qml_typeinfo MODULE_RESOURCE_PATH qml_module_path)
+    set(qml_into "${YOKE_SDK_CPP_QML_DIR}/Yoke/Interface")
+    install(TARGETS yoke-cpp-qml LIBRARY DESTINATION "${qml_into}")
+    install(FILES "${qml_qmldir}" "${qml_typeinfo}" DESTINATION "${qml_into}")
+endif()
 # The pkg-config file finds the prefix from where it was installed, so a prefix given at install holds.
 file(RELATIVE_PATH PC_TO_PREFIX "/prefix/${CMAKE_INSTALL_LIBDIR}/pkgconfig" "/prefix")
 configure_file(cmake/yoke-sdk-cpp.pc.in ${PROJECT_BINARY_DIR}/yoke-sdk-cpp.pc @ONLY)

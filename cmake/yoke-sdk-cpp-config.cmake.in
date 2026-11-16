@@ -1,4 +1,5 @@
-# The C++ family, for find_package(yoke-sdk-cpp): the target yoke::yoke-cpp and what it links against.
+# The C++ family, for find_package(yoke-sdk-cpp): the target yoke::yoke-cpp and what it links against;
+# with COMPONENTS qml, the QML binding.
 @PACKAGE_INIT@
 include(CMakeFindDependencyMacro)
 find_dependency(PkgConfig)
@@ -7,4 +8,10 @@ pkg_check_modules(PROTOBUF REQUIRED IMPORTED_TARGET protobuf)
 find_dependency(Threads)
 find_dependency(OpenSSL 3)
 include("${CMAKE_CURRENT_LIST_DIR}/yoke-sdk-cpp-targets.cmake")
+# The QML binding is the component `qml`, there where the family was built with it: a QML module, and
+# YOKE_SDK_CPP_QML_IMPORT_PATH the directory to put on the QML import path to find it.
+if(@YOKE_SDK_CPP_QML@)
+    set_and_check(YOKE_SDK_CPP_QML_IMPORT_PATH "@PACKAGE_YOKE_SDK_CPP_QML_DIR@")
+    set(yoke-sdk-cpp_qml_FOUND TRUE)
+endif()
 check_required_components(yoke-sdk-cpp)
