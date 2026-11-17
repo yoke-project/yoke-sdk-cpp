@@ -121,3 +121,16 @@
 | **Precondition** | a Core that ends the attachment at its first request without answering it; a document attaching with `attachAgain` set |
 | **Action** | the document commands a unit once attached; the Core goes away and its socket with it, for most of a second, and a second document attaches without `attachAgain`; then a second Core, with another opening, serves the same channel |
 | **Expected** | the attachment reads `Ended`, the command in flight is answered as refused, and nothing tries the first Core again on the same socket; with no channel it stays `Ended`, and so does the second document's; once the channel's socket is made again it is attached again, a second time, its picture the second Core's, and that Core is never sent the command; the second document stays `Ended` |
+
+## yoke-sdk-cpp:the-qml-binding.10 — a suspended channel is a property, with the channel that prevails
+
+| Field | Value |
+| --- | --- |
+| **Cites** | specs/70.6 · arch/70-interface-surface/06 §Arbitration · arch/45-events/06 §The catalogue |
+| **Level** | L1 |
+| **Method** | test |
+| **Not applicable in** | — |
+| **Label** | blocking |
+| **Precondition** | a Core whose opening picture holds the channel's own record, suspended, dark, by `panel`; and whose standing subscription then carries `channel.resumed` and `channel.suspended`, read-only, by `bench` |
+| **Action** | attach, and record each change of the suspension |
+| **Expected** | the document reads three changes: dark by `panel`, then active, then read-only by `bench`, each with its reason; it is attached throughout; nothing was asked of the Core to learn them |
