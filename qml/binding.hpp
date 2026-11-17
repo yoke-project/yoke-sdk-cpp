@@ -14,12 +14,14 @@
 #define YOKE_QML_BINDING_HPP
 
 #include <atomic>
+#include <chrono>
 #include <cstdint>
 #include <functional>
 #include <map>
 #include <memory>
 #include <mutex>
 
+#include <QFileSystemWatcher>
 #include <QJSValue>
 #include <QObject>
 #include <QPointer>
@@ -70,6 +72,15 @@ class Gate {
 // A client attached to a channel. It attaches when the document is complete and `active` holds, to the
 // channel `address` names, or to `channel` of the application instance `instance`; changing either
 // attaches again.
+//
+// Where the document sets `attachAgain`, an attachment that ended — the Core ended it, went away, or was
+// not there — is attached again once its channel is back, which it learns from the host — its socket
+// appearing — and never by trying at an interval; a channel reached at an address is not watched, and an
+// attachment to one stays ended. Nothing about it is hidden: the status reads
+// `Ended`, with its failure, until the next attachment is admitted; that one is given its own opening, and
+// the picture is replaced with it; subscriptions and deliveries open again on it as new ones, claiming no
+// continuity with the old; and a call in flight when the attachment ended is answered as refused, and
+// never sent again.
 class Attachment : public QObject, public QQmlParserStatus {
     Q_OBJECT
     QML_ELEMENT
@@ -79,6 +90,7 @@ class Attachment : public QObject, public QQmlParserStatus {
     Q_PROPERTY(QString instance READ instance WRITE setInstance NOTIFY addressChanged)
     Q_PROPERTY(QString channel READ channel WRITE setChannel NOTIFY addressChanged)
     Q_PROPERTY(bool active READ active WRITE setActive NOTIFY activeChanged)
+    Q_PROPERTY(bool attachAgain READ attachAgain WRITE setAttachAgain NOTIFY attachAgainChanged)
 
     Q_PROPERTY(Status status READ status NOTIFY statusChanged)
     Q_PROPERTY(bool attached READ attached NOTIFY statusChanged)
@@ -106,6 +118,8 @@ class Attachment : public QObject, public QQmlParserStatus {
     void setChannel(const QString &channel);
     bool active() const { return active_; }
     void setActive(bool active);
+    bool attachAgain() const { return again_; }
+    void setAttachAgain(bool again);
 
     Status status() const { return status_; }
     bool attached() const { return status_ == Attached; }
@@ -143,6 +157,7 @@ class Attachment : public QObject, public QQmlParserStatus {
   signals:
     void addressChanged();
     void activeChanged();
+    void attachAgainChanged();
     void statusChanged();
     void pictureChanged();
     // An event of the standing subscription, in order.
@@ -155,6 +170,8 @@ class Attachment : public QObject, public QQmlParserStatus {
     int issue(Work work, const QJSValue &then, const QJSValue &otherwise);
     int refuse(const QJSValue &then, const QJSValue &otherwise, const QVariantMap &failure);
     void reattach();
+    void attach(std::chrono::milliseconds wait);
+    void again();
     void detach();
     void end(const QVariantMap &failure);
     void settle(int call, bool ok, const QVariant &result);
@@ -163,6 +180,11 @@ class Attachment : public QObject, public QQmlParserStatus {
     QString address_, instance_, channel_;
     bool active_ = true;
     bool complete_ = false;
+    bool again_ = false;
+    // The socket last tried, as the host identifies it — a socket made again is another — and what watches
+    // the directory it is made in.
+    QString tried_;
+    QFileSystemWatcher *watch_ = nullptr;
 
     Status status_ = Detached;
     QVariantMap failure_;

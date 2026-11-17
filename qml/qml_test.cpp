@@ -7,6 +7,7 @@
 #include <functional>
 #include <memory>
 #include <string>
+#include <unistd.h>
 #include <vector>
 
 #include <QCoreApplication>
@@ -435,6 +436,65 @@ void test_nothing_of_the_plugin_or_interface_library_links_qt() {
 
 } // namespace
 
+// std: yoke-sdk-cpp:the-qml-binding.09
+void test_an_attachment_the_document_asks_for_again_is_attached_when_the_channel_is_back() {
+    // The first Core ends the attachment at its first request, a command it never answers.
+    Core first;
+    first.opening = opening_at(1);
+    first.end_after = 1;
+    first.answer = [](const std::string &, const iv1::Request &, const Send &) {};
+    auto served = std::make_unique<Served>(first);
+    std::string path = served->path;
+    Engine e;
+    auto doc =
+        e.load("Attachment {\n"
+               "  address: " +
+               quoted(path) +
+               "\n"
+               "  attachAgain: true\n"
+               "  property int times: 0\n"
+               "  property string inflight: ''\n"
+               "  onStatusChanged: {\n"
+               "    if (!attached) return\n"
+               "    times++\n"
+               "    if (times === 1) command('acquire', 'calibrate', '', null, r => inflight = r.code)\n"
+               "  }\n"
+               "}");
+    REQUIRE(until([&] { return get(doc, "status").toInt() == ended; }), "the attachment never read as ended");
+    REQUIRE(until([&] { return !str(get(doc, "inflight")).empty(); }),
+            "the command in flight when the attachment ended was never answered");
+
+    // The Core goes away, and its channel with it; for a while there is none.
+    served.reset();
+    ::unlink(path.c_str());
+    until([] { return false; }, 700);
+    REQUIRE(first.attachments() == 1, "the first Core was attached to ", first.attachments(),
+            " times, and so again on the same socket");
+    // A document that did not ask to be attached again, started while there is no channel.
+    auto stays = e.load("Attachment { address: " + quoted(path) + " }");
+    REQUIRE(until([&] { return get(stays, "status").toInt() == ended; }, 35000),
+            "an attachment to no channel never read as ended");
+    REQUIRE(get(doc, "status").toInt() == ended && get(doc, "times").toInt() == 1,
+            "with no channel, the attachment reads ", get(doc, "status").toInt(), " after ",
+            get(doc, "times").toInt(), " attachments");
+
+    // The channel is back, from another Core with another opening.
+    Core second;
+    second.opening = opening_at(1);
+    second.opening.mutable_picture()->add_records()->mutable_unit()->mutable_declared()->set_identity(
+        "second");
+    Served back(second);
+    REQUIRE(until([&] { return get(doc, "status").toInt() == attached; }, 8000),
+            "the attachment was not attached again once its channel was back");
+    REQUIRE(get(doc, "times").toInt() == 2 && get(doc, "records").toList().size() == 2, "attached again ",
+            get(doc, "times").toInt(), " times, with a picture of ", get(doc, "records").toList().size(),
+            " records rather than the second Core's two");
+    REQUIRE(count(second, iv1::Request::kCommand) == 0, "the command in flight was sent again");
+    until([] { return false; }, 300);
+    REQUIRE(get(stays, "status").toInt() == ended, "an attachment the document did not ask for again reads ",
+            get(stays, "status").toInt());
+}
+
 int main() {
     // Qt reads its text as UTF-8 and says so where the locale does not; the cases' lines are the record's.
     setenv("LC_ALL", "C.UTF-8", 1);
@@ -448,5 +508,7 @@ int main() {
          test_a_streams_frames_arrive_as_signals_and_letting_it_go_releases_it},
         {"yoke-sdk-cpp:the-qml-binding.06", test_an_attachment_the_core_ended_is_a_state_the_document_reads},
         {"yoke-sdk-cpp:the-qml-binding.07", test_nothing_of_the_plugin_or_interface_library_links_qt},
+        {"yoke-sdk-cpp:the-qml-binding.09",
+         test_an_attachment_the_document_asks_for_again_is_attached_when_the_channel_is_back},
     });
 }

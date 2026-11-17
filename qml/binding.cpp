@@ -1,9 +1,11 @@
 #include "binding.hpp"
 
 #include <cstdlib>
+#include <sys/stat.h>
 #include <thread>
 
 #include <QDebug>
+#include <QFileInfo>
 #include <QJSEngine>
 #include <QQmlEngine>
 
@@ -102,9 +104,86 @@ void Attachment::setActive(bool active) {
     reattach();
 }
 
+void Attachment::setAttachAgain(bool again) {
+    if (again_ == again) {
+        return;
+    }
+    again_ = again;
+    emit attachAgainChanged();
+    if (!again_ && watch_ != nullptr && !watch_->directories().isEmpty()) {
+        watch_->removePaths(watch_->directories());
+    }
+    this->again();
+}
+
 void Attachment::componentComplete() {
     complete_ = true;
     reattach();
+}
+
+namespace {
+
+// How long a try waits for the opening, once the channel's socket is there.
+constexpr std::chrono::milliseconds try_within{2000};
+
+// A socket as the host identifies it, or empty where there is none: made again, it is another.
+QString identity(const QString &path) {
+    struct stat st {};
+    if (::stat(path.toLocal8Bit().constData(), &st) != 0 || !S_ISSOCK(st.st_mode)) {
+        return {};
+    }
+    return QStringLiteral("%1:%2.%3").arg(st.st_ino).arg(st.st_ctim.tv_sec).arg(st.st_ctim.tv_nsec);
+}
+
+// The nearest directory of a path that exists: where the host says a socket was made.
+QString nearest(const QString &path) {
+    QString dir = QFileInfo(path).absolutePath();
+    while (!QFileInfo::exists(dir) && dir != QStringLiteral("/")) {
+        dir = QFileInfo(dir).absolutePath();
+    }
+    return dir;
+}
+
+} // namespace
+
+void Attachment::again() {
+    if (!again_ || !active_ || !complete_ || status_ != Ended) {
+        return;
+    }
+    QString where = address_;
+    if (where.isEmpty() && !instance_.isEmpty() && !channel_.isEmpty()) {
+        try {
+            where =
+                q(yi::application(s(instance_), s(channel_), [](const char *n) { return std::getenv(n); }));
+        } catch (...) {
+            return;
+        }
+    }
+    // An address is not watched: there is nothing on this host to say it is back.
+    if (!where.startsWith('/')) {
+        return;
+    }
+    // A socket not tried yet is a channel that may be back; the one that was tried is waited past.
+    QString now = identity(where);
+    if (!now.isEmpty() && now != tried_) {
+        tried_ = now;
+        attach(try_within);
+        return;
+    }
+    if (watch_ == nullptr) {
+        watch_ = new QFileSystemWatcher(this);
+        connect(watch_, &QFileSystemWatcher::directoryChanged, this, [this] { again(); });
+    }
+    if (!watch_->directories().isEmpty()) {
+        watch_->removePaths(watch_->directories());
+    }
+    watch_->addPath(nearest(where));
+    // A socket made while the watch was being set is one the watch did not see.
+    QString since = identity(where);
+    if (!since.isEmpty() && since != tried_) {
+        tried_ = since;
+        attach(try_within);
+    }
 }
 
 void Attachment::detach() {
@@ -124,12 +203,20 @@ void Attachment::end(const QVariantMap &failure) {
     subscription_.clear();
     settleAll(failure);
     emit statusChanged();
+    again();
 }
 
 void Attachment::reattach() {
     if (!complete_) {
         return;
     }
+    if (watch_ != nullptr && !watch_->directories().isEmpty()) {
+        watch_->removePaths(watch_->directories());
+    }
+    attach(yi::answer_within);
+}
+
+void Attachment::attach(std::chrono::milliseconds wait) {
     bool was = status_ != Detached;
     detach();
     settleAll(failed("binding.detached", QStringLiteral("the attachment was let go before it answered")));
@@ -155,6 +242,9 @@ void Attachment::reattach() {
         return;
     }
 
+    if (where.startsWith('/')) {
+        tried_ = identity(where);
+    }
     status_ = Attaching;
     failure_.clear();
     version_ = 0;
@@ -163,9 +253,9 @@ void Attachment::reattach() {
 
     auto gate = std::make_shared<Gate>(this);
     gate_ = gate;
-    apart([this, gate, where = s(where)] {
+    apart([this, gate, where = s(where), wait] {
         try {
-            std::shared_ptr<yi::Attachment> a(yi::Attachment::attach(where));
+            std::shared_ptr<yi::Attachment> a(yi::Attachment::attach(where, {}, wait));
             QVariantMap picture = variant(a->picture());
             int version = a->version();
             yi::Subscription *standing = a->standing();
@@ -176,6 +266,9 @@ void Attachment::reattach() {
                     return;
                 }
                 native_ = a;
+                if (watch_ != nullptr && !watch_->directories().isEmpty()) {
+                    watch_->removePaths(watch_->directories());
+                }
                 status_ = Attached;
                 version_ = version;
                 subscription_ = id;
