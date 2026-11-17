@@ -10,7 +10,12 @@
 #include <thread>
 #include <vector>
 
+#include <fstream>
+
+#include <linux/futex.h>
+#include <sys/mman.h>
 #include <sys/socket.h>
+#include <sys/syscall.h>
 #include <sys/un.h>
 #include <unistd.h>
 
@@ -488,6 +493,132 @@ void test_a_panel_links_nothing_of_the_administrative_contract() {
 
 } // namespace
 
+// How many times the thread has given up the processor of its own accord: each wait that ended.
+long waits_of(pid_t tid) {
+    std::ifstream status("/proc/self/task/" + std::to_string(tid) + "/status");
+    std::string line;
+    while (std::getline(status, line)) {
+        if (line.rfind("voluntary_ctxt_switches:", 0) == 0) {
+            return std::stol(line.substr(24));
+        }
+    }
+    return -1;
+}
+
+// std: yoke-sdk-cpp:the-interface-library.10
+void test_a_reader_of_the_ring_waits_on_its_wake_word() {
+    // The ring, as the Core makes it: four slots of 64 bytes, handed on the lifeline at the activation.
+    const std::uint32_t slots = 4, capacity = 64;
+    const std::size_t size = 64 + slots * (32 + capacity);
+    int memory = ::memfd_create("yoke-test", MFD_CLOEXEC);
+    REQUIRE(memory >= 0 && ::ftruncate(memory, static_cast<off_t>(size)) == 0, "the case cannot make a ring");
+    auto *mem =
+        static_cast<unsigned char *>(::mmap(nullptr, size, PROT_READ | PROT_WRITE, MAP_SHARED, memory, 0));
+    REQUIRE(mem != MAP_FAILED, "the case cannot map its ring");
+    std::memcpy(mem, "YOKERING", 8);
+    std::uint32_t header[3] = {1, slots, capacity};
+    std::memcpy(mem + 8, header, sizeof header);
+
+    std::string lifeline_path = check::dir() + "/00000001.sock";
+    int listener = socket(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0);
+    sockaddr_un addr{};
+    addr.sun_family = AF_UNIX;
+    std::strcpy(addr.sun_path, lifeline_path.c_str());
+    REQUIRE(listener >= 0 && bind(listener, reinterpret_cast<sockaddr *>(&addr), sizeof addr) == 0 &&
+                listen(listener, 1) == 0,
+            "the lifeline could not be made");
+    std::promise<int> accepted;
+    std::thread lifeline([&] {
+        int conn = accept(listener, nullptr, nullptr);
+        unsigned char activation[5] = {1, 0, 0, 0, 0};
+        iovec iov{activation, sizeof activation};
+        alignas(cmsghdr) char control[CMSG_SPACE(sizeof(int))] = {};
+        msghdr m{};
+        m.msg_iov = &iov;
+        m.msg_iovlen = 1;
+        m.msg_control = control;
+        m.msg_controllen = sizeof control;
+        cmsghdr *c = CMSG_FIRSTHDR(&m);
+        c->cmsg_level = SOL_SOCKET;
+        c->cmsg_type = SCM_RIGHTS;
+        c->cmsg_len = CMSG_LEN(sizeof(int));
+        std::memcpy(CMSG_DATA(c), &memory, sizeof(int));
+        ::sendmsg(conn, &m, MSG_NOSIGNAL);
+        accepted.set_value(conn);
+    });
+
+    Core c;
+    c.opening = opening_at(1);
+    c.answer = [&](const std::string &call, const iv1::Request &, const Send &send) {
+        iv1::Response resp;
+        auto *d = resp.mutable_stream_subscribe();
+        d->set_delivery("00000001"), d->set_flowing(true), d->set_shared(lifeline_path);
+        send(answered(call, resp));
+    };
+    Served s(c);
+    auto a = yi::Attachment::attach(s.path, {}, 3s);
+    auto d = a->subscribe_stream("acquire", "station.spectra");
+    int conn = accepted.get_future().get();
+
+    // The reader waits on its own thread, and says which thread that is.
+    std::promise<pid_t> waiting;
+    std::promise<std::optional<yi::Frame>> read;
+    std::thread reader([&] {
+        waiting.set_value(static_cast<pid_t>(::syscall(SYS_gettid)));
+        read.set_value(d->next());
+    });
+    pid_t tid = waiting.get_future().get();
+    check::sleep(300);
+    long before = waits_of(tid);
+    check::sleep(1000);
+    long idle = waits_of(tid) - before;
+
+    // The producer publishes one frame, and wakes whoever waits on the word.
+    unsigned char *slot = mem + 64;
+    std::uint64_t one = 1, clock = 1001;
+    std::uint32_t length = 3;
+    std::memcpy(slot + 8, &clock, 8);
+    std::memcpy(slot + 16, &length, 4);
+    std::memcpy(slot + 32, "one", 3);
+    __atomic_store_n(reinterpret_cast<std::uint64_t *>(slot), one, __ATOMIC_RELEASE);
+    __atomic_store_n(reinterpret_cast<std::uint64_t *>(mem + 24), one, __ATOMIC_RELEASE);
+    auto *wake = reinterpret_cast<std::uint32_t *>(mem + 32);
+    __atomic_fetch_add(wake, 1, __ATOMIC_ACQ_REL);
+    auto published = std::chrono::steady_clock::now();
+    ::syscall(SYS_futex, wake, FUTEX_WAKE, INT32_MAX, nullptr, nullptr, 0);
+    auto got = read.get_future();
+    bool arrived = got.wait_for(2s) == std::future_status::ready;
+    auto took =
+        std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - published);
+    std::optional<yi::Frame> f;
+    bool ended = false;
+    if (arrived) {
+        f = got.get();
+        // The lifeline closing ends the delivery, with the ring still mapped.
+        std::promise<std::optional<yi::Frame>> last;
+        std::thread ending([&] { last.set_value(d->next()); });
+        close(conn);
+        auto end = last.get_future();
+        ended = end.wait_for(2s) == std::future_status::ready && !end.get();
+        ending.join();
+    } else {
+        close(conn);
+    }
+    reader.join();
+    lifeline.join();
+    close(listener);
+    ::munmap(mem, size);
+    close(memory);
+
+    REQUIRE(idle >= 0 && idle <= 20, "waiting a second on a ring with nothing in it, the reader woke ", idle,
+            " times");
+    REQUIRE(arrived, "the frame published was not read");
+    REQUIRE(f && f->sequence == 1 && f->sent_at == 1001 && f->payload == "one", "the frame was read wrong");
+    REQUIRE(took < 100ms, "the frame was read ", took.count(),
+            " ms after it was published, not when the word woke the reader");
+    REQUIRE(ended, "the delivery did not end when its lifeline closed");
+}
+
 int main() {
     return check::run({
         {"yoke-sdk-cpp:the-interface-library.01", test_a_channels_address_is_computed_or_handed},
@@ -501,5 +632,6 @@ int main() {
          test_a_streams_delivery_is_read_where_its_answer_says_it_arrives},
         {"yoke-sdk-cpp:the-interface-library.08", test_closing_an_attachment_ends_it_in_order},
         {"yoke-sdk-cpp:the-interface-library.09", test_a_panel_links_nothing_of_the_administrative_contract},
+        {"yoke-sdk-cpp:the-interface-library.10", test_a_reader_of_the_ring_waits_on_its_wake_word},
     });
 }
