@@ -121,3 +121,16 @@
 | **Precondition** | the library as built |
 | **Action** | list the symbols it defines |
 | **Expected** | none is of the administrative contract's definitions — a program written with the interface library cannot reach the operations an interface must never issue, because they are not in what it links |
+
+## yoke-sdk-cpp:the-interface-library.10 — a reader of the ring waits on its wake word, not on a clock
+
+| Field | Value |
+| --- | --- |
+| **Cites** | arch/50-plugin-surface/07 §The shared ring · arch/70-interface-surface/07 §The three delivery paths |
+| **Level** | L1 |
+| **Method** | test |
+| **Not applicable in** | — |
+| **Label** | blocking |
+| **Precondition** | a Core that answers a subscription with the shared ring's lifeline, and on it hands a ring with nothing published |
+| **Action** | subscribe and wait for a frame on a thread of its own for a second; then publish one frame and wake the ring's word, as a producer does; then close the lifeline |
+| **Expected** | waiting the second, the thread woke no more than 20 times; the frame is read within 100 ms of being published, carrying its sequence, its clock and its payload; the delivery then ends |

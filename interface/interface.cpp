@@ -15,12 +15,17 @@
 #include <google/protobuf/wire_format_lite.h>
 #include <grpcpp/create_channel_posix.h>
 #include <grpcpp/grpcpp.h>
+#include <linux/futex.h>
 #include <poll.h>
 #include <sys/mman.h>
 #include <sys/socket.h>
 #include <sys/stat.h>
+#include <sys/syscall.h>
 #include <sys/un.h>
 #include <unistd.h>
+
+#include <cerrno>
+#include <ctime>
 
 #include "tls.hpp"
 #include "wire.hpp"
@@ -557,6 +562,12 @@ int handed(msghdr &m) {
     return fd;
 }
 
+// Where the ring's header keeps the word every published frame increments and wakes.
+constexpr std::size_t wake_offset = 32;
+
+// How long a reader waits on the wake word before it looks at the lifeline again.
+constexpr long lifeline_bound_ns = 250'000'000;
+
 // Maps a ring the lifeline handed, for reading alone.
 void map_ring(Delivery::State &st, int fd) {
     struct stat info {};
@@ -640,10 +651,16 @@ const std::string &Delivery::arrives() const { return state_->arrives; }
 std::optional<Frame> Delivery::next() {
     if (state_->shared) {
         // The lifeline's messages as they come — a ring on one byte, a stop of length zero, the end at its
-        // closing — and the ring read at a bounded interval between them.
+        // closing. With no ring mapped the lifeline is all there is to wait on; with one, the wait is on the
+        // ring's wake word, which the producer's every frame wakes, bounded so that the lifeline is looked
+        // at again — a stop or the end is noticed within that bound, and a frame at once.
         for (;;) {
             pollfd p{state_->socket, POLLIN, 0};
-            if (::poll(&p, 1, state_->ring != nullptr ? 2 : 100) > 0) {
+            int ready = ::poll(&p, 1, state_->ring != nullptr ? 0 : -1);
+            if (ready < 0 && errno == EINTR) {
+                continue;
+            }
+            if (ready > 0) {
                 unsigned char head[4];
                 char space[CMSG_SPACE(sizeof(int))];
                 iovec io{head, 4};
@@ -689,9 +706,14 @@ std::optional<Frame> Delivery::next() {
                 continue;
             }
             if (state_->ring != nullptr) {
+                auto *wake = reinterpret_cast<std::uint32_t *>(state_->ring + wake_offset);
+                auto seen = __atomic_load_n(wake, __ATOMIC_ACQUIRE);
                 if (auto f = read_ring(*state_)) {
                     return f;
                 }
+                // Shared, not private: the producer that wakes it is another process.
+                timespec bound{0, lifeline_bound_ns};
+                ::syscall(SYS_futex, wake, FUTEX_WAIT, seen, &bound, nullptr, 0);
             }
         }
     }
