@@ -594,15 +594,21 @@ void test_a_reader_of_the_ring_waits_on_its_wake_word() {
     bool ended = false;
     if (arrived) {
         f = got.get();
-        // The lifeline closing ends the delivery, with the ring still mapped.
+        // The lifeline closing ends the delivery, with the ring still mapped: the Core closes it and then
+        // wakes the ring, as it does after every stop and every end.
         std::promise<std::optional<yi::Frame>> last;
         std::thread ending([&] { last.set_value(d->next()); });
+        check::sleep(100);
         close(conn);
+        __atomic_fetch_add(wake, 1, __ATOMIC_ACQ_REL);
+        ::syscall(SYS_futex, wake, FUTEX_WAKE, INT32_MAX, nullptr, nullptr, 0);
         auto end = last.get_future();
         ended = end.wait_for(2s) == std::future_status::ready && !end.get();
         ending.join();
     } else {
         close(conn);
+        __atomic_fetch_add(wake, 1, __ATOMIC_ACQ_REL);
+        ::syscall(SYS_futex, wake, FUTEX_WAKE, INT32_MAX, nullptr, nullptr, 0);
     }
     reader.join();
     lifeline.join();
@@ -610,7 +616,7 @@ void test_a_reader_of_the_ring_waits_on_its_wake_word() {
     ::munmap(mem, size);
     close(memory);
 
-    REQUIRE(idle >= 0 && idle <= 20, "waiting a second on a ring with nothing in it, the reader woke ", idle,
+    REQUIRE(idle >= 0 && idle <= 5, "waiting a second on a ring with nothing in it, the reader woke ", idle,
             " times");
     REQUIRE(arrived, "the frame published was not read");
     REQUIRE(f && f->sequence == 1 && f->sent_at == 1001 && f->payload == "one", "the frame was read wrong");
