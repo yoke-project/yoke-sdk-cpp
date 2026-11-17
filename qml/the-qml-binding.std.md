@@ -108,3 +108,16 @@
 | **Precondition** | the family built with the binding, installed under a prefix of the case's own |
 | **Action** | configure a project asking `find_package(yoke-sdk-cpp REQUIRED COMPONENTS qml)` against that prefix; then load, in a program that links only Qt, a document importing `Yoke.Interface` from the import path the package names |
 | **Expected** | the package is found with its component `qml` and names an import path under the prefix; the document loads and instantiates an `Attachment` |
+
+## yoke-sdk-cpp:the-qml-binding.09 — an attachment the document asks for again is attached when its channel is back
+
+| Field | Value |
+| --- | --- |
+| **Cites** | specs/90.48 · arch/90-sdks/06 §An interface may attach again, and may not do it quietly · arch/70-interface-surface/03 §What ends an attachment |
+| **Level** | L1 |
+| **Method** | test |
+| **Not applicable in** | — |
+| **Label** | blocking |
+| **Precondition** | a Core that ends the attachment at its first request without answering it; a document attaching with `attachAgain` set |
+| **Action** | the document commands a unit once attached; the Core goes away and its socket with it, for most of a second, and a second document attaches without `attachAgain`; then a second Core, with another opening, serves the same channel |
+| **Expected** | the attachment reads `Ended`, the command in flight is answered as refused, and nothing tries the first Core again on the same socket; with no channel it stays `Ended`, and so does the second document's; once the channel's socket is made again it is attached again, a second time, its picture the second Core's, and that Core is never sent the command; the second document stays `Ended` |
