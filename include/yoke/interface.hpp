@@ -215,6 +215,9 @@ class Attachment {
     // subscribe_stream naming only the deliveries given — a stream socket, each frame after its length,
     // and the stream's ring itself, handed on a lifeline at each activation; subscribe_stream names both,
     // and none is the packet socket.
+    // Reading the ring itself needs a Core of 0.16.0 or later, which wakes the ring after every stop and
+    // every end its lifeline carries: the reader waits on the ring with no bound, and an earlier Core
+    // leaves it waiting at a stop until the next frame.
     std::unique_ptr<Delivery> subscribe_stream_reading(std::string_view unit, std::string_view stream,
                                                        const std::vector<v1::UnitStream::Reads> &reads,
                                                        std::chrono::milliseconds wait = answer_within);

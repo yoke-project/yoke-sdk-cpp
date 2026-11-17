@@ -565,9 +565,6 @@ int handed(msghdr &m) {
 // Where the ring's header keeps the word every published frame increments and wakes.
 constexpr std::size_t wake_offset = 32;
 
-// How long a reader waits on the wake word before it looks at the lifeline again.
-constexpr long lifeline_bound_ns = 250'000'000;
-
 // Maps a ring the lifeline handed, for reading alone.
 void map_ring(Delivery::State &st, int fd) {
     struct stat info {};
@@ -652,8 +649,9 @@ std::optional<Frame> Delivery::next() {
     if (state_->shared) {
         // The lifeline's messages as they come — a ring on one byte, a stop of length zero, the end at its
         // closing. With no ring mapped the lifeline is all there is to wait on; with one, the wait is on the
-        // ring's wake word, which the producer's every frame wakes, bounded so that the lifeline is looked
-        // at again — a stop or the end is noticed within that bound, and a frame at once.
+        // ring's wake word with no bound: the producer wakes it at every frame, and the Core after every
+        // stop and every end the lifeline carries, the message already written, so the lifeline is read
+        // when the word moves and never at an interval.
         for (;;) {
             pollfd p{state_->socket, POLLIN, 0};
             int ready = ::poll(&p, 1, state_->ring != nullptr ? 0 : -1);
@@ -711,9 +709,8 @@ std::optional<Frame> Delivery::next() {
                 if (auto f = read_ring(*state_)) {
                     return f;
                 }
-                // Shared, not private: the producer that wakes it is another process.
-                timespec bound{0, lifeline_bound_ns};
-                ::syscall(SYS_futex, wake, FUTEX_WAIT, seen, &bound, nullptr, 0);
+                // Shared, not private: the producer and the Core that wake it are other processes.
+                ::syscall(SYS_futex, wake, FUTEX_WAIT, seen, nullptr, nullptr, 0);
             }
         }
     }

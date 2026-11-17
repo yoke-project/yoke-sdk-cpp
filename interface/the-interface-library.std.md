@@ -132,5 +132,5 @@
 | **Not applicable in** | — |
 | **Label** | blocking |
 | **Precondition** | a Core that answers a subscription with the shared ring's lifeline, and on it hands a ring with nothing published |
-| **Action** | subscribe and wait for a frame on a thread of its own for a second; then publish one frame and wake the ring's word, as a producer does; then close the lifeline |
-| **Expected** | waiting the second, the thread woke no more than 20 times; the frame is read within 100 ms of being published, carrying its sequence, its clock and its payload; the delivery then ends |
+| **Action** | subscribe and wait for a frame on a thread of its own for a second; then publish one frame and wake the ring's word, as a producer does; then close the lifeline and wake the ring |
+| **Expected** | waiting the second, the thread woke no more than 5 times; the frame is read within 100 ms of being published, carrying its sequence, its clock and its payload; once the lifeline is closed and the ring woken, as the Core does, the delivery ends |
