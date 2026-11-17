@@ -7,6 +7,8 @@
 #include <QDebug>
 #include <QFileInfo>
 #include <QJSEngine>
+#include <QJsonDocument>
+#include <QJsonObject>
 #include <QQmlEngine>
 
 #include "convert.hpp"
@@ -195,8 +197,50 @@ void Attachment::detach() {
     native_.reset();
 }
 
+void Attachment::suspend(const QVariantMap &suspension) {
+    if (suspension_ == suspension) {
+        return;
+    }
+    suspension_ = suspension;
+    emit suspensionChanged();
+}
+
+void Attachment::readSuspension() {
+    // A channel observes its own record and no other channel's.
+    for (const auto &record : picture_.value("records").toList()) {
+        QVariantMap channel = record.toMap().value("channel").toMap();
+        if (channel.isEmpty()) {
+            continue;
+        }
+        QVariantMap observed = channel.value("observed").toMap();
+        if (!observed.value("suspended").toBool()) {
+            suspend({});
+        } else {
+            suspend({{"grade", observed.value("grade")},
+                     {"by", observed.value("by")},
+                     {"reason", observed.value("reason")}});
+        }
+        return;
+    }
+}
+
+void Attachment::follow(const QVariantMap &event) {
+    QString type = event.value("type").toString();
+    if (type == QStringLiteral("channel.resumed")) {
+        suspend({});
+    } else if (type == QStringLiteral("channel.suspended")) {
+        // The Core's own detail of its conclusion, not a unit's payload.
+        QVariantMap detail =
+            QJsonDocument::fromJson(event.value("detail").toByteArray()).object().toVariantMap();
+        suspend({{"grade", detail.value("retains")},
+                 {"by", detail.value("by")},
+                 {"reason", detail.value("reason")}});
+    }
+}
+
 void Attachment::end(const QVariantMap &failure) {
     detach();
+    suspend({});
     status_ = Ended;
     failure_ = failure;
     version_ = 0;
@@ -274,6 +318,7 @@ void Attachment::attach(std::chrono::milliseconds wait) {
                 subscription_ = id;
                 picture_ = picture;
                 emit pictureChanged();
+                readSuspension();
                 emit statusChanged();
             });
             if (!handed) {
@@ -298,12 +343,16 @@ void Attachment::attach(std::chrono::milliseconds wait) {
                 }
                 if (d->has_event()) {
                     QVariantMap e = variant(d->event());
-                    gate->post([this, e] { emit received(e); });
+                    gate->post([this, e] {
+                        follow(e);
+                        emit received(e);
+                    });
                 } else if (d->has_overflow() || d->has_snapshot()) {
                     QVariantMap p = variant(d->has_overflow() ? d->overflow() : d->snapshot());
                     gate->post([this, p] {
                         picture_ = p;
                         emit pictureChanged();
+                        readSuspension();
                     });
                 }
             }

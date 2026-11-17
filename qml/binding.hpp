@@ -98,6 +98,9 @@ class Attachment : public QObject, public QQmlParserStatus {
     Q_PROPERTY(int version READ version NOTIFY statusChanged)
     Q_PROPERTY(QString subscription READ subscription NOTIFY statusChanged)
 
+    Q_PROPERTY(bool suspended READ suspended NOTIFY suspensionChanged)
+    Q_PROPERTY(QVariantMap suspension READ suspension NOTIFY suspensionChanged)
+
     Q_PROPERTY(QVariantMap picture READ picture NOTIFY pictureChanged)
     Q_PROPERTY(QVariantList records READ records NOTIFY pictureChanged)
 
@@ -126,6 +129,11 @@ class Attachment : public QObject, public QQmlParserStatus {
     QVariantMap failure() const { return failure_; }
     int version() const { return version_; }
     QString subscription() const { return subscription_; }
+    // Whether the channel yields to another under arbitration, and while it does, `grade` — what it keeps,
+    // read-only or dark —, `by` — the channel that prevails — and `reason`; read from the channel's own
+    // record in the picture and from its channel.suspended and channel.resumed events, never asked for.
+    bool suspended() const { return !suspension_.isEmpty(); }
+    QVariantMap suspension() const { return suspension_; }
     QVariantMap picture() const { return picture_; }
     QVariantList records() const { return picture_.value("records").toList(); }
 
@@ -160,6 +168,7 @@ class Attachment : public QObject, public QQmlParserStatus {
     void attachAgainChanged();
     void statusChanged();
     void pictureChanged();
+    void suspensionChanged();
     // An event of the standing subscription, in order.
     void received(const QVariantMap &event);
     void answered(int call, const QVariant &answer);
@@ -176,6 +185,9 @@ class Attachment : public QObject, public QQmlParserStatus {
     void end(const QVariantMap &failure);
     void settle(int call, bool ok, const QVariant &result);
     void settleAll(const QVariantMap &refusal);
+    void suspend(const QVariantMap &suspension);
+    void readSuspension();
+    void follow(const QVariantMap &event);
 
     QString address_, instance_, channel_;
     bool active_ = true;
@@ -191,6 +203,7 @@ class Attachment : public QObject, public QQmlParserStatus {
     int version_ = 0;
     QString subscription_;
     QVariantMap picture_;
+    QVariantMap suspension_;
 
     int calls_ = 0;
     // The functions each call still unanswered was given, held on this object's thread.

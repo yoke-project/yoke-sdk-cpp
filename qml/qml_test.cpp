@@ -495,6 +495,42 @@ void test_an_attachment_the_document_asks_for_again_is_attached_when_the_channel
             get(stays, "status").toInt());
 }
 
+// std: yoke-sdk-cpp:the-qml-binding.10
+void test_a_suspended_channel_is_a_property_with_the_channel_that_prevails() {
+    Core c;
+    c.opening = opening_at(1);
+    auto *channel = c.opening.mutable_picture()->add_records()->mutable_channel();
+    channel->mutable_declared()->set_name("remote");
+    channel->mutable_observed()->set_suspended(true);
+    channel->mutable_observed()->set_grade("dark");
+    channel->mutable_observed()->set_by("panel");
+    channel->mutable_observed()->set_reason("arbitration");
+    iv1::CoreFrame resumed = event_at(5), suspended = event_at(6);
+    resumed.mutable_event()->set_type("channel.resumed");
+    suspended.mutable_event()->set_type("channel.suspended");
+    suspended.mutable_event()->set_detail(R"({"reason":"reclaimed","by":"bench","retains":"read-only"})");
+    c.standing = {resumed, suspended};
+    Served s(c);
+    Engine e;
+    auto doc = e.load("Attachment {\n"
+                      "  address: " +
+                      quoted(s.path) +
+                      "\n"
+                      "  property var seen: []\n"
+                      "  onSuspensionChanged: seen = seen.concat([suspended ? suspension.grade + ' by ' + "
+                      "suspension.by + ' (' + suspension.reason + ')' : 'active'])\n"
+                      "}");
+    REQUIRE(until([&] { return get(doc, "seen").toList().size() == 3; }), "the suspension changed ",
+            get(doc, "seen").toList().size(), " times, not three");
+    auto seen = get(doc, "seen").toList();
+    REQUIRE(str(seen[0]) == "dark by panel (arbitration)" && str(seen[1]) == "active" &&
+                str(seen[2]) == "read-only by bench (reclaimed)",
+            "the suspension read ", str(seen[0]), ", ", str(seen[1]), ", ", str(seen[2]));
+    REQUIRE(get(doc, "suspended").toBool() && get(doc, "attached").toBool(),
+            "a suspended channel reads as not suspended, or as not attached");
+    REQUIRE(c.requests().empty(), "the binding asked the Core something to learn the suspension");
+}
+
 int main() {
     // Qt reads its text as UTF-8 and says so where the locale does not; the cases' lines are the record's.
     setenv("LC_ALL", "C.UTF-8", 1);
@@ -510,5 +546,7 @@ int main() {
         {"yoke-sdk-cpp:the-qml-binding.07", test_nothing_of_the_plugin_or_interface_library_links_qt},
         {"yoke-sdk-cpp:the-qml-binding.09",
          test_an_attachment_the_document_asks_for_again_is_attached_when_the_channel_is_back},
+        {"yoke-sdk-cpp:the-qml-binding.10",
+         test_a_suspended_channel_is_a_property_with_the_channel_that_prevails},
     });
 }
