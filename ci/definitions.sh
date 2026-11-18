@@ -8,8 +8,14 @@
 # Every contract the record names is generated, messages and services; the well-known types it imports
 # are libprotobuf's own. A contract the generator cannot express is refused by name.
 #
+# A builder whose protobuf is not the one the record names cannot compile the committed tree, since
+# generated C++ compiles only against the protobuf that generated it. `regenerate` writes the same module's
+# contracts with the generators on its PATH, whatever their versions, into a directory of its own, with a
+# record naming the generators it used; the committed tree is left as it is.
+#
 # Usage: definitions.sh generate [directory]   writes the tree, by default into definitions/
 #        definitions.sh check                  regenerates, and fails on any difference from definitions/
+#        definitions.sh regenerate directory   writes the tree with the generators found, into directory
 set -euo pipefail
 
 root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -47,14 +53,19 @@ if [[ "$computed" != "$digest" ]]; then
 fi
 source="$work/zip/$module@$version"
 
-# The generators are the ones recorded.
+# The generators are the ones recorded, except where a builder regenerates with its own.
+include="$(dirname "$(command -v protoc)")/../include"
+if [[ "$mode" == regenerate ]]; then
+  command -v protoc > /dev/null || { echo "definitions: protoc is not on PATH"; exit 1; }
+  command -v grpc_cpp_plugin > /dev/null || { echo "definitions: grpc_cpp_plugin is not on PATH"; exit 1; }
+else
 found="$(protoc --version 2>/dev/null | awk '{print $2}')" || true
 [[ "$found" == "$(field protoc)" ]] || { echo "definitions: protoc ${found:-is not on PATH}${found:+ is not the version recorded}, the record names $(field protoc)"; exit 1; }
 # grpc_cpp_plugin says no version of its own: the package that installed it does.
 found="$(dpkg-query -W -f '${Version}' protobuf-compiler-grpc 2>/dev/null | sed -E 's/^([0-9.]+).*/\1/')" || true
 command -v grpc_cpp_plugin > /dev/null || found=""
 [[ "$found" == "$(field grpc_cpp_plugin)" ]] || { echo "definitions: grpc_cpp_plugin ${found:-is not on PATH, or not from a package}${found:+ is not the version recorded}, the record names $(field grpc_cpp_plugin)"; exit 1; }
-include="$(dirname "$(command -v protoc)")/../include"
+fi
 
 # Every contract the record names, messages and services.
 generate() {
@@ -92,8 +103,19 @@ case "$mode" in
     fi
     echo "definitions: the committed tree is what $module $version generates"
     ;;
+  regenerate)
+    out="${2:?definitions: regenerate names the directory it writes}"
+    rm -rf "$out"
+    mkdir -p "$out"
+    generate "$out"
+    # The record of this tree: the same module, and the generators that wrote it.
+    { grep -v -E '^(protoc|grpc_cpp_plugin) ' "$record"
+      echo "protoc $(protoc --version | awk '{print $2}')"
+      echo "grpc_cpp_plugin $(command -v grpc_cpp_plugin)"; } > "$out/record"
+    echo "definitions: regenerated $contracts from $module $version with protoc $(protoc --version | awk '{print $2}'), into $out"
+    ;;
   *)
-    echo "usage: definitions.sh generate [directory] | check"
+    echo "usage: definitions.sh generate [directory] | check | regenerate directory"
     exit 2
     ;;
 esac

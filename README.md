@@ -35,7 +35,7 @@ without it, the family is what it was, and nothing of the plugin or interface li
 | `interface/` | The library an interface client is written with, and the TLS 1.3 it carries itself |
 | `interface-harness/` | The interface library's harness for the conformance suite |
 | `qml/` | The interface library's QML binding, the module `Yoke.Interface` |
-| `definitions/` | The generated C++ of every contract, and `record`, which pins the definitions' version, digest and generators |
+| `definitions/` | The generated C++ of every contract, and `record`, which pins the definitions' version, digest and generators. A build may name another tree, with `YOKE_SDK_CPP_DEFINITIONS`, which `ci/definitions.sh regenerate` writes |
 | `testing/` | What the programs that run the cases share |
 | `cmake/` | The package config and the pkg-config file `cmake --install` writes |
 | `template/` | The starting tree of a Plugin project in C++, handed over with each release for `yoke-compose new plugin` |
@@ -45,7 +45,7 @@ A test's description sits beside the test, as a `.std.md` file.
 
 ## Working on it
 
-A C++ compiler, CMake and `pkg-config`; the development packages of protobuf, gRPC for C++, OpenSSL 3
+A C++ compiler, CMake and `pkg-config`; the development packages of protobuf, gRPC for C++, OpenSSL 3 or 4
 and nlohmann-json; Qt 6's QML (on Debian and Ubuntu `qt6-declarative-dev`, with the modules
 `qml6-module-qtqml`, `-models` and `-workerscript` its cases load); `clang-format` 18.1.8 for `just fmt`, which `ci/install-tools.sh` installs; and
 [`just`](https://just.systems) 1.58.0 or newer. `just develop` also puts the published verification
@@ -55,6 +55,7 @@ with all of it.
 | Command | What it does |
 | --- | --- |
 | `just build` | Configures and builds, with CMake, the definitions, the base, the two libraries, the QML binding, their harnesses and the programs that run their cases |
+| `just build-here` | Builds as `just build` does, into `build-here/`, on definitions generated again by the `protoc` and `grpc_cpp_plugin` on the `PATH` from the same definitions module, checked by its digest: for a machine whose protobuf is not the committed tree's (protoc 3.21), which that tree does not compile against. It also needs `curl`, `jq` and `unzip` |
 | `just test` | Runs the checks and the programs `just build` made, and checks each description against its tests |
 | `just lint` | Parses every shell script |
 | `just fmt` | Fails, naming each file, when a C++ file is not formatted |

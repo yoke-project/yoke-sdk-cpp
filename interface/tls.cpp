@@ -252,7 +252,7 @@ std::unique_ptr<Pump> connect(const std::string &address, const std::string &roo
         X509_VERIFY_PARAM_set1_ip_asc(param, expected.c_str());
     } else {
         SSL_set_tlsext_host_name(ssl, expected.c_str());
-        SSL_set1_host(ssl, expected.c_str());
+        X509_VERIFY_PARAM_set1_host(param, expected.c_str(), 0);
     }
     SSL_set_fd(ssl, net);
     if (SSL_connect(ssl) != 1) {
