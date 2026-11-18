@@ -14,6 +14,13 @@ namespace yoke::qml {
 
 namespace {
 
+// An enum's value by its name, or by its number where the definitions name none — a value a newer peer
+// sent; read through the value, as every protobuf the family builds against offers it.
+QVariant enumName(const google::protobuf::FieldDescriptor *f, int value) {
+    const google::protobuf::EnumValueDescriptor *named = f->enum_type()->FindValueByNumber(value);
+    return named ? QString::fromStdString(std::string(named->name())) : QString::number(value);
+}
+
 using google::protobuf::FieldDescriptor;
 using google::protobuf::Message;
 using google::protobuf::Reflection;
@@ -48,7 +55,7 @@ QVariant one(const Message &m, const FieldDescriptor *f) {
     case FieldDescriptor::CPPTYPE_BOOL:
         return r->GetBool(m, f);
     case FieldDescriptor::CPPTYPE_ENUM:
-        return QString::fromStdString(std::string(r->GetEnum(m, f)->name()));
+        return enumName(f, r->GetEnumValue(m, f));
     case FieldDescriptor::CPPTYPE_STRING: {
         std::string s = r->GetString(m, f);
         if (f->type() == FieldDescriptor::TYPE_BYTES) {
@@ -82,7 +89,7 @@ QVariant repeated(const Message &m, const FieldDescriptor *f, int i) {
     case FieldDescriptor::CPPTYPE_BOOL:
         return r->GetRepeatedBool(m, f, i);
     case FieldDescriptor::CPPTYPE_ENUM:
-        return QString::fromStdString(std::string(r->GetRepeatedEnum(m, f, i)->name()));
+        return enumName(f, r->GetRepeatedEnumValue(m, f, i));
     case FieldDescriptor::CPPTYPE_STRING: {
         std::string s = r->GetRepeatedString(m, f, i);
         if (f->type() == FieldDescriptor::TYPE_BYTES) {

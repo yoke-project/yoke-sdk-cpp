@@ -92,7 +92,9 @@ std::unique_ptr<grpc::Server> serve(Core &core, const std::string &path) {
 
 grpc::Status refused(grpc::StatusCode code, const iv1::Refusal &refusal) {
     google::protobuf::Any any;
-    any.PackFrom(refusal);
+    if (!any.PackFrom(refusal)) {
+        return grpc::Status(grpc::StatusCode::INTERNAL, "the refusal cannot be packed");
+    }
     std::string details;
     {
         google::protobuf::io::StringOutputStream raw(&details);

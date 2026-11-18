@@ -10,6 +10,17 @@ build:
     cmake --build build --parallel
     echo "build: the definitions, the base, the plugin and the interface libraries and the QML binding compile"
 
+# Builds with the definitions generated again by the generators on this machine's PATH, for a builder whose
+# protobuf is not the one the committed tree was generated with; into build-here/, beside the default build.
+build-here:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    ci/definitions.sh regenerate "$PWD/build-here/definitions"
+    cmake -S . -B build-here -DCMAKE_BUILD_TYPE=RelWithDebInfo -DYOKE_SDK_CPP_QML=ON \
+        -DYOKE_SDK_CPP_DEFINITIONS="$PWD/build-here/definitions" > /dev/null
+    cmake --build build-here --parallel
+    echo "build-here: the libraries and the QML binding compile, on definitions this machine's generators wrote"
+
 # Run this repository's own checks, with no sibling present.
 test:
     #!/usr/bin/env bash
@@ -55,7 +66,7 @@ lint:
 fmt:
     #!/usr/bin/env bash
     set -euo pipefail
-    files="$(find . \( -name '*.cpp' -o -name '*.hpp' -o -name '*.cc' -o -name '*.h' \) -not -path './.git/*' -not -path './definitions/*' -not -path './build/*' | sort)"
+    files="$(find . \( -name '*.cpp' -o -name '*.hpp' -o -name '*.cc' -o -name '*.h' \) -not -path './.git/*' -not -path './definitions/*' -not -path './build/*' -not -path './build-here/*' | sort)"
     if [[ -z "$files" ]]; then echo "fmt: nothing to format yet"; exit 0; fi
     clang-format --dry-run -Werror $files
     echo "fmt: every file is formatted"
