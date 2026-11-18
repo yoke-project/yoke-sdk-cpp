@@ -2,6 +2,7 @@
 #include <cctype>
 #include <cstring>
 #include <filesystem>
+#include <fstream>
 #include <memory>
 #include <optional>
 #include <string>
@@ -703,6 +704,19 @@ void test_on_the_shared_ring_emit_publishes_into_it() {
 
 } // namespace
 
+// std: yoke-sdk-cpp:the-plugin-library.19
+void test_a_unit_is_named_after_its_executable() {
+    // As the kernel names a unit the Core started through the descriptor.
+    std::ofstream("/proc/self/comm") << "3";
+    Opened o;
+    std::ifstream cmdline("/proc/self/cmdline", std::ios::binary);
+    std::string first, comm;
+    std::getline(cmdline, first, '\0');
+    std::ifstream("/proc/self/comm") >> comm;
+    std::string name = first.substr(first.find_last_of('/') + 1).substr(0, 15);
+    REQUIRE(comm == name, "the process is named ", comm, ", and its executable ", name);
+}
+
 int main() {
     return check::run({
         {"yoke-sdk-cpp:the-plugin-library.01", test_a_declaration_generates_the_manifest},
@@ -725,5 +739,6 @@ int main() {
         {"yoke-sdk-cpp:the-plugin-library.16", test_emit_writes_envelopes_and_frames_numbered_from_one},
         {"yoke-sdk-cpp:the-plugin-library.17", test_a_stop_closes_the_transport_and_emit_is_refused_after_it},
         {"yoke-sdk-cpp:the-plugin-library.18", test_on_the_shared_ring_emit_publishes_into_it},
+        {"yoke-sdk-cpp:the-plugin-library.19", test_a_unit_is_named_after_its_executable},
     });
 }

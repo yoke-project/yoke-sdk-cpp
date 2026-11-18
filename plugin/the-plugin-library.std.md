@@ -239,3 +239,16 @@
 | **Action** | read the registration the channel received; activate a stream on the shared object at that socket; emit three payloads; then one larger than a slot |
 | **Expected** | the registration offers the shared object; the activation is acknowledged done and the author is handed it, naming the transport `shared object`; frames 1, 2 and 3 are in their slots with the payloads emitted, a clock each, and the count published is 3; the payload larger than a slot is refused with `stream.inactive`, naming the capacity, and nothing more is published |
 
+
+## yoke-sdk-cpp:the-plugin-library.19 — a unit is named after its executable, not after the descriptor it was started through
+
+| Field | Value |
+| --- | --- |
+| **Cites** | arch/35-units/04 §The plan |
+| **Level** | L1 |
+| **Method** | test |
+| **Not applicable in** | — |
+| **Label** | blocking |
+| **Precondition** | a process the kernel names `3`, as it names a unit the Core started through `/proc/self/fd/3` |
+| **Action** | start a unit |
+| **Expected** | the process's name is its executable's, from its first argument, cut to 15 bytes |

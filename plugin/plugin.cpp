@@ -9,6 +9,7 @@
 #include <condition_variable>
 #include <cstring>
 #include <deque>
+#include <fstream>
 #include <map>
 #include <mutex>
 #include <sstream>
@@ -567,6 +568,27 @@ struct Unit::State {
     }
 };
 
+namespace {
+
+// Names the process after its executable. The Core starts a unit through the descriptor it took the
+// executable's digest through, and the kernel names a process after the path executed — /proc/self/fd/3,
+// so 3 in every list of processes and in the journal. The name is the executable's, from the first argument
+// the Core passes, cut to the kernel's 15 bytes; where it cannot be read or written, nothing is said.
+void name_the_process() {
+    std::ifstream cmdline("/proc/self/cmdline", std::ios::binary);
+    std::string first;
+    if (!std::getline(cmdline, first, '\0')) {
+        return;
+    }
+    std::string name = first.substr(first.find_last_of('/') + 1);
+    if (name.empty()) {
+        return;
+    }
+    std::ofstream("/proc/self/comm") << name.substr(0, 15);
+}
+
+} // namespace
+
 Unit::Unit(std::unique_ptr<State> state) : state_(std::move(state)) {}
 
 std::unique_ptr<Unit> Unit::start(const Declaration &declaration) {
@@ -575,6 +597,7 @@ std::unique_ptr<Unit> Unit::start(const Declaration &declaration) {
 
 std::unique_ptr<Unit> Unit::start(const Declaration &declaration, const Getenv &getenv) {
     Env env = environment(getenv);
+    name_the_process();
     // Bind before registering: registered and unreachable is the one order that is wrong.
     int listener = bind_unit(env.bind);
     auto release = [&] {
