@@ -18,14 +18,29 @@ include(GNUInstallDirs)
 # The generated definitions of the two contracts the library speaks, compiled as they were generated. The
 # administrative contract's are generated beside them and compiled into nothing: a panel built on the
 # library must not link the operations an interface may never issue.
-file(GLOB_RECURSE DEFINITIONS CONFIGURE_DEPENDS definitions/yoke/plugin/*.cc definitions/yoke/interface/*.cc)
-set_source_files_properties(${DEFINITIONS} PROPERTIES COMPILE_OPTIONS "-Wall;-Werror")
+#
+# By default they are the committed tree, which compiles only against the protobuf that generated it. A
+# builder whose protobuf is another names a tree `ci/definitions.sh regenerate` wrote with its own
+# generators, from the same definitions module (`just build-here`); that tree is held to -Wall, not to
+# -Werror, since what another generator writes is not this repository's to correct.
+set(YOKE_SDK_CPP_DEFINITIONS "${PROJECT_SOURCE_DIR}/definitions" CACHE PATH
+    "The generated definitions: the committed tree, or one ci/definitions.sh regenerate wrote")
+if(NOT EXISTS "${YOKE_SDK_CPP_DEFINITIONS}/record")
+    message(FATAL_ERROR "${YOKE_SDK_CPP_DEFINITIONS} holds no definitions: it has no record")
+endif()
+file(GLOB_RECURSE DEFINITIONS CONFIGURE_DEPENDS ${YOKE_SDK_CPP_DEFINITIONS}/yoke/plugin/*.cc
+     ${YOKE_SDK_CPP_DEFINITIONS}/yoke/interface/*.cc)
+if(YOKE_SDK_CPP_DEFINITIONS STREQUAL "${PROJECT_SOURCE_DIR}/definitions")
+    set_source_files_properties(${DEFINITIONS} PROPERTIES COMPILE_OPTIONS "-Wall;-Werror")
+else()
+    set_source_files_properties(${DEFINITIONS} PROPERTIES COMPILE_OPTIONS "-Wall")
+endif()
 
 add_library(yoke-cpp base/base.cpp plugin/plugin.cpp interface/interface.cpp interface/tls.cpp ${DEFINITIONS})
 # The library is reached as the project it is, and also from the project that fetches it: its own
 # directories are PROJECT_SOURCE_DIR and PROJECT_BINARY_DIR, never the top level's.
 target_include_directories(yoke-cpp
-    PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include> $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/definitions>
+    PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include> $<BUILD_INTERFACE:${YOKE_SDK_CPP_DEFINITIONS}>
            $<INSTALL_INTERFACE:include>
     PRIVATE base interface)
 target_link_libraries(yoke-cpp PUBLIC PkgConfig::GRPCXX PkgConfig::PROTOBUF Threads::Threads PRIVATE OpenSSL::SSL)
@@ -128,7 +143,7 @@ endif()
 include(CMakePackageConfigHelpers)
 install(TARGETS yoke-cpp EXPORT yoke-sdk-cpp-targets ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
 install(DIRECTORY include/yoke DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
-install(DIRECTORY definitions/yoke/interface/v1 DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/yoke/interface
+install(DIRECTORY ${YOKE_SDK_CPP_DEFINITIONS}/yoke/interface/v1 DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/yoke/interface
     FILES_MATCHING PATTERN "*.pb.h" PATTERN "*.grpc.pb.h" EXCLUDE)
 install(EXPORT yoke-sdk-cpp-targets NAMESPACE yoke:: DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/yoke-sdk-cpp)
 configure_package_config_file(cmake/yoke-sdk-cpp-config.cmake.in ${PROJECT_BINARY_DIR}/yoke-sdk-cpp-config.cmake

@@ -88,7 +88,7 @@ QVariant at(const QVariant &v, const QString &path) {
 
 std::string str(const QVariant &v) { return v.toString().toStdString(); }
 
-std::string quoted(const std::string &s) { return "\"" + s + "\""; }
+std::string as_qml_string(const std::string &s) { return "\"" + s + "\""; }
 
 // Attached is 2 in the order of the binding's statuses: Detached, Attaching, Attached, Ended.
 constexpr int attached = 2, ended = 3;
@@ -107,7 +107,7 @@ void test_attaching_surfaces_the_opening_as_properties() {
     c.opening = opening_at(1);
     Served s(c);
     Engine e;
-    auto doc = e.load("Attachment { address: " + quoted(s.path) +
+    auto doc = e.load("Attachment { address: " + as_qml_string(s.path) +
                       "; property var seen: []; onStatusChanged: seen = seen.concat([status]) }");
     REQUIRE(until([&] { return get(doc, "status").toInt() == attached; }), "the document never attached");
     auto seen = get(doc, "seen").toList();
@@ -144,7 +144,7 @@ void test_every_operation_returns_at_once_and_answers_later() {
     auto doc =
         e.load("Attachment {\n"
                "  address: " +
-               quoted(s.path) +
+               as_qml_string(s.path) +
                "\n"
                "  property var log: []\n"
                "  property int took: -1\n"
@@ -211,7 +211,7 @@ void test_a_refusal_reaches_the_document_with_its_code_and_its_detail() {
     Engine e;
     auto doc = e.load("Attachment {\n"
                       "  address: " +
-                      quoted(s.path) +
+                      as_qml_string(s.path) +
                       "\n"
                       "  property var readRefusal\n"
                       "  property var commandRefusal\n"
@@ -268,7 +268,7 @@ void test_subscriptions_arrive_as_signals_and_only_the_document_confirms() {
                       "  property var seen: []\n"
                       "  property Attachment a: Attachment {\n"
                       "    address: " +
-                      quoted(s.path) +
+                      as_qml_string(s.path) +
                       "\n"
                       "    onReceived: (event) => standingSeen = standingSeen.concat([event.seq])\n"
                       "  }\n"
@@ -350,7 +350,7 @@ void test_a_streams_frames_arrive_as_signals_and_letting_it_go_releases_it() {
         "QtObject {\n"
         "  property var seen: []\n"
         "  property Attachment a: Attachment { address: " +
-        quoted(s.path) +
+        as_qml_string(s.path) +
         " }\n"
         "  property Delivery d: Delivery {\n"
         "    attachment: a; unit: 'hw'; stream: 'cpu'\n"
@@ -393,7 +393,7 @@ void test_an_attachment_the_core_ended_is_a_state_the_document_reads() {
     auto doc = e.load(
         "Attachment {\n"
         "  address: " +
-        quoted(s.path) +
+        as_qml_string(s.path) +
         "\n"
         "  property string after: ''\n"
         "  onStatusChanged: {\n"
@@ -408,7 +408,7 @@ void test_an_attachment_the_core_ended_is_a_state_the_document_reads() {
             "a command after the end was answered '", str(get(doc, "after")), "'");
 
     auto started = check::ms();
-    auto nowhere = e.load("Attachment { address: " + quoted(check::dir() + "/nobody.sock") + " }");
+    auto nowhere = e.load("Attachment { address: " + as_qml_string(check::dir() + "/nobody.sock") + " }");
     auto took = check::ms() - started;
     REQUIRE(took < 100, "loading a document attaching nowhere took ", took, " ms on its thread");
     REQUIRE(until([&] { return get(nowhere, "status").toInt() == ended; }, 35000),
@@ -449,7 +449,7 @@ void test_an_attachment_the_document_asks_for_again_is_attached_when_the_channel
     auto doc =
         e.load("Attachment {\n"
                "  address: " +
-               quoted(path) +
+               as_qml_string(path) +
                "\n"
                "  attachAgain: true\n"
                "  property int times: 0\n"
@@ -471,7 +471,7 @@ void test_an_attachment_the_document_asks_for_again_is_attached_when_the_channel
     REQUIRE(first.attachments() == 1, "the first Core was attached to ", first.attachments(),
             " times, and so again on the same socket");
     // A document that did not ask to be attached again, started while there is no channel.
-    auto stays = e.load("Attachment { address: " + quoted(path) + " }");
+    auto stays = e.load("Attachment { address: " + as_qml_string(path) + " }");
     REQUIRE(until([&] { return get(stays, "status").toInt() == ended; }, 35000),
             "an attachment to no channel never read as ended");
     REQUIRE(get(doc, "status").toInt() == ended && get(doc, "times").toInt() == 1,
@@ -514,7 +514,7 @@ void test_a_suspended_channel_is_a_property_with_the_channel_that_prevails() {
     Engine e;
     auto doc = e.load("Attachment {\n"
                       "  address: " +
-                      quoted(s.path) +
+                      as_qml_string(s.path) +
                       "\n"
                       "  property var seen: []\n"
                       "  onSuspensionChanged: seen = seen.concat([suspended ? suspension.grade + ' by ' + "
