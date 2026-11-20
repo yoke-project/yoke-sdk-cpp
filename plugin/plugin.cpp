@@ -9,10 +9,12 @@
 #include <condition_variable>
 #include <cstring>
 #include <deque>
+#include <fcntl.h>
 #include <fstream>
 #include <map>
 #include <mutex>
 #include <sstream>
+#include <system_error>
 #include <thread>
 
 #include <linux/futex.h>
@@ -77,6 +79,9 @@ const char *governed(Governs kind) {
         return "occurrence";
     case Governs::surface:
         return "surface";
+    case Governs::use_query:
+    case Governs::use_stream:
+        return "use";
     }
     return "";
 }
@@ -342,11 +347,40 @@ std::string Declaration::manifest() const {
     ids(out, "commands", commands);
     ids(out, "queries", queries);
     ids(out, "occurrences", occurrences);
+    if (!uses.empty()) {
+        out << "uses:\n";
+        for (const auto &[need, use] : uses) {
+            out << "  " << yaml_quoted(need)
+                << (use.questions.empty() && use.streams.empty() ? ": {}\n" : ":\n");
+            for (const auto &[key, list] :
+                 {std::pair{"questions", &use.questions}, std::pair{"streams", &use.streams}}) {
+                if (list->empty()) {
+                    continue;
+                }
+                out << "    " << key << ":\n";
+                for (const auto &id : *list) {
+                    out << "      - " << yaml_quoted(id) << "\n";
+                }
+            }
+        }
+    }
+    if (!rewrites.empty()) {
+        out << "rewrites:\n";
+        for (const auto &name : rewrites) {
+            out << "  - " << yaml_quoted(name) << "\n";
+        }
+    }
     if (!capabilities.empty()) {
         out << "capabilities:\n";
         for (const auto &c : capabilities) {
-            out << "  - name: " << yaml_quoted(c.name) << "\n    governs:\n      " << governed(c.governs.kind)
-                << ": " << yaml_quoted(c.governs.id) << "\n";
+            out << "  - name: " << yaml_quoted(c.name) << "\n    governs:\n";
+            if (c.governs.kind == Governs::use_query || c.governs.kind == Governs::use_stream) {
+                out << "      use:\n        need: " << yaml_quoted(c.governs.need) << "\n        "
+                    << (c.governs.kind == Governs::use_query ? "query" : "stream") << ": "
+                    << yaml_quoted(c.governs.id) << "\n";
+                continue;
+            }
+            out << "      " << governed(c.governs.kind) << ": " << yaml_quoted(c.governs.id) << "\n";
         }
     }
     return out.str();
@@ -486,7 +520,9 @@ struct Unit::State {
             push(Stopped{stream_id});
         } else if (e.has_query() && e.query().has_question()) {
             const auto &q = e.query().question();
-            push(Question{e.message_id(), q.type(), q.payload()});
+            push(Question{e.message_id(), q.type(), q.payload(), q.asker(),
+                          std::chrono::system_clock::time_point{std::chrono::milliseconds{q.deadline()}},
+                          q.chain()});
         } else if (e.has_error()) {
             push(Refused{e.correlation_id(), e.error().code(), e.error().message(),
                          e.error().has_withheld() ? e.error().withheld().item() : std::string()});
@@ -850,6 +886,49 @@ void Unit::emit(std::string_view stream, std::string_view payload) {
     if (::send(f->fd, message.data(), message.size(), MSG_NOSIGNAL) < 0) {
         throw Refusal("stream.inactive",
                       "the transport of " + std::string(stream) + " took nothing: " + std::strerror(errno));
+    }
+}
+
+void rewrite(const std::string &path, std::string_view value) {
+    auto slash = path.rfind('/');
+    std::string dir = slash == std::string::npos ? "." : slash == 0 ? "/" : path.substr(0, slash);
+    std::string next = dir + "/value.new";
+    auto fail = [&](const char *what) {
+        int e = errno;
+        ::unlink(next.c_str());
+        throw std::system_error(e, std::generic_category(),
+                                "the secret at " + path + " cannot be rewritten: " + next + " was not " +
+                                    what);
+    };
+    int fd = ::open(next.c_str(), O_WRONLY | O_CREAT | O_TRUNC | O_CLOEXEC, 0600);
+    if (fd < 0) {
+        fail("written");
+    }
+    for (std::size_t at = 0; at < value.size();) {
+        ssize_t n = ::write(fd, value.data() + at, value.size() - at);
+        if (n < 0 && errno == EINTR) {
+            continue;
+        }
+        if (n <= 0) {
+            ::close(fd);
+            fail("written");
+        }
+        at += static_cast<std::size_t>(n);
+    }
+    if (::fsync(fd) != 0) {
+        ::close(fd);
+        fail("flushed");
+    }
+    if (::close(fd) != 0) {
+        fail("closed");
+    }
+    if (::rename(next.c_str(), path.c_str()) != 0) {
+        fail("renamed over its value");
+    }
+    int d = ::open(dir.c_str(), O_RDONLY | O_DIRECTORY | O_CLOEXEC);
+    if (d >= 0) {
+        ::fsync(d);
+        ::close(d);
     }
 }
 

@@ -156,6 +156,37 @@ class Delivery {
     std::shared_ptr<State> state_;
 };
 
+// How long a follow waits between two attempts while the unit is not there to subscribe to.
+inline constexpr std::chrono::milliseconds follow_retry{250};
+
+// A unit's stream followed: started where it may and subscribed, and started and subscribed again each time
+// its delivery ends because the unit's Session did — a restart of the unit, on a need's channel or any
+// other. Frames come in order within a delivery; the next delivery's numbering is its own. It holds the
+// attachment it was made on, which outlives it.
+class Follow {
+  public:
+    // Closes the follow, if it was not closed.
+    ~Follow();
+    Follow(const Follow &) = delete;
+    Follow &operator=(const Follow &) = delete;
+
+    // The next frame of the stream, across the unit's restarts; nothing once the follow was closed. Throws
+    // Ended once the attachment did, and a refusal other than the unit's absence.
+    std::optional<Frame> next();
+
+    // The identifier of the delivery the last frame came on.
+    const std::string &delivery() const;
+
+    // Ends the follow and releases its delivery.
+    void close();
+
+    struct State;
+    explicit Follow(std::unique_ptr<State> state);
+
+  private:
+    std::unique_ptr<State> state_;
+};
+
 // A client attached to a channel.
 class Attachment {
   public:
@@ -202,6 +233,12 @@ class Attachment {
     // Asks a unit a question, its payload opaque, and returns the answer's.
     std::string ask(std::string_view unit, std::string_view type, std::string_view payload = {},
                     std::chrono::milliseconds wait = answer_within);
+    // Asks a unit a question on a need's channel while answering another: cause is the identifier of the
+    // question the asking unit was delivered and is answering, and the Core gives this question that one's
+    // chain and its deadline less a margin. Only a need's channel takes a cause; any other refuses it
+    // `use.cause.unknown`.
+    std::string ask_caused(std::string_view cause, std::string_view unit, std::string_view type,
+                           std::string_view payload = {}, std::chrono::milliseconds wait = answer_within);
     // Asks for a unit's stream to flow, for everyone.
     v1::Acknowledged start_stream(std::string_view unit, std::string_view stream,
                                   std::chrono::milliseconds wait = answer_within);
@@ -221,6 +258,11 @@ class Attachment {
     std::unique_ptr<Delivery> subscribe_stream_reading(std::string_view unit, std::string_view stream,
                                                        const std::vector<v1::UnitStream::Reads> &reads,
                                                        std::chrono::milliseconds wait = answer_within);
+    // Follows a unit's stream, naming the deliveries given, or every one this library reads where none is.
+    // The first subscription is made before it returns; a refusal of it other than the unit's absence is
+    // thrown.
+    std::unique_ptr<Follow> follow(std::string_view unit, std::string_view stream,
+                                   const std::vector<v1::UnitStream::Reads> &reads = {});
     // Takes control back for a channel bound as a local socket.
     v1::Reclaimed reclaim(std::chrono::milliseconds wait = answer_within);
 

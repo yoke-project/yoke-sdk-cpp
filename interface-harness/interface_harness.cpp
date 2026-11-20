@@ -115,6 +115,8 @@ struct Harness {
     std::vector<std::unique_ptr<yi::Subscription>> subscriptions;
     std::vector<std::unique_ptr<yi::Delivery>> deliveries;
     std::vector<std::thread> reporting;
+    // Destroyed before the attachment they were made on, once what reports them has finished.
+    std::vector<std::unique_ptr<yi::Follow>> follows;
 
     ~Harness() {
         // Every attachment and subscription lives until the harness finishes; closing them ends what
@@ -212,9 +214,9 @@ struct Harness {
         if (verb == "attach") {
             return attach(text(args, "channel"));
         }
-        static const char *const operations[] = {"authenticate",     "read",   "subscribe",    "confirm",
-                                                 "command",          "query",  "stream-start", "stream-stop",
-                                                 "stream-subscribe", "reclaim"};
+        static const char *const operations[] = {
+            "authenticate", "read",        "subscribe",        "confirm",       "command", "query",
+            "stream-start", "stream-stop", "stream-subscribe", "stream-follow", "reclaim"};
         bool known = false;
         for (const char *op : operations) {
             known = known || verb == op;
@@ -259,9 +261,9 @@ struct Harness {
                          plain(a->command(text(args, "unit"), text(args, "type"), text(args, "payload")))}};
             }
             if (verb == "query") {
-                return {
-                    {"value",
-                     {{"answer", a->ask(text(args, "unit"), text(args, "type"), text(args, "payload"))}}}};
+                return {{"value",
+                         {{"answer", a->ask_caused(text(args, "cause"), text(args, "unit"),
+                                                   text(args, "type"), text(args, "payload"))}}}};
             }
             if (verb == "stream-start") {
                 return {{"value", plain(a->start_stream(text(args, "unit"), text(args, "stream")))}};
@@ -305,6 +307,32 @@ struct Harness {
                 });
                 return {
                     {"value", {{"delivery", d->id()}, {"flowing", d->flowing()}, {"arrives", d->arrives()}}}};
+            }
+            if (verb == "stream-follow") {
+                // A stream followed across its unit's restarts: each frame names the follow and the delivery
+                // it came on.
+                follows.push_back(a->follow(text(args, "unit"), text(args, "stream")));
+                yi::Follow *f = follows.back().get();
+                std::string id = "follow-" + std::to_string(follows.size());
+                reporting.emplace_back([this, f, id] {
+                    for (;;) {
+                        std::optional<yi::Frame> frame;
+                        try {
+                            frame = f->next();
+                        } catch (...) {
+                        }
+                        if (!frame) {
+                            observe("follow-ended", {{"follow", id}});
+                            return;
+                        }
+                        observe("frame", {{"follow", id},
+                                          {"delivery", f->delivery()},
+                                          {"sequence", frame->sequence},
+                                          {"sent_at", frame->sent_at},
+                                          {"payload", frame->payload}});
+                    }
+                });
+                return {{"value", {{"follow", id}}}};
             }
             return {{"value", plain(a->reclaim())}};
         } catch (...) {

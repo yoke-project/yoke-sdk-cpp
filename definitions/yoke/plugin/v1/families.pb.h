@@ -1957,6 +1957,9 @@ class Query_Question final :
   enum : int {
     kTypeFieldNumber = 1,
     kPayloadFieldNumber = 2,
+    kAskerFieldNumber = 3,
+    kChainFieldNumber = 5,
+    kDeadlineFieldNumber = 4,
   };
   // string type = 1;
   void clear_type();
@@ -1986,6 +1989,43 @@ class Query_Question final :
   std::string* _internal_mutable_payload();
   public:
 
+  // string asker = 3;
+  void clear_asker();
+  const std::string& asker() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_asker(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_asker();
+  PROTOBUF_NODISCARD std::string* release_asker();
+  void set_allocated_asker(std::string* asker);
+  private:
+  const std::string& _internal_asker() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_asker(const std::string& value);
+  std::string* _internal_mutable_asker();
+  public:
+
+  // string chain = 5;
+  void clear_chain();
+  const std::string& chain() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_chain(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_chain();
+  PROTOBUF_NODISCARD std::string* release_chain();
+  void set_allocated_chain(std::string* chain);
+  private:
+  const std::string& _internal_chain() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_chain(const std::string& value);
+  std::string* _internal_mutable_chain();
+  public:
+
+  // uint64 deadline = 4;
+  void clear_deadline();
+  uint64_t deadline() const;
+  void set_deadline(uint64_t value);
+  private:
+  uint64_t _internal_deadline() const;
+  void _internal_set_deadline(uint64_t value);
+  public:
+
   // @@protoc_insertion_point(class_scope:yoke.plugin.v1.Query.Question)
  private:
   class _Internal;
@@ -1996,6 +2036,9 @@ class Query_Question final :
   struct Impl_ {
     ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr type_;
     ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr payload_;
+    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr asker_;
+    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr chain_;
+    uint64_t deadline_;
     mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   };
   union { Impl_ _impl_; };
@@ -4441,6 +4484,126 @@ inline void Query_Question::set_allocated_payload(std::string* payload) {
   }
 #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
   // @@protoc_insertion_point(field_set_allocated:yoke.plugin.v1.Query.Question.payload)
+}
+
+// string asker = 3;
+inline void Query_Question::clear_asker() {
+  _impl_.asker_.ClearToEmpty();
+}
+inline const std::string& Query_Question::asker() const {
+  // @@protoc_insertion_point(field_get:yoke.plugin.v1.Query.Question.asker)
+  return _internal_asker();
+}
+template <typename ArgT0, typename... ArgT>
+inline PROTOBUF_ALWAYS_INLINE
+void Query_Question::set_asker(ArgT0&& arg0, ArgT... args) {
+ 
+ _impl_.asker_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:yoke.plugin.v1.Query.Question.asker)
+}
+inline std::string* Query_Question::mutable_asker() {
+  std::string* _s = _internal_mutable_asker();
+  // @@protoc_insertion_point(field_mutable:yoke.plugin.v1.Query.Question.asker)
+  return _s;
+}
+inline const std::string& Query_Question::_internal_asker() const {
+  return _impl_.asker_.Get();
+}
+inline void Query_Question::_internal_set_asker(const std::string& value) {
+  
+  _impl_.asker_.Set(value, GetArenaForAllocation());
+}
+inline std::string* Query_Question::_internal_mutable_asker() {
+  
+  return _impl_.asker_.Mutable(GetArenaForAllocation());
+}
+inline std::string* Query_Question::release_asker() {
+  // @@protoc_insertion_point(field_release:yoke.plugin.v1.Query.Question.asker)
+  return _impl_.asker_.Release();
+}
+inline void Query_Question::set_allocated_asker(std::string* asker) {
+  if (asker != nullptr) {
+    
+  } else {
+    
+  }
+  _impl_.asker_.SetAllocated(asker, GetArenaForAllocation());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (_impl_.asker_.IsDefault()) {
+    _impl_.asker_.Set("", GetArenaForAllocation());
+  }
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  // @@protoc_insertion_point(field_set_allocated:yoke.plugin.v1.Query.Question.asker)
+}
+
+// uint64 deadline = 4;
+inline void Query_Question::clear_deadline() {
+  _impl_.deadline_ = uint64_t{0u};
+}
+inline uint64_t Query_Question::_internal_deadline() const {
+  return _impl_.deadline_;
+}
+inline uint64_t Query_Question::deadline() const {
+  // @@protoc_insertion_point(field_get:yoke.plugin.v1.Query.Question.deadline)
+  return _internal_deadline();
+}
+inline void Query_Question::_internal_set_deadline(uint64_t value) {
+  
+  _impl_.deadline_ = value;
+}
+inline void Query_Question::set_deadline(uint64_t value) {
+  _internal_set_deadline(value);
+  // @@protoc_insertion_point(field_set:yoke.plugin.v1.Query.Question.deadline)
+}
+
+// string chain = 5;
+inline void Query_Question::clear_chain() {
+  _impl_.chain_.ClearToEmpty();
+}
+inline const std::string& Query_Question::chain() const {
+  // @@protoc_insertion_point(field_get:yoke.plugin.v1.Query.Question.chain)
+  return _internal_chain();
+}
+template <typename ArgT0, typename... ArgT>
+inline PROTOBUF_ALWAYS_INLINE
+void Query_Question::set_chain(ArgT0&& arg0, ArgT... args) {
+ 
+ _impl_.chain_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:yoke.plugin.v1.Query.Question.chain)
+}
+inline std::string* Query_Question::mutable_chain() {
+  std::string* _s = _internal_mutable_chain();
+  // @@protoc_insertion_point(field_mutable:yoke.plugin.v1.Query.Question.chain)
+  return _s;
+}
+inline const std::string& Query_Question::_internal_chain() const {
+  return _impl_.chain_.Get();
+}
+inline void Query_Question::_internal_set_chain(const std::string& value) {
+  
+  _impl_.chain_.Set(value, GetArenaForAllocation());
+}
+inline std::string* Query_Question::_internal_mutable_chain() {
+  
+  return _impl_.chain_.Mutable(GetArenaForAllocation());
+}
+inline std::string* Query_Question::release_chain() {
+  // @@protoc_insertion_point(field_release:yoke.plugin.v1.Query.Question.chain)
+  return _impl_.chain_.Release();
+}
+inline void Query_Question::set_allocated_chain(std::string* chain) {
+  if (chain != nullptr) {
+    
+  } else {
+    
+  }
+  _impl_.chain_.SetAllocated(chain, GetArenaForAllocation());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (_impl_.chain_.IsDefault()) {
+    _impl_.chain_.Set("", GetArenaForAllocation());
+  }
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  // @@protoc_insertion_point(field_set_allocated:yoke.plugin.v1.Query.Question.chain)
 }
 
 // -------------------------------------------------------------------

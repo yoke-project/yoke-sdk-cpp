@@ -47,7 +47,11 @@ class Panel : public iv1::Interface::Service {
             iv1::CoreFrame out;
             out.set_call(f.call());
             auto *r = out.mutable_refusal();
-            if (f.request().has_command()) {
+            if (f.request().has_query() && !f.request().query().cause().empty()) {
+                r->set_code("use.cause.unknown");
+                r->set_message("no such question");
+                r->set_item(f.request().query().cause());
+            } else if (f.request().has_command()) {
                 r->set_code("channel.suspended");
                 r->set_message("the channel is suspended");
                 r->mutable_suspension()->set_grade("read-only");
@@ -261,6 +265,19 @@ void test_the_suite_is_run_against_the_interface_harness() {
             "ci/conformance.sh no longer runs the suite against the plugin harness");
 }
 
+// std: yoke-sdk-cpp:the-interface-harness.06
+void test_a_query_carries_its_cause_and_stream_follow_is_known() {
+    Suite s;
+    s.read();
+    s.directive("attach", {{"channel", "panel"}});
+    json query = s.directive("query", {{"unit", "source"}, {"type", "status"}, {"cause", "q-none"}});
+    REQUIRE(query.value("refusal", "") == "use.cause.unknown" && query["value"].value("item", "") == "q-none",
+            "the query was reported as ", query.dump());
+    json follow = s.directive("stream-follow", {{"unit", "nobody"}, {"stream", "s"}});
+    REQUIRE(!follow.contains("unrecognised") && follow.value("refusal", "") == "subject.unknown",
+            "the follow was reported as ", follow.dump());
+}
+
 } // namespace
 
 int main() {
@@ -271,5 +288,6 @@ int main() {
         {"yoke-sdk-cpp:the-interface-harness.03", test_a_refusal_is_reported_with_what_it_names},
         {"yoke-sdk-cpp:the-interface-harness.04", test_it_knows_no_other_verb_finishes_and_holds_no_wire},
         {"yoke-sdk-cpp:the-interface-harness.05", test_the_suite_is_run_against_the_interface_harness},
+        {"yoke-sdk-cpp:the-interface-harness.06", test_a_query_carries_its_cause_and_stream_follow_is_known},
     });
 }

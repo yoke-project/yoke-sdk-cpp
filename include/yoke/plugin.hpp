@@ -15,6 +15,7 @@
 
 #include <chrono>
 #include <cstdint>
+#include <map>
 #include <memory>
 #include <optional>
 #include <string>
@@ -35,19 +36,27 @@ struct Stream {
     std::uint64_t max_frame = 0;
 };
 
-// The kind of the one thing a capability governs.
-enum class Governs { stream, command, query, occurrence, surface };
+// The kind of the one thing a capability governs: use_query and use_stream are a question and a stream
+// of a `unit` need, named in uses.
+enum class Governs { stream, command, query, occurrence, surface, use_query, use_stream };
 
-// The one thing a capability governs.
+// The one thing a capability governs. A use names its need too: the question or the stream is id.
 struct Object {
     Governs kind;
     std::string id;
+    std::string need = {};
 };
 
 // What an operator may grant, governing exactly one object.
 struct Capability {
     std::string name;
     Object governs;
+};
+
+// What a Plugin uses of one `unit` need: questions it asks and streams it follows, in the bound unit's
+// vocabulary. There are no commands: a unit never instructs another.
+struct Use {
+    std::vector<std::string> questions, streams;
 };
 
 // What a Plugin says about itself: what is true of the binary wherever it runs.
@@ -59,6 +68,10 @@ struct Declaration {
     std::vector<std::string> queries;
     std::vector<std::string> occurrences;
     std::vector<Capability> capabilities;
+    // For each `unit` need, what the Plugin uses of the unit bound to it.
+    std::map<std::string, Use> uses = {};
+    // The `secret` needs whose value the unit replaces itself, with rewrite.
+    std::vector<std::string> rewrites = {};
 
     // The document the declaration generates.
     std::string manifest() const;
@@ -83,11 +96,16 @@ struct Command {
     std::string payload;
 };
 
-// A query the Core asked, to be answered.
+// A query the Core asked, to be answered. The Core states who asked, the instant the asker stops waiting
+// and the chain the question belongs to; the unit states none of them. A unit asking on a need's channel
+// while it answers names id as the cause.
 struct Question {
     std::string id; // the message identity an answer is correlated to
     std::string type;
     std::string payload;
+    std::string asker = {}; // `unit:<unit>`, `channel:<name>` or `operator:<person>`
+    std::chrono::system_clock::time_point deadline = {};
+    std::string chain = {}; // the chain's identity, 32 lower-case hex digits
 };
 
 // A stream may now be emitted on, and where.
@@ -203,6 +221,12 @@ class Unit {
     explicit Unit(std::unique_ptr<State> state);
     std::unique_ptr<State> state_;
 };
+
+// Replaces the value of a secret the Plugin declares in rewrites, at path — the value `${bind.<name>}`
+// resolved to — without a restart: the new value is written beside it as `value.new`, flushed, and renamed
+// over it, so a reader meets the old value or the new one and never a part of either. The Core never opens
+// it; the unit reads it again when it next needs it. Throws std::system_error where it could not.
+void rewrite(const std::string &path, std::string_view value);
 
 } // namespace yoke::plugin
 

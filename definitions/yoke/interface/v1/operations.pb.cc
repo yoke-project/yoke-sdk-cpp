@@ -127,6 +127,7 @@ PROTOBUF_CONSTEXPR Question::Question(
     /*decltype(_impl_.unit_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
   , /*decltype(_impl_.type_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
   , /*decltype(_impl_.payload_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
+  , /*decltype(_impl_.cause_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
   , /*decltype(_impl_._cached_size_)*/{}} {}
 struct QuestionDefaultTypeInternal {
   PROTOBUF_CONSTEXPR QuestionDefaultTypeInternal()
@@ -384,6 +385,7 @@ const uint32_t TableStruct_yoke_2finterface_2fv1_2foperations_2eproto::offsets[]
   PROTOBUF_FIELD_OFFSET(::yoke::interface::v1::Question, _impl_.unit_),
   PROTOBUF_FIELD_OFFSET(::yoke::interface::v1::Question, _impl_.type_),
   PROTOBUF_FIELD_OFFSET(::yoke::interface::v1::Question, _impl_.payload_),
+  PROTOBUF_FIELD_OFFSET(::yoke::interface::v1::Question, _impl_.cause_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::yoke::interface::v1::UnitStream, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -502,18 +504,18 @@ static const ::_pbi::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protode
   { 51, -1, -1, sizeof(::yoke::interface::v1::Confirm)},
   { 59, -1, -1, sizeof(::yoke::interface::v1::Command)},
   { 68, -1, -1, sizeof(::yoke::interface::v1::Question)},
-  { 77, -1, -1, sizeof(::yoke::interface::v1::UnitStream)},
-  { 86, -1, -1, sizeof(::yoke::interface::v1::StreamRelease)},
-  { 93, -1, -1, sizeof(::yoke::interface::v1::Reclaim)},
-  { 99, -1, -1, sizeof(::yoke::interface::v1::Response)},
-  { 117, -1, -1, sizeof(::yoke::interface::v1::Authenticated)},
-  { 126, -1, -1, sizeof(::yoke::interface::v1::Subscribed)},
-  { 136, -1, -1, sizeof(::yoke::interface::v1::Confirmed)},
-  { 142, -1, -1, sizeof(::yoke::interface::v1::Acknowledged)},
-  { 150, -1, -1, sizeof(::yoke::interface::v1::Answered)},
-  { 157, -1, -1, sizeof(::yoke::interface::v1::Delivering)},
-  { 171, -1, -1, sizeof(::yoke::interface::v1::Released)},
-  { 177, -1, -1, sizeof(::yoke::interface::v1::Reclaimed)},
+  { 78, -1, -1, sizeof(::yoke::interface::v1::UnitStream)},
+  { 87, -1, -1, sizeof(::yoke::interface::v1::StreamRelease)},
+  { 94, -1, -1, sizeof(::yoke::interface::v1::Reclaim)},
+  { 100, -1, -1, sizeof(::yoke::interface::v1::Response)},
+  { 118, -1, -1, sizeof(::yoke::interface::v1::Authenticated)},
+  { 127, -1, -1, sizeof(::yoke::interface::v1::Subscribed)},
+  { 137, -1, -1, sizeof(::yoke::interface::v1::Confirmed)},
+  { 143, -1, -1, sizeof(::yoke::interface::v1::Acknowledged)},
+  { 151, -1, -1, sizeof(::yoke::interface::v1::Answered)},
+  { 158, -1, -1, sizeof(::yoke::interface::v1::Delivering)},
+  { 172, -1, -1, sizeof(::yoke::interface::v1::Released)},
+  { 178, -1, -1, sizeof(::yoke::interface::v1::Reclaimed)},
 };
 
 static const ::_pb::Message* const file_default_instances[] = {
@@ -568,49 +570,49 @@ const char descriptor_table_protodef_yoke_2finterface_2fv1_2foperations_2eproto[
   "face.v1.Filter\"1\n\007Confirm\022\024\n\014subscriptio"
   "n\030\001 \001(\t\022\020\n\010sequence\030\002 \001(\004\"6\n\007Command\022\014\n\004"
   "unit\030\001 \001(\t\022\014\n\004type\030\002 \001(\t\022\017\n\007payload\030\003 \001("
-  "\014\"7\n\010Question\022\014\n\004unit\030\001 \001(\t\022\014\n\004type\030\002 \001("
-  "\t\022\017\n\007payload\030\003 \001(\014\"\260\001\n\nUnitStream\022\014\n\004uni"
-  "t\030\001 \001(\t\022\016\n\006stream\030\002 \001(\t\0222\n\005reads\030\003 \003(\0162#"
-  ".yoke.interface.v1.UnitStream.Reads\"P\n\005R"
-  "eads\022\025\n\021READS_UNSPECIFIED\020\000\022\027\n\023READS_STR"
-  "EAM_SOCKET\020\001\022\027\n\023READS_SHARED_OBJECT\020\002\"!\n"
-  "\rStreamRelease\022\020\n\010delivery\030\001 \001(\t\"\t\n\007Recl"
-  "aim\"\331\004\n\010Response\0228\n\014authenticate\030\001 \001(\0132 "
-  ".yoke.interface.v1.AuthenticatedH\000\022*\n\004re"
-  "ad\030\002 \001(\0132\032.yoke.interface.v1.RecordsH\000\0222"
-  "\n\tsubscribe\030\003 \001(\0132\035.yoke.interface.v1.Su"
-  "bscribedH\000\022/\n\007confirm\030\004 \001(\0132\034.yoke.inter"
-  "face.v1.ConfirmedH\000\0222\n\007command\030\005 \001(\0132\037.y"
-  "oke.interface.v1.AcknowledgedH\000\022,\n\005query"
-  "\030\006 \001(\0132\033.yoke.interface.v1.AnsweredH\000\0227\n"
-  "\014stream_start\030\007 \001(\0132\037.yoke.interface.v1."
-  "AcknowledgedH\000\0226\n\013stream_stop\030\010 \001(\0132\037.yo"
-  "ke.interface.v1.AcknowledgedH\000\0229\n\020stream"
-  "_subscribe\030\t \001(\0132\035.yoke.interface.v1.Del"
-  "iveringH\000\0229\n\022stream_unsubscribe\030\n \001(\0132\033."
-  "yoke.interface.v1.ReleasedH\000\022/\n\007reclaim\030"
-  "\013 \001(\0132\034.yoke.interface.v1.ReclaimedH\000B\010\n"
-  "\006answer\"\\\n\rAuthenticated\022\017\n\007account\030\001 \001("
-  "\t\022\r\n\005token\030\002 \001(\t\022+\n\007expires\030\003 \001(\0132\032.goog"
-  "le.protobuf.Timestamp\"\244\001\n\nSubscribed\022/\n\010"
-  "snapshot\030\001 \001(\0132\033.yoke.interface.v1.Snaps"
-  "hotH\000\022)\n\005event\030\002 \001(\0132\030.yoke.interface.v1"
-  ".EventH\000\022/\n\010overflow\030\003 \001(\0132\033.yoke.interf"
-  "ace.v1.SnapshotH\000B\t\n\007carries\"\013\n\tConfirme"
-  "d\"\266\001\n\014Acknowledged\0228\n\007outcome\030\001 \001(\0162\'.yo"
-  "ke.interface.v1.Acknowledged.Outcome\022\014\n\004"
-  "line\030\002 \001(\t\"^\n\007Outcome\022\027\n\023OUTCOME_UNSPECI"
-  "FIED\020\000\022\024\n\020OUTCOME_ACCEPTED\020\001\022\020\n\014OUTCOME_"
-  "DONE\020\002\022\022\n\016OUTCOME_FAILED\020\003\"\033\n\010Answered\022\017"
-  "\n\007payload\030\001 \001(\014\"\235\001\n\nDelivering\022\020\n\010delive"
-  "ry\030\001 \001(\t\022\020\n\006socket\030\002 \001(\tH\000\022\024\n\nconnection"
-  "\030\003 \001(\010H\000\022\016\n\004path\030\004 \001(\tH\000\022\027\n\rstream_socke"
-  "t\030\006 \001(\tH\000\022\020\n\006shared\030\007 \001(\tH\000\022\017\n\007flowing\030\005"
-  " \001(\010B\t\n\007arrives\"\n\n\010Released\"O\n\tReclaimed"
-  "\0221\n\007channel\030\001 \001(\0132 .yoke.interface.v1.Ch"
-  "annelRecord\022\017\n\007changed\030\002 \001(\010BBZ@github.c"
-  "om/yoke-project/yoke/proto/yoke/interfac"
-  "e/v1;interfacev1b\006proto3"
+  "\014\"F\n\010Question\022\014\n\004unit\030\001 \001(\t\022\014\n\004type\030\002 \001("
+  "\t\022\017\n\007payload\030\003 \001(\014\022\r\n\005cause\030\004 \001(\t\"\260\001\n\nUn"
+  "itStream\022\014\n\004unit\030\001 \001(\t\022\016\n\006stream\030\002 \001(\t\0222"
+  "\n\005reads\030\003 \003(\0162#.yoke.interface.v1.UnitSt"
+  "ream.Reads\"P\n\005Reads\022\025\n\021READS_UNSPECIFIED"
+  "\020\000\022\027\n\023READS_STREAM_SOCKET\020\001\022\027\n\023READS_SHA"
+  "RED_OBJECT\020\002\"!\n\rStreamRelease\022\020\n\010deliver"
+  "y\030\001 \001(\t\"\t\n\007Reclaim\"\331\004\n\010Response\0228\n\014authe"
+  "nticate\030\001 \001(\0132 .yoke.interface.v1.Authen"
+  "ticatedH\000\022*\n\004read\030\002 \001(\0132\032.yoke.interface"
+  ".v1.RecordsH\000\0222\n\tsubscribe\030\003 \001(\0132\035.yoke."
+  "interface.v1.SubscribedH\000\022/\n\007confirm\030\004 \001"
+  "(\0132\034.yoke.interface.v1.ConfirmedH\000\0222\n\007co"
+  "mmand\030\005 \001(\0132\037.yoke.interface.v1.Acknowle"
+  "dgedH\000\022,\n\005query\030\006 \001(\0132\033.yoke.interface.v"
+  "1.AnsweredH\000\0227\n\014stream_start\030\007 \001(\0132\037.yok"
+  "e.interface.v1.AcknowledgedH\000\0226\n\013stream_"
+  "stop\030\010 \001(\0132\037.yoke.interface.v1.Acknowled"
+  "gedH\000\0229\n\020stream_subscribe\030\t \001(\0132\035.yoke.i"
+  "nterface.v1.DeliveringH\000\0229\n\022stream_unsub"
+  "scribe\030\n \001(\0132\033.yoke.interface.v1.Release"
+  "dH\000\022/\n\007reclaim\030\013 \001(\0132\034.yoke.interface.v1"
+  ".ReclaimedH\000B\010\n\006answer\"\\\n\rAuthenticated\022"
+  "\017\n\007account\030\001 \001(\t\022\r\n\005token\030\002 \001(\t\022+\n\007expir"
+  "es\030\003 \001(\0132\032.google.protobuf.Timestamp\"\244\001\n"
+  "\nSubscribed\022/\n\010snapshot\030\001 \001(\0132\033.yoke.int"
+  "erface.v1.SnapshotH\000\022)\n\005event\030\002 \001(\0132\030.yo"
+  "ke.interface.v1.EventH\000\022/\n\010overflow\030\003 \001("
+  "\0132\033.yoke.interface.v1.SnapshotH\000B\t\n\007carr"
+  "ies\"\013\n\tConfirmed\"\266\001\n\014Acknowledged\0228\n\007out"
+  "come\030\001 \001(\0162\'.yoke.interface.v1.Acknowled"
+  "ged.Outcome\022\014\n\004line\030\002 \001(\t\"^\n\007Outcome\022\027\n\023"
+  "OUTCOME_UNSPECIFIED\020\000\022\024\n\020OUTCOME_ACCEPTE"
+  "D\020\001\022\020\n\014OUTCOME_DONE\020\002\022\022\n\016OUTCOME_FAILED\020"
+  "\003\"\033\n\010Answered\022\017\n\007payload\030\001 \001(\014\"\235\001\n\nDeliv"
+  "ering\022\020\n\010delivery\030\001 \001(\t\022\020\n\006socket\030\002 \001(\tH"
+  "\000\022\024\n\nconnection\030\003 \001(\010H\000\022\016\n\004path\030\004 \001(\tH\000\022"
+  "\027\n\rstream_socket\030\006 \001(\tH\000\022\020\n\006shared\030\007 \001(\t"
+  "H\000\022\017\n\007flowing\030\005 \001(\010B\t\n\007arrives\"\n\n\010Releas"
+  "ed\"O\n\tReclaimed\0221\n\007channel\030\001 \001(\0132 .yoke."
+  "interface.v1.ChannelRecord\022\017\n\007changed\030\002 "
+  "\001(\010BBZ@github.com/yoke-project/yoke/prot"
+  "o/yoke/interface/v1;interfacev1b\006proto3"
   ;
 static const ::_pbi::DescriptorTable* const descriptor_table_yoke_2finterface_2fv1_2foperations_2eproto_deps[3] = {
   &::descriptor_table_google_2fprotobuf_2ftimestamp_2eproto,
@@ -619,7 +621,7 @@ static const ::_pbi::DescriptorTable* const descriptor_table_yoke_2finterface_2f
 };
 static ::_pbi::once_flag descriptor_table_yoke_2finterface_2fv1_2foperations_2eproto_once;
 const ::_pbi::DescriptorTable descriptor_table_yoke_2finterface_2fv1_2foperations_2eproto = {
-    false, false, 2824, descriptor_table_protodef_yoke_2finterface_2fv1_2foperations_2eproto,
+    false, false, 2839, descriptor_table_protodef_yoke_2finterface_2fv1_2foperations_2eproto,
     "yoke/interface/v1/operations.proto",
     &descriptor_table_yoke_2finterface_2fv1_2foperations_2eproto_once, descriptor_table_yoke_2finterface_2fv1_2foperations_2eproto_deps, 3, 20,
     schemas, file_default_instances, TableStruct_yoke_2finterface_2fv1_2foperations_2eproto::offsets,
@@ -3076,6 +3078,7 @@ Question::Question(const Question& from)
       decltype(_impl_.unit_){}
     , decltype(_impl_.type_){}
     , decltype(_impl_.payload_){}
+    , decltype(_impl_.cause_){}
     , /*decltype(_impl_._cached_size_)*/{}};
 
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
@@ -3103,6 +3106,14 @@ Question::Question(const Question& from)
     _this->_impl_.payload_.Set(from._internal_payload(), 
       _this->GetArenaForAllocation());
   }
+  _impl_.cause_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.cause_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (!from._internal_cause().empty()) {
+    _this->_impl_.cause_.Set(from._internal_cause(), 
+      _this->GetArenaForAllocation());
+  }
   // @@protoc_insertion_point(copy_constructor:yoke.interface.v1.Question)
 }
 
@@ -3114,6 +3125,7 @@ inline void Question::SharedCtor(
       decltype(_impl_.unit_){}
     , decltype(_impl_.type_){}
     , decltype(_impl_.payload_){}
+    , decltype(_impl_.cause_){}
     , /*decltype(_impl_._cached_size_)*/{}
   };
   _impl_.unit_.InitDefault();
@@ -3127,6 +3139,10 @@ inline void Question::SharedCtor(
   _impl_.payload_.InitDefault();
   #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
     _impl_.payload_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  _impl_.cause_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.cause_.Set("", GetArenaForAllocation());
   #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
 }
 
@@ -3144,6 +3160,7 @@ inline void Question::SharedDtor() {
   _impl_.unit_.Destroy();
   _impl_.type_.Destroy();
   _impl_.payload_.Destroy();
+  _impl_.cause_.Destroy();
 }
 
 void Question::SetCachedSize(int size) const {
@@ -3159,6 +3176,7 @@ void Question::Clear() {
   _impl_.unit_.ClearToEmpty();
   _impl_.type_.ClearToEmpty();
   _impl_.payload_.ClearToEmpty();
+  _impl_.cause_.ClearToEmpty();
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
@@ -3194,6 +3212,16 @@ const char* Question::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx)
           auto str = _internal_mutable_payload();
           ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
           CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // string cause = 4;
+      case 4:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 34)) {
+          auto str = _internal_mutable_cause();
+          ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(ptr);
+          CHK_(::_pbi::VerifyUTF8(str, "yoke.interface.v1.Question.cause"));
         } else
           goto handle_unusual;
         continue;
@@ -3252,6 +3280,16 @@ uint8_t* Question::_InternalSerialize(
         3, this->_internal_payload(), target);
   }
 
+  // string cause = 4;
+  if (!this->_internal_cause().empty()) {
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
+      this->_internal_cause().data(), static_cast<int>(this->_internal_cause().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
+      "yoke.interface.v1.Question.cause");
+    target = stream->WriteStringMaybeAliased(
+        4, this->_internal_cause(), target);
+  }
+
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
@@ -3289,6 +3327,13 @@ size_t Question::ByteSizeLong() const {
         this->_internal_payload());
   }
 
+  // string cause = 4;
+  if (!this->_internal_cause().empty()) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+        this->_internal_cause());
+  }
+
   return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
 }
 
@@ -3315,6 +3360,9 @@ void Question::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTO
   }
   if (!from._internal_payload().empty()) {
     _this->_internal_set_payload(from._internal_payload());
+  }
+  if (!from._internal_cause().empty()) {
+    _this->_internal_set_cause(from._internal_cause());
   }
   _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
 }
@@ -3346,6 +3394,10 @@ void Question::InternalSwap(Question* other) {
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
       &_impl_.payload_, lhs_arena,
       &other->_impl_.payload_, rhs_arena
+  );
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
+      &_impl_.cause_, lhs_arena,
+      &other->_impl_.cause_, rhs_arena
   );
 }
 

@@ -491,6 +491,109 @@ void test_a_panel_links_nothing_of_the_administrative_contract() {
             "the library defines symbols of the administrative contract, which a panel would link");
 }
 
+// std: yoke-sdk-cpp:the-interface-library.11
+void test_a_question_may_name_its_cause() {
+    Core c;
+    c.opening = opening_at(1);
+    c.answer = [](const std::string &call, const iv1::Request &r, const Send &send) {
+        if (!r.has_query()) {
+            return;
+        }
+        if (!r.query().cause().empty()) {
+            iv1::CoreFrame f;
+            f.set_call(call);
+            f.mutable_refusal()->set_code("use.cause.unknown");
+            f.mutable_refusal()->set_message("no such question");
+            f.mutable_refusal()->set_item(r.query().cause());
+            send(f);
+            return;
+        }
+        iv1::Response resp;
+        resp.mutable_query()->set_payload("42");
+        send(answered(call, resp));
+    };
+    Served s(c);
+    auto a = yi::Attachment::attach(s.path, {}, 3s);
+    REQUIRE(a->ask("source", "status", "p") == "42", "the question with no cause was not answered");
+    std::string item;
+    std::string code = refusal_of([&] {
+        try {
+            a->ask_caused("q-7", "source", "status", "p");
+        } catch (const yoke::Refusal &r) {
+            item = r.item();
+            throw;
+        }
+    });
+    REQUIRE(code == "use.cause.unknown" && item == "q-7", "the caused question was refused ", code,
+            " naming ", item);
+    std::vector<std::string> causes;
+    for (const auto &r : c.requests()) {
+        if (r.has_query()) {
+            REQUIRE(r.query().payload() == "p", "a question reached the Core with another payload");
+            causes.push_back(r.query().cause());
+        }
+    }
+    REQUIRE(causes == std::vector<std::string>({"", "q-7"}), "the causes the Core received are wrong");
+}
+
+// std: yoke-sdk-cpp:the-interface-library.12
+void test_a_stream_followed_is_subscribed_again_when_its_delivery_ends() {
+    Core c;
+    c.opening = opening_at(1);
+    std::atomic<int> starts{0}, subscribes{0}, releases{0};
+    c.answer = [&](const std::string &call, const iv1::Request &r, const Send &send) {
+        iv1::Response resp;
+        if (r.has_stream_start()) {
+            int n = ++starts;
+            if (n == 2 || n == 3) {
+                iv1::CoreFrame f;
+                f.set_call(call);
+                f.mutable_refusal()->set_code("unit.not_running");
+                f.mutable_refusal()->set_message("restarting");
+                send(f);
+                return;
+            }
+            resp.mutable_stream_start()->set_outcome(iv1::Acknowledged::OUTCOME_DONE);
+            send(answered(call, resp));
+        } else if (r.has_stream_subscribe()) {
+            int n = ++subscribes;
+            std::string id = "d-" + std::to_string(n);
+            auto *d = resp.mutable_stream_subscribe();
+            d->set_delivery(id), d->set_flowing(true), d->set_connection(true);
+            send(answered(call, resp));
+            check::sleep(50);
+            iv1::CoreFrame f;
+            f.set_call(id);
+            f.mutable_delivery()->set_delivery(id);
+            f.mutable_delivery()->set_sequence(1);
+            f.mutable_delivery()->set_payload("frame of " + id);
+            send(f);
+            if (n == 1) {
+                // The unit's Session ended: so does its delivery.
+                iv1::CoreFrame done;
+                done.set_call(id);
+                done.mutable_completion()->set_by(iv1::Completion::BY_CORE);
+                send(done);
+            }
+        } else if (r.has_stream_unsubscribe()) {
+            ++releases;
+            resp.mutable_stream_unsubscribe();
+            send(answered(call, resp));
+        }
+    };
+    Served s(c);
+    auto a = yi::Attachment::attach(s.path, {}, 3s);
+    auto f = a->follow("acquire", "spectra");
+    for (const char *delivery : {"d-1", "d-2"}) {
+        auto frame = f->next();
+        REQUIRE(frame && frame->payload == std::string("frame of ") + delivery && f->delivery() == delivery,
+                "the frame of ", delivery, " did not come on it");
+    }
+    f->close();
+    REQUIRE(starts == 4 && subscribes == 2 && releases == 2, "the stream was started ", starts.load(),
+            " times, subscribed ", subscribes.load(), " and released ", releases.load());
+}
+
 } // namespace
 
 // How many times the thread has given up the processor of its own accord: each wait that ended.
@@ -639,5 +742,8 @@ int main() {
         {"yoke-sdk-cpp:the-interface-library.08", test_closing_an_attachment_ends_it_in_order},
         {"yoke-sdk-cpp:the-interface-library.09", test_a_panel_links_nothing_of_the_administrative_contract},
         {"yoke-sdk-cpp:the-interface-library.10", test_a_reader_of_the_ring_waits_on_its_wake_word},
+        {"yoke-sdk-cpp:the-interface-library.11", test_a_question_may_name_its_cause},
+        {"yoke-sdk-cpp:the-interface-library.12",
+         test_a_stream_followed_is_subscribed_again_when_its_delivery_ends},
     });
 }
