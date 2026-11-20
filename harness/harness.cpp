@@ -64,14 +64,18 @@ plugin::Declaration declared() {
         d.streams.push_back(large);
         d.capabilities.push_back({"stream.large.publish", {plugin::Governs::stream, "conformance.large"}});
     }
+    // With `rewrites`, the harness needs the secret `token` and rewrites it.
+    if (named("rewrites")) {
+        d.needs.push_back("secret:token");
+        d.rewrites = {"token"};
+    }
     return d;
 }
 } // namespace
 
-const plugin::Declaration &declaration() {
-    static const plugin::Declaration d = declared();
-    return d;
-}
+// The harness's declaration for the suite running it: a feature the suite names is declared, and one it does
+// not name is left out, because a Core of an earlier release refuses a Manifest key it does not know.
+plugin::Declaration declaration() { return declared(); }
 
 namespace {
 
@@ -140,7 +144,15 @@ struct Harness {
                 std::lock_guard<std::mutex> hold(mu);
                 commands[c->id] = *c;
             } else if (auto *q = std::get_if<plugin::Question>(&*event)) {
-                kind = "question", fields = {{"id", q->id}, {"type", q->type}, {"payload", q->payload}};
+                kind = "question",
+                fields = {{"id", q->id},
+                          {"type", q->type},
+                          {"payload", q->payload},
+                          {"asker", q->asker},
+                          {"deadline", std::chrono::duration_cast<std::chrono::milliseconds>(
+                                           q->deadline.time_since_epoch())
+                                           .count()},
+                          {"chain", q->chain}};
                 std::lock_guard<std::mutex> hold(mu);
                 questions[q->id] = *q;
             } else if (auto *a = std::get_if<plugin::Activated>(&*event)) {
@@ -194,8 +206,8 @@ struct Harness {
                                    {"withheld", scope(a.withheld)}};
                 return;
             }
-            static const char *const acts[] = {"close",  "emit", "emit-sized", "report-health",
-                                               "report", "ack",  "answer",     "fail"};
+            static const char *const acts[] = {"close", "emit",   "emit-sized", "report-health", "report",
+                                               "ack",   "answer", "fail",       "rewrite"};
             bool known = false;
             for (const char *a : acts) {
                 known = known || verb == a;
@@ -242,6 +254,14 @@ struct Harness {
                     }
                 }
                 unit->ack(c, plugin::Outcome::done, arg(args, "line"));
+            } else if (verb == "rewrite") {
+                // The secret the suite placed, at the path the Core resolved for it.
+                const char *path = getenv("CONFORMANCE_SECRET");
+                if (arg(args, "secret") != "token" || path == nullptr || *path == '\0') {
+                    result["value"] = {{"failed", true}};
+                    return;
+                }
+                plugin::rewrite(path, arg(args, "value"));
             } else if (verb == "fail") {
                 // A question or a command the Core sent, failed with a code and a message, correlated to it.
                 unit->fail(arg(args, "about"), arg(args, "code"), arg(args, "message"));

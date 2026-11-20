@@ -10,7 +10,7 @@
 namespace harness {
 
 // What the harness declares: one object of every kind, a stream on each transport, each governed.
-const yoke::plugin::Declaration &declaration();
+yoke::plugin::Declaration declaration();
 
 // Runs the harness against the control socket getenv names as CONFORMANCE_SOCKET, until it is told to
 // finish, its Session ends, or it is asked to stop; its exit status.

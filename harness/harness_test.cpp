@@ -1,9 +1,12 @@
 // The harness's cases: a control socket of the case's own stands in for the suite, and a plugin channel
 // for the Core. The harness runs in a thread of the case's process, so that what it does to the process —
 // a termination signal, its exit — is the case's to observe.
+#include <algorithm>
 #include <atomic>
 #include <csignal>
+#include <cstdlib>
 #include <cstring>
+#include <fstream>
 #include <memory>
 #include <thread>
 
@@ -51,6 +54,10 @@ struct Suite {
                 }
                 if (std::strcmp(name, "YOKE_UNIT") == 0) {
                     return "harness";
+                }
+                if (std::strncmp(name, "CONFORMANCE_", 12) == 0) {
+                    // What a case names of the suite: the features, the secret it placed.
+                    return std::getenv(name);
                 }
                 return channel_env(name);
             });
@@ -329,6 +336,58 @@ void test_it_declares_a_stream_on_each_transport_each_governed() {
     }
 }
 
+// std: yoke-sdk-cpp:the-harness.11
+void test_a_question_is_observed_with_who_asked_its_deadline_and_its_chain() {
+    Channel ch(check::dir());
+    Suite s(&ch);
+    start(s, ch);
+    pluginv1::Envelope e;
+    auto *q = e.mutable_query()->mutable_question();
+    q->set_type("status");
+    q->set_asker("operator:ada");
+    q->set_deadline(1795000000123ULL);
+    q->set_chain("0123456789abcdef0123456789abcdef");
+    ch.send(e);
+    json o = s.observation();
+    REQUIRE(!o.is_null() && o.value("kind", "") == "question" &&
+                o["fields"].value("asker", "") == "operator:ada" &&
+                o["fields"].value("deadline", 0LL) == 1795000000123LL &&
+                o["fields"].value("chain", "") == "0123456789abcdef0123456789abcdef",
+            "the question was observed as ", o.dump());
+}
+
+// std: yoke-sdk-cpp:the-harness.12
+void test_the_secret_it_rewrites_is_declared_where_the_suite_names_it() {
+    struct Unset {
+        ~Unset() {
+            unsetenv("CONFORMANCE_FEATURES");
+            unsetenv("CONFORMANCE_SECRET");
+        }
+    } unset;
+    auto rewriting = [](const yoke::plugin::Declaration &d) {
+        return std::find(d.needs.begin(), d.needs.end(), "secret:token") != d.needs.end() &&
+               d.rewrites == std::vector<std::string>{"token"};
+    };
+    setenv("CONFORMANCE_FEATURES", "max_frame", 1);
+    REQUIRE(harness::declaration().rewrites.empty() && !rewriting(harness::declaration()),
+            "a suite that does not name rewrites is declared a secret to rewrite");
+    setenv("CONFORMANCE_FEATURES", "max_frame,rewrites", 1);
+    REQUIRE(rewriting(harness::declaration()), "a suite naming rewrites is not declared the secret");
+    std::string path = check::dir() + "/value";
+    std::ofstream(path) << "first";
+    setenv("CONFORMANCE_SECRET", path.c_str(), 1);
+    Channel ch(check::dir());
+    Suite s(&ch);
+    start(s, ch);
+    s.write_line(
+        R"({"type":"directive","id":"w","verb":"rewrite","args":{"secret":"token","value":"second"}})");
+    json r = s.result_of("w");
+    REQUIRE(!r.is_null() && r["value"].is_object() && !r["value"].contains("failed") &&
+                !r.contains("refusal") && !r.contains("unrecognised"),
+            "the rewrite answered ", r.dump());
+    REQUIRE(check::read(path) == "second", "the secret holds ", check::read(path));
+}
+
 } // namespace
 
 int main() {
@@ -344,5 +403,8 @@ int main() {
         {"yoke-sdk-cpp:the-harness.08", test_the_suite_is_the_published_pair_authenticated_and_never_built},
         {"yoke-sdk-cpp:the-harness.09", test_a_question_is_observed_with_the_bytes_it_carries},
         {"yoke-sdk-cpp:the-harness.10", test_it_declares_a_stream_on_each_transport_each_governed},
+        {"yoke-sdk-cpp:the-harness.11",
+         test_a_question_is_observed_with_who_asked_its_deadline_and_its_chain},
+        {"yoke-sdk-cpp:the-harness.12", test_the_secret_it_rewrites_is_declared_where_the_suite_names_it},
     });
 }

@@ -147,6 +147,9 @@ PROTOBUF_CONSTEXPR Query_Question::Query_Question(
     ::_pbi::ConstantInitialized): _impl_{
     /*decltype(_impl_.type_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
   , /*decltype(_impl_.payload_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
+  , /*decltype(_impl_.asker_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
+  , /*decltype(_impl_.chain_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
+  , /*decltype(_impl_.deadline_)*/uint64_t{0u}
   , /*decltype(_impl_._cached_size_)*/{}} {}
 struct Query_QuestionDefaultTypeInternal {
   PROTOBUF_CONSTEXPR Query_QuestionDefaultTypeInternal()
@@ -358,6 +361,9 @@ const uint32_t TableStruct_yoke_2fplugin_2fv1_2ffamilies_2eproto::offsets[] PROT
   ~0u,  // no _inlined_string_donated_
   PROTOBUF_FIELD_OFFSET(::yoke::plugin::v1::Query_Question, _impl_.type_),
   PROTOBUF_FIELD_OFFSET(::yoke::plugin::v1::Query_Question, _impl_.payload_),
+  PROTOBUF_FIELD_OFFSET(::yoke::plugin::v1::Query_Question, _impl_.asker_),
+  PROTOBUF_FIELD_OFFSET(::yoke::plugin::v1::Query_Question, _impl_.deadline_),
+  PROTOBUF_FIELD_OFFSET(::yoke::plugin::v1::Query_Question, _impl_.chain_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::yoke::plugin::v1::Query_Answer, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -437,14 +443,14 @@ static const ::_pbi::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protode
   { 54, -1, -1, sizeof(::yoke::plugin::v1::Control)},
   { 64, -1, -1, sizeof(::yoke::plugin::v1::Ack)},
   { 72, -1, -1, sizeof(::yoke::plugin::v1::Query_Question)},
-  { 80, -1, -1, sizeof(::yoke::plugin::v1::Query_Answer)},
-  { 87, -1, -1, sizeof(::yoke::plugin::v1::Query)},
-  { 96, -1, -1, sizeof(::yoke::plugin::v1::Data)},
-  { 104, -1, -1, sizeof(::yoke::plugin::v1::Health)},
-  { 112, -1, -1, sizeof(::yoke::plugin::v1::Event)},
-  { 122, -1, -1, sizeof(::yoke::plugin::v1::Error_Divergence)},
-  { 129, -1, -1, sizeof(::yoke::plugin::v1::Error_Withheld)},
-  { 136, -1, -1, sizeof(::yoke::plugin::v1::Error)},
+  { 83, -1, -1, sizeof(::yoke::plugin::v1::Query_Answer)},
+  { 90, -1, -1, sizeof(::yoke::plugin::v1::Query)},
+  { 99, -1, -1, sizeof(::yoke::plugin::v1::Data)},
+  { 107, -1, -1, sizeof(::yoke::plugin::v1::Health)},
+  { 115, -1, -1, sizeof(::yoke::plugin::v1::Event)},
+  { 125, -1, -1, sizeof(::yoke::plugin::v1::Error_Divergence)},
+  { 132, -1, -1, sizeof(::yoke::plugin::v1::Error_Withheld)},
+  { 139, -1, -1, sizeof(::yoke::plugin::v1::Error)},
 };
 
 static const ::_pb::Message* const file_default_instances[] = {
@@ -498,26 +504,28 @@ const char descriptor_table_protodef_yoke_2fplugin_2fv1_2ffamilies_2eproto[] PRO
   "ugin.v1.Ack.Outcome\022\014\n\004line\030\002 \001(\t\"^\n\007Out"
   "come\022\027\n\023OUTCOME_UNSPECIFIED\020\000\022\024\n\020OUTCOME"
   "_ACCEPTED\020\001\022\020\n\014OUTCOME_DONE\020\002\022\022\n\016OUTCOME"
-  "_FAILED\020\003\"\271\001\n\005Query\0222\n\010question\030\001 \001(\0132\036."
+  "_FAILED\020\003\"\351\001\n\005Query\0222\n\010question\030\001 \001(\0132\036."
   "yoke.plugin.v1.Query.QuestionH\000\022.\n\006answe"
   "r\030\002 \001(\0132\034.yoke.plugin.v1.Query.AnswerH\000\032"
-  ")\n\010Question\022\014\n\004type\030\001 \001(\t\022\017\n\007payload\030\002 \001"
-  "(\014\032\031\n\006Answer\022\017\n\007payload\030\001 \001(\014B\006\n\004kind\")\n"
-  "\004Data\022\020\n\010sequence\030\001 \001(\004\022\017\n\007payload\030\002 \001(\014"
-  "\"%\n\006Health\022\r\n\005grade\030\001 \001(\r\022\014\n\004line\030\002 \001(\t\""
-  "K\n\005Event\022\022\n\noccurrence\030\001 \001(\t\022\020\n\010severity"
-  "\030\002 \001(\r\022\014\n\004line\030\003 \001(\t\022\016\n\006detail\030\004 \001(\014\"\322\001\n"
-  "\005Error\022\014\n\004code\030\001 \001(\t\022\017\n\007message\030\002 \001(\t\0225\n"
-  "\tdivergent\030\003 \001(\0132 .yoke.plugin.v1.Error."
-  "DivergenceH\000\0222\n\010withheld\030\004 \001(\0132\036.yoke.pl"
-  "ugin.v1.Error.WithheldH\000\032\033\n\nDivergence\022\r"
-  "\n\005items\030\001 \003(\t\032\030\n\010Withheld\022\014\n\004item\030\001 \001(\tB"
-  "\010\n\006detailB<Z:github.com/yoke-project/yok"
-  "e/proto/yoke/plugin/v1;pluginv1b\006proto3"
+  "Y\n\010Question\022\014\n\004type\030\001 \001(\t\022\017\n\007payload\030\002 \001"
+  "(\014\022\r\n\005asker\030\003 \001(\t\022\020\n\010deadline\030\004 \001(\004\022\r\n\005c"
+  "hain\030\005 \001(\t\032\031\n\006Answer\022\017\n\007payload\030\001 \001(\014B\006\n"
+  "\004kind\")\n\004Data\022\020\n\010sequence\030\001 \001(\004\022\017\n\007paylo"
+  "ad\030\002 \001(\014\"%\n\006Health\022\r\n\005grade\030\001 \001(\r\022\014\n\004lin"
+  "e\030\002 \001(\t\"K\n\005Event\022\022\n\noccurrence\030\001 \001(\t\022\020\n\010"
+  "severity\030\002 \001(\r\022\014\n\004line\030\003 \001(\t\022\016\n\006detail\030\004"
+  " \001(\014\"\322\001\n\005Error\022\014\n\004code\030\001 \001(\t\022\017\n\007message\030"
+  "\002 \001(\t\0225\n\tdivergent\030\003 \001(\0132 .yoke.plugin.v"
+  "1.Error.DivergenceH\000\0222\n\010withheld\030\004 \001(\0132\036"
+  ".yoke.plugin.v1.Error.WithheldH\000\032\033\n\nDive"
+  "rgence\022\r\n\005items\030\001 \003(\t\032\030\n\010Withheld\022\014\n\004ite"
+  "m\030\001 \001(\tB\010\n\006detailB<Z:github.com/yoke-pro"
+  "ject/yoke/proto/yoke/plugin/v1;pluginv1b"
+  "\006proto3"
   ;
 static ::_pbi::once_flag descriptor_table_yoke_2fplugin_2fv1_2ffamilies_2eproto_once;
 const ::_pbi::DescriptorTable descriptor_table_yoke_2fplugin_2fv1_2ffamilies_2eproto = {
-    false, false, 1799, descriptor_table_protodef_yoke_2fplugin_2fv1_2ffamilies_2eproto,
+    false, false, 1847, descriptor_table_protodef_yoke_2fplugin_2fv1_2ffamilies_2eproto,
     "yoke/plugin/v1/families.proto",
     &descriptor_table_yoke_2fplugin_2fv1_2ffamilies_2eproto_once, nullptr, 0, 18,
     schemas, file_default_instances, TableStruct_yoke_2fplugin_2fv1_2ffamilies_2eproto::offsets,
@@ -2639,6 +2647,9 @@ Query_Question::Query_Question(const Query_Question& from)
   new (&_impl_) Impl_{
       decltype(_impl_.type_){}
     , decltype(_impl_.payload_){}
+    , decltype(_impl_.asker_){}
+    , decltype(_impl_.chain_){}
+    , decltype(_impl_.deadline_){}
     , /*decltype(_impl_._cached_size_)*/{}};
 
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
@@ -2658,6 +2669,23 @@ Query_Question::Query_Question(const Query_Question& from)
     _this->_impl_.payload_.Set(from._internal_payload(), 
       _this->GetArenaForAllocation());
   }
+  _impl_.asker_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.asker_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (!from._internal_asker().empty()) {
+    _this->_impl_.asker_.Set(from._internal_asker(), 
+      _this->GetArenaForAllocation());
+  }
+  _impl_.chain_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.chain_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (!from._internal_chain().empty()) {
+    _this->_impl_.chain_.Set(from._internal_chain(), 
+      _this->GetArenaForAllocation());
+  }
+  _this->_impl_.deadline_ = from._impl_.deadline_;
   // @@protoc_insertion_point(copy_constructor:yoke.plugin.v1.Query.Question)
 }
 
@@ -2668,6 +2696,9 @@ inline void Query_Question::SharedCtor(
   new (&_impl_) Impl_{
       decltype(_impl_.type_){}
     , decltype(_impl_.payload_){}
+    , decltype(_impl_.asker_){}
+    , decltype(_impl_.chain_){}
+    , decltype(_impl_.deadline_){uint64_t{0u}}
     , /*decltype(_impl_._cached_size_)*/{}
   };
   _impl_.type_.InitDefault();
@@ -2677,6 +2708,14 @@ inline void Query_Question::SharedCtor(
   _impl_.payload_.InitDefault();
   #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
     _impl_.payload_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  _impl_.asker_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.asker_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  _impl_.chain_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.chain_.Set("", GetArenaForAllocation());
   #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
 }
 
@@ -2693,6 +2732,8 @@ inline void Query_Question::SharedDtor() {
   GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
   _impl_.type_.Destroy();
   _impl_.payload_.Destroy();
+  _impl_.asker_.Destroy();
+  _impl_.chain_.Destroy();
 }
 
 void Query_Question::SetCachedSize(int size) const {
@@ -2707,6 +2748,9 @@ void Query_Question::Clear() {
 
   _impl_.type_.ClearToEmpty();
   _impl_.payload_.ClearToEmpty();
+  _impl_.asker_.ClearToEmpty();
+  _impl_.chain_.ClearToEmpty();
+  _impl_.deadline_ = uint64_t{0u};
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
@@ -2732,6 +2776,34 @@ const char* Query_Question::_InternalParse(const char* ptr, ::_pbi::ParseContext
           auto str = _internal_mutable_payload();
           ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
           CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // string asker = 3;
+      case 3:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 26)) {
+          auto str = _internal_mutable_asker();
+          ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(ptr);
+          CHK_(::_pbi::VerifyUTF8(str, "yoke.plugin.v1.Query.Question.asker"));
+        } else
+          goto handle_unusual;
+        continue;
+      // uint64 deadline = 4;
+      case 4:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 32)) {
+          _impl_.deadline_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // string chain = 5;
+      case 5:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 42)) {
+          auto str = _internal_mutable_chain();
+          ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(ptr);
+          CHK_(::_pbi::VerifyUTF8(str, "yoke.plugin.v1.Query.Question.chain"));
         } else
           goto handle_unusual;
         continue;
@@ -2780,6 +2852,32 @@ uint8_t* Query_Question::_InternalSerialize(
         2, this->_internal_payload(), target);
   }
 
+  // string asker = 3;
+  if (!this->_internal_asker().empty()) {
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
+      this->_internal_asker().data(), static_cast<int>(this->_internal_asker().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
+      "yoke.plugin.v1.Query.Question.asker");
+    target = stream->WriteStringMaybeAliased(
+        3, this->_internal_asker(), target);
+  }
+
+  // uint64 deadline = 4;
+  if (this->_internal_deadline() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::_pbi::WireFormatLite::WriteUInt64ToArray(4, this->_internal_deadline(), target);
+  }
+
+  // string chain = 5;
+  if (!this->_internal_chain().empty()) {
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
+      this->_internal_chain().data(), static_cast<int>(this->_internal_chain().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
+      "yoke.plugin.v1.Query.Question.chain");
+    target = stream->WriteStringMaybeAliased(
+        5, this->_internal_chain(), target);
+  }
+
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
@@ -2810,6 +2908,25 @@ size_t Query_Question::ByteSizeLong() const {
         this->_internal_payload());
   }
 
+  // string asker = 3;
+  if (!this->_internal_asker().empty()) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+        this->_internal_asker());
+  }
+
+  // string chain = 5;
+  if (!this->_internal_chain().empty()) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+        this->_internal_chain());
+  }
+
+  // uint64 deadline = 4;
+  if (this->_internal_deadline() != 0) {
+    total_size += ::_pbi::WireFormatLite::UInt64SizePlusOne(this->_internal_deadline());
+  }
+
   return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
 }
 
@@ -2833,6 +2950,15 @@ void Query_Question::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const :
   }
   if (!from._internal_payload().empty()) {
     _this->_internal_set_payload(from._internal_payload());
+  }
+  if (!from._internal_asker().empty()) {
+    _this->_internal_set_asker(from._internal_asker());
+  }
+  if (!from._internal_chain().empty()) {
+    _this->_internal_set_chain(from._internal_chain());
+  }
+  if (from._internal_deadline() != 0) {
+    _this->_internal_set_deadline(from._internal_deadline());
   }
   _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
 }
@@ -2861,6 +2987,15 @@ void Query_Question::InternalSwap(Query_Question* other) {
       &_impl_.payload_, lhs_arena,
       &other->_impl_.payload_, rhs_arena
   );
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
+      &_impl_.asker_, lhs_arena,
+      &other->_impl_.asker_, rhs_arena
+  );
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
+      &_impl_.chain_, lhs_arena,
+      &other->_impl_.chain_, rhs_arena
+  );
+  swap(_impl_.deadline_, other->_impl_.deadline_);
 }
 
 ::PROTOBUF_NAMESPACE_ID::Metadata Query_Question::GetMetadata() const {

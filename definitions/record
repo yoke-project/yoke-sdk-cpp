@@ -1,6 +1,6 @@
 module github.com/yoke-project/yoke/proto
-version v0.6.0
-digest h1:whsVO7LZPo7h9I/Gf84qJP3R4DXQeImiTB0uU3eE66c=
+version v0.7.0
+digest h1:ygNXk+XrNOjpsgqH/lAalPDtn+VoHL+NCpbieMevyPs=
 protoc 3.21.12
 grpc_cpp_plugin 1.51.1
 contracts administrative interface plugin
