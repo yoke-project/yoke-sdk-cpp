@@ -6,6 +6,7 @@
 #include <memory>
 #include <optional>
 #include <string>
+#include <system_error>
 #include <vector>
 
 #include <thread>
@@ -13,6 +14,7 @@
 #include <poll.h>
 #include <sys/mman.h>
 #include <sys/socket.h>
+#include <sys/stat.h>
 #include <sys/un.h>
 #include <unistd.h>
 
@@ -702,6 +704,113 @@ void test_on_the_shared_ring_emit_publishes_into_it() {
     REQUIRE(ring.published() == 3, "the refused frame was published");
 }
 
+// std: yoke-sdk-cpp:the-plugin-library.20
+void test_a_declaration_says_what_it_uses_and_the_secrets_it_rewrites() {
+    yp::Declaration calendar{
+        "com.yoke.calendar",
+        {"unit:accounts", "secret:refresh"},
+        {},
+        {},
+        {},
+        {},
+        {
+            {"query.oauth-token.ask", {yp::Governs::use_query, "oauth.token", "accounts"}},
+            {"stream.oauth-status.follow", {yp::Governs::use_stream, "oauth.status", "accounts"}},
+        },
+        {{"accounts", {{"oauth.token"}, {"oauth.status"}}}},
+        {"refresh"},
+    };
+    std::string want = "manifest: 1\n"
+                       "id: \"com.yoke.calendar\"\n"
+                       "protocol: " +
+                       std::to_string(yoke::plugin_contract()) +
+                       "\n"
+                       "needs:\n"
+                       "  - \"unit:accounts\"\n"
+                       "  - \"secret:refresh\"\n"
+                       "uses:\n"
+                       "  \"accounts\":\n"
+                       "    questions:\n"
+                       "      - \"oauth.token\"\n"
+                       "    streams:\n"
+                       "      - \"oauth.status\"\n"
+                       "rewrites:\n"
+                       "  - \"refresh\"\n"
+                       "capabilities:\n"
+                       "  - name: \"query.oauth-token.ask\"\n"
+                       "    governs:\n"
+                       "      use:\n"
+                       "        need: \"accounts\"\n"
+                       "        query: \"oauth.token\"\n"
+                       "  - name: \"stream.oauth-status.follow\"\n"
+                       "    governs:\n"
+                       "      use:\n"
+                       "        need: \"accounts\"\n"
+                       "        stream: \"oauth.status\"\n";
+    std::string got = calendar.manifest();
+    REQUIRE(got == want, "the Manifest generated is\n", got);
+    std::string plain = station.manifest();
+    REQUIRE(plain.find("uses:") == std::string::npos && plain.find("rewrites:") == std::string::npos &&
+                plain.find("use:") == std::string::npos,
+            "a declaration that uses nothing says it does:\n", plain);
+}
+
+// std: yoke-sdk-cpp:the-plugin-library.21
+void test_a_question_surfaces_who_asked_its_deadline_and_its_chain() {
+    Opened o;
+    pluginv1::Envelope e;
+    auto *q = e.mutable_query()->mutable_question();
+    q->set_type("head-status");
+    q->set_asker("unit:archive");
+    q->set_deadline(1795000000123ULL);
+    q->set_chain("0123456789abcdef0123456789abcdef");
+    std::string id = o.ch->send(e);
+    auto question = next_of<yp::Question>(*o.unit);
+    auto ms =
+        std::chrono::duration_cast<std::chrono::milliseconds>(question.deadline.time_since_epoch()).count();
+    REQUIRE(question.id == id && question.asker == "unit:archive" && ms == 1795000000123LL &&
+                question.chain == "0123456789abcdef0123456789abcdef",
+            "the question surfaced is ", question.id, ", asked by ", question.asker, ", by ", ms, ", in ",
+            question.chain);
+    o.unit->answer(question, "42");
+    long i = o.ch->await(pluginv1::Envelope::kQuery, 0, 3000);
+    REQUIRE(i >= 0, "no answer arrived");
+    REQUIRE(o.ch->arrival(static_cast<std::size_t>(i)).correlation_id() == id,
+            "the answer is not correlated to the question");
+}
+
+// std: yoke-sdk-cpp:the-plugin-library.22
+void test_a_secret_the_unit_rewrites_is_replaced_in_place() {
+    namespace fs = std::filesystem;
+    fs::path dir = fs::path(check::dir()) / "secret";
+    fs::create_directories(dir);
+    fs::permissions(dir, fs::perms::owner_all, fs::perm_options::replace);
+    std::string path = (dir / "value").string();
+    std::ofstream(path) << "first";
+    yp::rewrite(path, "second");
+    REQUIRE(check::read(path) == "second", "the value is ", check::read(path));
+    struct stat st {};
+    REQUIRE(::stat(path.c_str(), &st) == 0 && (st.st_mode & 0777) == 0600, "the value's mode is not 0600");
+    int entries = 0;
+    for ([[maybe_unused]] const auto &e : fs::directory_iterator(dir)) {
+        entries++;
+    }
+    REQUIRE(entries == 1, "the directory holds ", entries, " entries, not the value alone");
+    fs::permissions(dir, fs::perms::owner_read | fs::perms::owner_exec, fs::perm_options::replace);
+    if (::access(dir.c_str(), W_OK) != 0) {
+        bool failed = false;
+        try {
+            yp::rewrite(path, "third");
+        } catch (const std::system_error &) {
+            failed = true;
+        }
+        fs::permissions(dir, fs::perms::owner_all, fs::perm_options::replace);
+        REQUIRE(failed, "a rewrite into an unwritable directory succeeded");
+        REQUIRE(check::read(path) == "second", "a failed rewrite left ", check::read(path));
+    }
+    fs::permissions(dir, fs::perms::owner_all, fs::perm_options::replace);
+}
+
 } // namespace
 
 // std: yoke-sdk-cpp:the-plugin-library.19
@@ -740,5 +849,9 @@ int main() {
         {"yoke-sdk-cpp:the-plugin-library.17", test_a_stop_closes_the_transport_and_emit_is_refused_after_it},
         {"yoke-sdk-cpp:the-plugin-library.18", test_on_the_shared_ring_emit_publishes_into_it},
         {"yoke-sdk-cpp:the-plugin-library.19", test_a_unit_is_named_after_its_executable},
+        {"yoke-sdk-cpp:the-plugin-library.20",
+         test_a_declaration_says_what_it_uses_and_the_secrets_it_rewrites},
+        {"yoke-sdk-cpp:the-plugin-library.21", test_a_question_surfaces_who_asked_its_deadline_and_its_chain},
+        {"yoke-sdk-cpp:the-plugin-library.22", test_a_secret_the_unit_rewrites_is_replaced_in_place},
     });
 }

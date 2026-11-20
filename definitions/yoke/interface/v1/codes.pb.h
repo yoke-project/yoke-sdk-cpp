@@ -89,12 +89,17 @@ enum Code : int {
   CODE_UNIT_UNANSWERED = 15,
   CODE_INSTANCE_STOPPING = 16,
   CODE_UNIT_FAILED = 17,
+  CODE_USE_COMMAND = 18,
+  CODE_USE_UNDECLARED = 19,
+  CODE_USE_CAUSE_UNKNOWN = 20,
+  CODE_DEADLINE_EXHAUSTED = 21,
+  CODE_STREAM_HELD = 22,
   Code_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<int32_t>::min(),
   Code_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<int32_t>::max()
 };
 bool Code_IsValid(int value);
 constexpr Code Code_MIN = CODE_UNSPECIFIED;
-constexpr Code Code_MAX = CODE_UNIT_FAILED;
+constexpr Code Code_MAX = CODE_STREAM_HELD;
 constexpr int Code_ARRAYSIZE = Code_MAX + 1;
 
 const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* Code_descriptor();

@@ -1767,6 +1767,7 @@ class Question final :
     kUnitFieldNumber = 1,
     kTypeFieldNumber = 2,
     kPayloadFieldNumber = 3,
+    kCauseFieldNumber = 4,
   };
   // string unit = 1;
   void clear_unit();
@@ -1810,6 +1811,20 @@ class Question final :
   std::string* _internal_mutable_payload();
   public:
 
+  // string cause = 4;
+  void clear_cause();
+  const std::string& cause() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_cause(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_cause();
+  PROTOBUF_NODISCARD std::string* release_cause();
+  void set_allocated_cause(std::string* cause);
+  private:
+  const std::string& _internal_cause() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_cause(const std::string& value);
+  std::string* _internal_mutable_cause();
+  public:
+
   // @@protoc_insertion_point(class_scope:yoke.interface.v1.Question)
  private:
   class _Internal;
@@ -1821,6 +1836,7 @@ class Question final :
     ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr unit_;
     ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr type_;
     ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr payload_;
+    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr cause_;
     mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   };
   union { Impl_ _impl_; };
@@ -5853,6 +5869,56 @@ inline void Question::set_allocated_payload(std::string* payload) {
   }
 #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
   // @@protoc_insertion_point(field_set_allocated:yoke.interface.v1.Question.payload)
+}
+
+// string cause = 4;
+inline void Question::clear_cause() {
+  _impl_.cause_.ClearToEmpty();
+}
+inline const std::string& Question::cause() const {
+  // @@protoc_insertion_point(field_get:yoke.interface.v1.Question.cause)
+  return _internal_cause();
+}
+template <typename ArgT0, typename... ArgT>
+inline PROTOBUF_ALWAYS_INLINE
+void Question::set_cause(ArgT0&& arg0, ArgT... args) {
+ 
+ _impl_.cause_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:yoke.interface.v1.Question.cause)
+}
+inline std::string* Question::mutable_cause() {
+  std::string* _s = _internal_mutable_cause();
+  // @@protoc_insertion_point(field_mutable:yoke.interface.v1.Question.cause)
+  return _s;
+}
+inline const std::string& Question::_internal_cause() const {
+  return _impl_.cause_.Get();
+}
+inline void Question::_internal_set_cause(const std::string& value) {
+  
+  _impl_.cause_.Set(value, GetArenaForAllocation());
+}
+inline std::string* Question::_internal_mutable_cause() {
+  
+  return _impl_.cause_.Mutable(GetArenaForAllocation());
+}
+inline std::string* Question::release_cause() {
+  // @@protoc_insertion_point(field_release:yoke.interface.v1.Question.cause)
+  return _impl_.cause_.Release();
+}
+inline void Question::set_allocated_cause(std::string* cause) {
+  if (cause != nullptr) {
+    
+  } else {
+    
+  }
+  _impl_.cause_.SetAllocated(cause, GetArenaForAllocation());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (_impl_.cause_.IsDefault()) {
+    _impl_.cause_.Set("", GetArenaForAllocation());
+  }
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  // @@protoc_insertion_point(field_set_allocated:yoke.interface.v1.Question.cause)
 }
 
 // -------------------------------------------------------------------

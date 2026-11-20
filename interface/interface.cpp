@@ -518,6 +518,9 @@ struct Delivery::State {
     std::size_t ring_size = 0;
     std::uint32_t slots = 0, capacity = 0;
     std::uint64_t next = 1;
+    // The ring's word moved with nothing published: the Core does so after every stop and every end, and
+    // the lifeline's message is then on its way, so the reader waits for it there.
+    bool woken = false;
 
     void unmap() {
         if (ring != nullptr) {
@@ -650,15 +653,16 @@ std::optional<Frame> Delivery::next() {
         // The lifeline's messages as they come — a ring on one byte, a stop of length zero, the end at its
         // closing. With no ring mapped the lifeline is all there is to wait on; with one, the wait is on the
         // ring's wake word with no bound: the producer wakes it at every frame, and the Core after every
-        // stop and every end the lifeline carries, the message already written, so the lifeline is read
-        // when the word moves and never at an interval.
+        // stop and every end the lifeline carries, so when the word moves with nothing published the lifeline
+        // is waited on, its message on its way, and never read at an interval.
         for (;;) {
             pollfd p{state_->socket, POLLIN, 0};
-            int ready = ::poll(&p, 1, state_->ring != nullptr ? 0 : -1);
+            int ready = ::poll(&p, 1, state_->ring != nullptr && !state_->woken ? 0 : -1);
             if (ready < 0 && errno == EINTR) {
                 continue;
             }
             if (ready > 0) {
+                state_->woken = false;
                 unsigned char head[4];
                 char space[CMSG_SPACE(sizeof(int))];
                 iovec io{head, 4};
@@ -707,10 +711,16 @@ std::optional<Frame> Delivery::next() {
                 auto *wake = reinterpret_cast<std::uint32_t *>(state_->ring + wake_offset);
                 auto seen = __atomic_load_n(wake, __ATOMIC_ACQUIRE);
                 if (auto f = read_ring(*state_)) {
+                    state_->woken = false;
                     return f;
                 }
                 // Shared, not private: the producer and the Core that wake it are other processes.
-                ::syscall(SYS_futex, wake, FUTEX_WAIT, seen, nullptr, nullptr, 0);
+                bool woke = ::syscall(SYS_futex, wake, FUTEX_WAIT, seen, nullptr, nullptr, 0) == 0;
+                if (auto f = read_ring(*state_)) {
+                    return f;
+                }
+                // Woken with nothing published: the wake was the Core's.
+                state_->woken = woke;
             }
         }
     }
@@ -951,7 +961,13 @@ v1::Acknowledged Attachment::command(std::string_view unit, std::string_view typ
 
 std::string Attachment::ask(std::string_view unit, std::string_view type, std::string_view payload,
                             std::chrono::milliseconds wait) {
+    return ask_caused({}, unit, type, payload, wait);
+}
+
+std::string Attachment::ask_caused(std::string_view cause, std::string_view unit, std::string_view type,
+                                   std::string_view payload, std::chrono::milliseconds wait) {
     v1::Request r;
+    r.mutable_query()->set_cause(std::string(cause));
     r.mutable_query()->set_unit(std::string(unit));
     r.mutable_query()->set_type(std::string(type));
     r.mutable_query()->set_payload(std::string(payload));
@@ -1054,6 +1070,112 @@ v1::Reclaimed Attachment::reclaim(std::chrono::milliseconds wait) {
     v1::Request r;
     r.mutable_reclaim();
     return state_->call(std::move(r), wait).reclaim();
+}
+
+// ---- a stream followed ----
+
+namespace {
+
+// Whether a refusal says the unit is not there yet — not running, or running with no Session — which a
+// follow waits out.
+bool returning(const Refusal &r) { return r.code() == "unit.not_running" || r.code() == "unit.no_session"; }
+
+} // namespace
+
+struct Follow::State {
+    Attachment *a;
+    std::string unit, stream;
+    std::vector<v1::UnitStream::Reads> reads;
+    std::unique_ptr<Delivery> current;
+    std::string last;
+    bool closed = false;
+
+    // Starts the stream, where it may, and subscribes to it, until it succeeds, the unit's absence aside.
+    void subscribe() {
+        for (;;) {
+            bool there = true;
+            try {
+                a->start_stream(unit, stream);
+            } catch (const Refusal &r) {
+                // A start refused for any other reason leaves a stream that may flow anyway: the
+                // subscription says.
+                there = !returning(r);
+            }
+            if (there) {
+                try {
+                    current = a->subscribe_stream_reading(unit, stream, reads);
+                    return;
+                } catch (const Refusal &r) {
+                    if (!returning(r)) {
+                        throw;
+                    }
+                }
+            }
+            std::this_thread::sleep_for(follow_retry);
+        }
+    }
+};
+
+Follow::Follow(std::unique_ptr<State> state) : state_(std::move(state)) {}
+
+Follow::~Follow() {
+    try {
+        close();
+    } catch (...) {
+    }
+}
+
+const std::string &Follow::delivery() const { return state_->last; }
+
+std::optional<Frame> Follow::next() {
+    for (;;) {
+        if (state_->closed || !state_->current) {
+            return std::nullopt;
+        }
+        std::optional<Frame> f;
+        try {
+            f = state_->current->next();
+        } catch (const Refusal &r) {
+            if (!returning(r)) {
+                throw;
+            }
+        }
+        if (f) {
+            state_->last = state_->current->id();
+            return f;
+        }
+        // The delivery ended with the unit's Session: what was opened for it is let go, and the stream
+        // followed again.
+        try {
+            state_->current->release();
+        } catch (const Refusal &) {
+        }
+        state_->current.reset();
+        state_->subscribe();
+    }
+}
+
+void Follow::close() {
+    if (state_->closed) {
+        return;
+    }
+    state_->closed = true;
+    if (auto d = std::move(state_->current)) {
+        d->release();
+    }
+}
+
+std::unique_ptr<Follow> Attachment::follow(std::string_view unit, std::string_view stream,
+                                           const std::vector<v1::UnitStream::Reads> &reads) {
+    auto s = std::make_unique<Follow::State>();
+    s->a = this;
+    s->unit = std::string(unit);
+    s->stream = std::string(stream);
+    s->reads = reads.empty() ? std::vector<v1::UnitStream::Reads>{v1::UnitStream::READS_STREAM_SOCKET,
+                                                                  v1::UnitStream::READS_SHARED_OBJECT}
+                             : reads;
+    s->subscribe();
+    return std::unique_ptr<Follow>(new Follow(std::move(s)));
 }
 
 } // namespace yoke::iface

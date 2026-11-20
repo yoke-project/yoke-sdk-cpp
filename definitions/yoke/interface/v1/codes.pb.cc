@@ -127,8 +127,8 @@ const char descriptor_table_protodef_yoke_2finterface_2fv1_2fcodes_2eproto[] PRO
   "sion\030\005 \001(\0132\035.yoke.interface.v1.Suspensio"
   "nH\000B\010\n\006detail\">\n\007Subject\022\014\n\004kind\030\001 \001(\t\022\020"
   "\n\010identity\030\002 \001(\t\022\023\n\013incarnation\030\003 \001(\004\"\'\n"
-  "\nSuspension\022\r\n\005grade\030\001 \001(\t\022\n\n\002by\030\002 \001(\t*\321"
-  "\006\n\004Code\022\024\n\020CODE_UNSPECIFIED\020\000\0225\n\030CODE_OP"
+  "\nSuspension\022\r\n\005grade\030\001 \001(\t\022\n\n\002by\030\002 \001(\t*\264"
+  "\010\n\004Code\022\024\n\020CODE_UNSPECIFIED\020\000\0225\n\030CODE_OP"
   "ERATION_MALFORMED\020\001\032\027\222\265\030\023operation.malfo"
   "rmed\0221\n\026CODE_OPERATION_UNKNOWN\020\002\032\025\222\265\030\021op"
   "eration.unknown\0223\n\027CODE_COMPAT_UNSUPPORT"
@@ -149,17 +149,23 @@ const char descriptor_table_protodef_yoke_2finterface_2fv1_2fcodes_2eproto[] PRO
   "E_UNIT_UNANSWERED\020\017\032\023\222\265\030\017unit.unanswered"
   "\0221\n\026CODE_INSTANCE_STOPPING\020\020\032\025\222\265\030\021instan"
   "ce.stopping\022%\n\020CODE_UNIT_FAILED\020\021\032\017\222\265\030\013u"
-  "nit.failed:1\n\004code\022!.google.protobuf.Enu"
-  "mValueOptions\030\322\206\003 \001(\tBBZ@github.com/yoke"
-  "-project/yoke/proto/yoke/interface/v1;in"
-  "terfacev1b\006proto3"
+  "nit.failed\022%\n\020CODE_USE_COMMAND\020\022\032\017\222\265\030\013us"
+  "e.command\022+\n\023CODE_USE_UNDECLARED\020\023\032\022\222\265\030\016"
+  "use.undeclared\0221\n\026CODE_USE_CAUSE_UNKNOWN"
+  "\020\024\032\025\222\265\030\021use.cause.unknown\0223\n\027CODE_DEADLI"
+  "NE_EXHAUSTED\020\025\032\026\222\265\030\022deadline.exhausted\022%"
+  "\n\020CODE_STREAM_HELD\020\026\032\017\222\265\030\013stream.held:1\n"
+  "\004code\022!.google.protobuf.EnumValueOptions"
+  "\030\322\206\003 \001(\tBBZ@github.com/yoke-project/yoke"
+  "/proto/yoke/interface/v1;interfacev1b\006pr"
+  "oto3"
   ;
 static const ::_pbi::DescriptorTable* const descriptor_table_yoke_2finterface_2fv1_2fcodes_2eproto_deps[1] = {
   &::descriptor_table_google_2fprotobuf_2fdescriptor_2eproto,
 };
 static ::_pbi::once_flag descriptor_table_yoke_2finterface_2fv1_2fcodes_2eproto_once;
 const ::_pbi::DescriptorTable descriptor_table_yoke_2finterface_2fv1_2fcodes_2eproto = {
-    false, false, 1337, descriptor_table_protodef_yoke_2finterface_2fv1_2fcodes_2eproto,
+    false, false, 1564, descriptor_table_protodef_yoke_2finterface_2fv1_2fcodes_2eproto,
     "yoke/interface/v1/codes.proto",
     &descriptor_table_yoke_2finterface_2fv1_2fcodes_2eproto_once, descriptor_table_yoke_2finterface_2fv1_2fcodes_2eproto_deps, 1, 3,
     schemas, file_default_instances, TableStruct_yoke_2finterface_2fv1_2fcodes_2eproto::offsets,
@@ -199,6 +205,11 @@ bool Code_IsValid(int value) {
     case 15:
     case 16:
     case 17:
+    case 18:
+    case 19:
+    case 20:
+    case 21:
+    case 22:
       return true;
     default:
       return false;
