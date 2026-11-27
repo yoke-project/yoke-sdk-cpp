@@ -28,6 +28,7 @@ PROTOBUF_CONSTEXPR Event::Event(
     /*decltype(_impl_.type_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
   , /*decltype(_impl_.occurrence_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
   , /*decltype(_impl_.detail_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
+  , /*decltype(_impl_.line_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
   , /*decltype(_impl_.subject_)*/nullptr
   , /*decltype(_impl_.time_)*/nullptr
   , /*decltype(_impl_.actor_)*/nullptr
@@ -100,6 +101,7 @@ const uint32_t TableStruct_yoke_2fadministrative_2fv1_2fevents_2eproto::offsets[
   PROTOBUF_FIELD_OFFSET(::yoke::administrative::v1::Event, _impl_.occurrence_),
   PROTOBUF_FIELD_OFFSET(::yoke::administrative::v1::Event, _impl_.cause_),
   PROTOBUF_FIELD_OFFSET(::yoke::administrative::v1::Event, _impl_.detail_),
+  PROTOBUF_FIELD_OFFSET(::yoke::administrative::v1::Event, _impl_.line_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::yoke::administrative::v1::Actor, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -124,8 +126,8 @@ const uint32_t TableStruct_yoke_2fadministrative_2fv1_2fevents_2eproto::offsets[
 };
 static const ::_pbi::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, -1, sizeof(::yoke::administrative::v1::Event)},
-  { 15, -1, -1, sizeof(::yoke::administrative::v1::Actor)},
-  { 23, -1, -1, sizeof(::yoke::administrative::v1::Filter)},
+  { 16, -1, -1, sizeof(::yoke::administrative::v1::Actor)},
+  { 24, -1, -1, sizeof(::yoke::administrative::v1::Filter)},
 };
 
 static const ::_pb::Message* const file_default_instances[] = {
@@ -138,20 +140,20 @@ const char descriptor_table_protodef_yoke_2fadministrative_2fv1_2fevents_2eproto
   "\n#yoke/administrative/v1/events.proto\022\026y"
   "oke.administrative.v1\032\037google/protobuf/t"
   "imestamp.proto\032\"yoke/administrative/v1/c"
-  "odes.proto\"\361\001\n\005Event\022\013\n\003seq\030\001 \001(\004\022\014\n\004typ"
+  "odes.proto\"\377\001\n\005Event\022\013\n\003seq\030\001 \001(\004\022\014\n\004typ"
   "e\030\002 \001(\t\0220\n\007subject\030\003 \001(\0132\037.yoke.administ"
   "rative.v1.Subject\022(\n\004time\030\004 \001(\0132\032.google"
   ".protobuf.Timestamp\022,\n\005actor\030\005 \001(\0132\035.yok"
   "e.administrative.v1.Actor\022\020\n\010severity\030\006 "
   "\001(\r\022\022\n\noccurrence\030\007 \001(\t\022\r\n\005cause\030\010 \001(\004\022\016"
-  "\n\006detail\030\t \001(\014\"&\n\005Actor\022\r\n\005class\030\001 \001(\t\022\016"
-  "\n\006person\030\002 \001(\t\"\231\001\n\006Filter\022\024\n\014subject_kin"
-  "d\030\001 \001(\t\022\030\n\020subject_identity\030\002 \001(\t\022\r\n\005flo"
-  "or\030\003 \001(\r\022\014\n\004type\030\004 \001(\t\022\023\n\013type_prefix\030\005 "
-  "\001(\010\022\022\n\noccurrence\030\006 \001(\t\022\031\n\021occurrence_pr"
-  "efix\030\007 \001(\010BLZJgithub.com/yoke-project/yo"
-  "ke/proto/yoke/administrative/v1;administ"
-  "rativev1b\006proto3"
+  "\n\006detail\030\t \001(\014\022\014\n\004line\030\n \001(\t\"&\n\005Actor\022\r\n"
+  "\005class\030\001 \001(\t\022\016\n\006person\030\002 \001(\t\"\231\001\n\006Filter\022"
+  "\024\n\014subject_kind\030\001 \001(\t\022\030\n\020subject_identit"
+  "y\030\002 \001(\t\022\r\n\005floor\030\003 \001(\r\022\014\n\004type\030\004 \001(\t\022\023\n\013"
+  "type_prefix\030\005 \001(\010\022\022\n\noccurrence\030\006 \001(\t\022\031\n"
+  "\021occurrence_prefix\030\007 \001(\010BLZJgithub.com/y"
+  "oke-project/yoke/proto/yoke/administrati"
+  "ve/v1;administrativev1b\006proto3"
   ;
 static const ::_pbi::DescriptorTable* const descriptor_table_yoke_2fadministrative_2fv1_2fevents_2eproto_deps[2] = {
   &::descriptor_table_google_2fprotobuf_2ftimestamp_2eproto,
@@ -159,7 +161,7 @@ static const ::_pbi::DescriptorTable* const descriptor_table_yoke_2fadministrati
 };
 static ::_pbi::once_flag descriptor_table_yoke_2fadministrative_2fv1_2fevents_2eproto_once;
 const ::_pbi::DescriptorTable descriptor_table_yoke_2fadministrative_2fv1_2fevents_2eproto = {
-    false, false, 656, descriptor_table_protodef_yoke_2fadministrative_2fv1_2fevents_2eproto,
+    false, false, 670, descriptor_table_protodef_yoke_2fadministrative_2fv1_2fevents_2eproto,
     "yoke/administrative/v1/events.proto",
     &descriptor_table_yoke_2fadministrative_2fv1_2fevents_2eproto_once, descriptor_table_yoke_2fadministrative_2fv1_2fevents_2eproto_deps, 2, 3,
     schemas, file_default_instances, TableStruct_yoke_2fadministrative_2fv1_2fevents_2eproto::offsets,
@@ -222,6 +224,7 @@ Event::Event(const Event& from)
       decltype(_impl_.type_){}
     , decltype(_impl_.occurrence_){}
     , decltype(_impl_.detail_){}
+    , decltype(_impl_.line_){}
     , decltype(_impl_.subject_){nullptr}
     , decltype(_impl_.time_){nullptr}
     , decltype(_impl_.actor_){nullptr}
@@ -255,6 +258,14 @@ Event::Event(const Event& from)
     _this->_impl_.detail_.Set(from._internal_detail(), 
       _this->GetArenaForAllocation());
   }
+  _impl_.line_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.line_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (!from._internal_line().empty()) {
+    _this->_impl_.line_.Set(from._internal_line(), 
+      _this->GetArenaForAllocation());
+  }
   if (from._internal_has_subject()) {
     _this->_impl_.subject_ = new ::yoke::administrative::v1::Subject(*from._impl_.subject_);
   }
@@ -278,6 +289,7 @@ inline void Event::SharedCtor(
       decltype(_impl_.type_){}
     , decltype(_impl_.occurrence_){}
     , decltype(_impl_.detail_){}
+    , decltype(_impl_.line_){}
     , decltype(_impl_.subject_){nullptr}
     , decltype(_impl_.time_){nullptr}
     , decltype(_impl_.actor_){nullptr}
@@ -298,6 +310,10 @@ inline void Event::SharedCtor(
   #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
     _impl_.detail_.Set("", GetArenaForAllocation());
   #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  _impl_.line_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.line_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
 }
 
 Event::~Event() {
@@ -314,6 +330,7 @@ inline void Event::SharedDtor() {
   _impl_.type_.Destroy();
   _impl_.occurrence_.Destroy();
   _impl_.detail_.Destroy();
+  _impl_.line_.Destroy();
   if (this != internal_default_instance()) delete _impl_.subject_;
   if (this != internal_default_instance()) delete _impl_.time_;
   if (this != internal_default_instance()) delete _impl_.actor_;
@@ -332,6 +349,7 @@ void Event::Clear() {
   _impl_.type_.ClearToEmpty();
   _impl_.occurrence_.ClearToEmpty();
   _impl_.detail_.ClearToEmpty();
+  _impl_.line_.ClearToEmpty();
   if (GetArenaForAllocation() == nullptr && _impl_.subject_ != nullptr) {
     delete _impl_.subject_;
   }
@@ -433,6 +451,16 @@ const char* Event::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
         } else
           goto handle_unusual;
         continue;
+      // string line = 10;
+      case 10:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 82)) {
+          auto str = _internal_mutable_line();
+          ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(ptr);
+          CHK_(::_pbi::VerifyUTF8(str, "yoke.administrative.v1.Event.line"));
+        } else
+          goto handle_unusual;
+        continue;
       default:
         goto handle_unusual;
     }  // switch
@@ -527,6 +555,16 @@ uint8_t* Event::_InternalSerialize(
         9, this->_internal_detail(), target);
   }
 
+  // string line = 10;
+  if (!this->_internal_line().empty()) {
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
+      this->_internal_line().data(), static_cast<int>(this->_internal_line().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
+      "yoke.administrative.v1.Event.line");
+    target = stream->WriteStringMaybeAliased(
+        10, this->_internal_line(), target);
+  }
+
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
@@ -562,6 +600,13 @@ size_t Event::ByteSizeLong() const {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::BytesSize(
         this->_internal_detail());
+  }
+
+  // string line = 10;
+  if (!this->_internal_line().empty()) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+        this->_internal_line());
   }
 
   // .yoke.administrative.v1.Subject subject = 3;
@@ -627,6 +672,9 @@ void Event::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF
   if (!from._internal_detail().empty()) {
     _this->_internal_set_detail(from._internal_detail());
   }
+  if (!from._internal_line().empty()) {
+    _this->_internal_set_line(from._internal_line());
+  }
   if (from._internal_has_subject()) {
     _this->_internal_mutable_subject()->::yoke::administrative::v1::Subject::MergeFrom(
         from._internal_subject());
@@ -678,6 +726,10 @@ void Event::InternalSwap(Event* other) {
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
       &_impl_.detail_, lhs_arena,
       &other->_impl_.detail_, rhs_arena
+  );
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
+      &_impl_.line_, lhs_arena,
+      &other->_impl_.line_, rhs_arena
   );
   ::PROTOBUF_NAMESPACE_ID::internal::memswap<
       PROTOBUF_FIELD_OFFSET(Event, _impl_.severity_)

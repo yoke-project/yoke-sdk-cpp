@@ -196,6 +196,7 @@ class Event final :
     kTypeFieldNumber = 2,
     kOccurrenceFieldNumber = 7,
     kDetailFieldNumber = 9,
+    kLineFieldNumber = 10,
     kSubjectFieldNumber = 3,
     kTimeFieldNumber = 4,
     kActorFieldNumber = 5,
@@ -243,6 +244,20 @@ class Event final :
   const std::string& _internal_detail() const;
   inline PROTOBUF_ALWAYS_INLINE void _internal_set_detail(const std::string& value);
   std::string* _internal_mutable_detail();
+  public:
+
+  // string line = 10;
+  void clear_line();
+  const std::string& line() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_line(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_line();
+  PROTOBUF_NODISCARD std::string* release_line();
+  void set_allocated_line(std::string* line);
+  private:
+  const std::string& _internal_line() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_line(const std::string& value);
+  std::string* _internal_mutable_line();
   public:
 
   // .yoke.administrative.v1.Subject subject = 3;
@@ -337,6 +352,7 @@ class Event final :
     ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr type_;
     ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr occurrence_;
     ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr detail_;
+    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr line_;
     ::yoke::administrative::v1::Subject* subject_;
     ::PROTOBUF_NAMESPACE_ID::Timestamp* time_;
     ::yoke::administrative::v1::Actor* actor_;
@@ -1230,6 +1246,56 @@ inline void Event::set_allocated_detail(std::string* detail) {
   }
 #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
   // @@protoc_insertion_point(field_set_allocated:yoke.administrative.v1.Event.detail)
+}
+
+// string line = 10;
+inline void Event::clear_line() {
+  _impl_.line_.ClearToEmpty();
+}
+inline const std::string& Event::line() const {
+  // @@protoc_insertion_point(field_get:yoke.administrative.v1.Event.line)
+  return _internal_line();
+}
+template <typename ArgT0, typename... ArgT>
+inline PROTOBUF_ALWAYS_INLINE
+void Event::set_line(ArgT0&& arg0, ArgT... args) {
+ 
+ _impl_.line_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:yoke.administrative.v1.Event.line)
+}
+inline std::string* Event::mutable_line() {
+  std::string* _s = _internal_mutable_line();
+  // @@protoc_insertion_point(field_mutable:yoke.administrative.v1.Event.line)
+  return _s;
+}
+inline const std::string& Event::_internal_line() const {
+  return _impl_.line_.Get();
+}
+inline void Event::_internal_set_line(const std::string& value) {
+  
+  _impl_.line_.Set(value, GetArenaForAllocation());
+}
+inline std::string* Event::_internal_mutable_line() {
+  
+  return _impl_.line_.Mutable(GetArenaForAllocation());
+}
+inline std::string* Event::release_line() {
+  // @@protoc_insertion_point(field_release:yoke.administrative.v1.Event.line)
+  return _impl_.line_.Release();
+}
+inline void Event::set_allocated_line(std::string* line) {
+  if (line != nullptr) {
+    
+  } else {
+    
+  }
+  _impl_.line_.SetAllocated(line, GetArenaForAllocation());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (_impl_.line_.IsDefault()) {
+    _impl_.line_.Set("", GetArenaForAllocation());
+  }
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  // @@protoc_insertion_point(field_set_allocated:yoke.administrative.v1.Event.line)
 }
 
 // -------------------------------------------------------------------
