@@ -134,3 +134,16 @@
 | **Precondition** | a Core whose opening picture holds the channel's own record, suspended, dark, by `panel`; and whose standing subscription then carries `channel.resumed` and `channel.suspended`, read-only, by `bench` |
 | **Action** | attach, and record each change of the suspension |
 | **Expected** | the document reads three changes: dark by `panel`, then active, then read-only by `bench`, each with its reason; it is attached throughout; nothing was asked of the Core to learn them |
+
+## yoke-sdk-cpp:the-qml-binding.11 — an event's line reaches the document
+
+| Field | Value |
+| --- | --- |
+| **Cites** | specs/31.3 · arch/45-events/01 §The nine fields |
+| **Level** | L1 |
+| **Method** | test |
+| **Not applicable in** | — |
+| **Label** | blocking |
+| **Precondition** | a Core whose standing subscription carries an occurrence with the line `the head is drifting` |
+| **Action** | attach, and record the line of the event received |
+| **Expected** | the document reads `the head is drifting` as the event's `line` |

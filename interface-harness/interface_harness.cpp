@@ -77,7 +77,8 @@ json event(const v1::Event &e) {
             {"type", e.type()},
             {"subject_kind", e.subject().kind()},
             {"subject", e.subject().identity()},
-            {"severity", e.severity()}};
+            {"severity", e.severity()},
+            {"line", e.line()}};
 }
 
 // A refusal as its code and what it names; anything else the library failed with is a failure the

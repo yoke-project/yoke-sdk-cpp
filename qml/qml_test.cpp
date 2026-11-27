@@ -531,6 +531,27 @@ void test_a_suspended_channel_is_a_property_with_the_channel_that_prevails() {
     REQUIRE(c.requests().empty(), "the binding asked the Core something to learn the suspension");
 }
 
+// std: yoke-sdk-cpp:the-qml-binding.11
+void test_an_events_line_reaches_the_document() {
+    Core c;
+    c.opening = opening_at(1);
+    iv1::CoreFrame reported = event_at(5);
+    reported.mutable_event()->set_type("unit.occurrence.reported");
+    reported.mutable_event()->set_line("the head is drifting");
+    c.standing = {reported};
+    Served s(c);
+    Engine e;
+    auto doc = e.load("Attachment {\n"
+                      "  address: " +
+                      as_qml_string(s.path) +
+                      "\n"
+                      "  property string seen: ''\n"
+                      "  onReceived: (event) => seen = event.line\n"
+                      "}");
+    REQUIRE(until([&] { return !str(get(doc, "seen")).empty(); }), "no event reached the document");
+    REQUIRE(str(get(doc, "seen")) == "the head is drifting", "the event's line read ", str(get(doc, "seen")));
+}
+
 int main() {
     // Qt reads its text as UTF-8 and says so where the locale does not; the cases' lines are the record's.
     setenv("LC_ALL", "C.UTF-8", 1);
@@ -548,5 +569,6 @@ int main() {
          test_an_attachment_the_document_asks_for_again_is_attached_when_the_channel_is_back},
         {"yoke-sdk-cpp:the-qml-binding.10",
          test_a_suspended_channel_is_a_property_with_the_channel_that_prevails},
+        {"yoke-sdk-cpp:the-qml-binding.11", test_an_events_line_reaches_the_document},
     });
 }
